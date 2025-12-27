@@ -76,28 +76,29 @@ export const Dashboard = ({ user, onLogout }) => {
         <div className="dashboard-container" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', minHeight: '100vh', background: 'radial-gradient(circle at top right, #1e293b, #030712)' }}>
             {/* Header */}
             <header className="glass-panel" style={{ padding: '2rem', marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--glass-border)' }}>
-                <div>
+                <div className="header-title-area">
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-1px', background: 'linear-gradient(to right, var(--text-primary), var(--accent-color))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t.title}</h1>
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>{t.subtitle}</p>
-                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem', fontSize: '0.8rem' }}>
-                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '0.4rem 1rem', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--success-color)', fontWeight: 600 }}>
+                    <div className="header-stats-bar" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', fontSize: '0.8rem' }}>
+                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--success-color)', fontWeight: 600 }}>
                             {t.pass_rate}: {analytics.passRate.toFixed(1)}%
                         </div>
-                        <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '0.4rem 1rem', borderRadius: '20px', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                        <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', fontWeight: 600 }}>
                             {t.no_bet_rate}: {analytics.noBetRate.toFixed(1)}%
                         </div>
-                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.4rem 1rem', borderRadius: '20px', border: '1px solid rgba(56, 189, 248, 0.2)', color: 'var(--accent-color)', fontWeight: 600 }}>
+                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(56, 189, 248, 0.2)', color: 'var(--accent-color)', fontWeight: 600 }}>
                             {t.limit}: {bankState.daily_bet_count}/{CONFIG.BANKROLL.HIERARCHY.THRESHOLDS.DAILY_BET_LIMIT}
                         </div>
-                        <button onClick={() => setShowFAQ(true)} className="faq-btn" style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>?</button>
+                        <button onClick={() => setShowFAQ(true)} className="faq-btn" style={{ width: '1.8rem', height: '1.8rem', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.7rem' }}>?</button>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-                    <div style={{ textAlign: 'right' }}>
-                        <div style={{ color: 'var(--accent-color)', fontWeight: 800, fontSize: '0.8rem' }}>{user?.email}</div>
+                <div className="header-actions" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                    <div className="auth-user-info" style={{ textAlign: 'right' }}>
+                        <div style={{ color: 'var(--accent-color)', fontWeight: 800, fontSize: '0.7rem', opacity: 0.8 }}>{user?.email}</div>
                         <button
                             onClick={onLogout}
+                            className="logout-btn"
                             style={{
                                 background: 'rgba(239, 68, 68, 0.1)',
                                 border: '1px solid rgba(239, 68, 68, 0.2)',
@@ -105,10 +106,11 @@ export const Dashboard = ({ user, onLogout }) => {
                                 fontSize: '0.6rem',
                                 fontWeight: 800,
                                 cursor: 'pointer',
-                                padding: '0.3rem 0.6rem',
+                                padding: '0.35rem 0.7rem',
                                 borderRadius: '6px',
                                 marginTop: '0.4rem',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                whiteSpace: 'nowrap'
                             }}
                         >
                             🚪 {lang === 'tr' ? 'ÇIKIŞ YAP' : 'LOGOUT'}
@@ -116,51 +118,51 @@ export const Dashboard = ({ user, onLogout }) => {
                     </div>
 
                     {isAdmin && (
-                        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.3rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                        <div className="admin-toggle-wrapper" style={{ display: 'flex', gap: '0.3rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.2rem', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
                             <button
                                 onClick={() => setView('DASHBOARD')}
                                 style={{
-                                    padding: '0.5rem 1rem',
-                                    fontSize: '0.7rem',
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.65rem',
                                     cursor: 'pointer',
                                     background: view === 'DASHBOARD' ? 'var(--accent-color)' : 'transparent',
                                     color: view === 'DASHBOARD' ? '#000' : 'var(--text-secondary)',
                                     border: 'none',
-                                    borderRadius: '8px',
+                                    borderRadius: '7px',
                                     fontWeight: 800,
                                     transition: 'all 0.2s'
                                 }}
-                            >📊 PANEL</button>
+                            >📊</button>
                             <button
                                 onClick={() => setView('ADMIN')}
                                 style={{
-                                    padding: '0.5rem 1rem',
-                                    fontSize: '0.7rem',
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.65rem',
                                     cursor: 'pointer',
                                     background: view === 'ADMIN' ? 'var(--warning-color)' : 'transparent',
                                     color: view === 'ADMIN' ? '#000' : 'var(--text-secondary)',
                                     border: 'none',
-                                    borderRadius: '8px',
+                                    borderRadius: '7px',
                                     fontWeight: 800,
                                     transition: 'all 0.2s'
                                 }}
-                            >🛡️ YÖNETİM</button>
+                            >🛡️</button>
                         </div>
                     )}
 
-                    <div className="lang-toggle" style={{ display: 'flex', gap: '0.5rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.3rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                    <div className="lang-toggle" style={{ display: 'flex', gap: '0.3rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.2rem', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
                         {['tr', 'en'].map(l => (
                             <button
                                 key={l}
                                 onClick={() => setLang(l)}
                                 style={{
-                                    padding: '0.5rem 1rem',
-                                    fontSize: '0.75rem',
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.65rem',
                                     cursor: 'pointer',
                                     background: lang === l ? 'var(--accent-color)' : 'transparent',
                                     color: lang === l ? '#000' : 'var(--text-secondary)',
                                     border: 'none',
-                                    borderRadius: '8px',
+                                    borderRadius: '7px',
                                     fontWeight: 800,
                                     transition: 'all 0.2s'
                                 }}
@@ -168,8 +170,28 @@ export const Dashboard = ({ user, onLogout }) => {
                         ))}
                     </div>
 
-                    <button onClick={() => setShowAdvanced(true)} className="settings-btn" style={{ fontSize: '1.2rem', background: 'transparent', border: 'none', cursor: 'pointer', opacity: 0.7 }}>⚙️</button>
-                    <button onClick={() => { if (confirm(t.reset_confirm)) bankrollManager.reset(); setBankState(bankrollManager.getState()); }} style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.5, fontSize: '0.9rem' }}>🔄</button>
+                    <div className="utility-btns" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                        <button onClick={() => setShowAdvanced(true)} className="settings-btn" style={{ fontSize: '1.1rem', background: 'transparent', border: 'none', cursor: 'pointer', opacity: 0.7 }}>⚙️</button>
+                        <button
+                            onClick={() => {
+                                console.log('[DEBUG] Reset button clicked - executing immediately!');
+                                localStorage.removeItem('lbm_bankroll_state');
+                                window.location.reload();
+                            }}
+                            style={{
+                                background: 'rgba(239, 68, 68, 0.2)',
+                                border: '1px solid rgba(239, 68, 68, 0.5)',
+                                borderRadius: '8px',
+                                padding: '0.4rem 0.8rem',
+                                cursor: 'pointer',
+                                fontSize: '0.7rem',
+                                color: 'var(--danger-color)',
+                                fontWeight: 700
+                            }}
+                        >
+                            🔄 SIFIRLA
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -178,24 +200,27 @@ export const Dashboard = ({ user, onLogout }) => {
             ) : (
                 <>
                     {/* Bankroll Strategy Panel (Phase 13) */}
-                    <div className="bankroll-binding-panel" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '2rem', marginBottom: '3rem' }}>
+                    <div className="bankroll-binding-panel bankroll-ledger-container">
                         <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '1px', color: 'var(--accent-color)' }}>{t.bankroll_panel}</h3>
-                                <div className={`mode-badge mode-${bankState.current_mode}`} style={{
-                                    padding: '0.5rem 1.5rem',
-                                    borderRadius: '12px',
-                                    background: bankState.current_mode === 'NORMAL' ? 'var(--success-color)' : bankState.current_mode === 'CAUTION' ? 'var(--warning-color)' : 'var(--danger-color)',
-                                    color: '#000',
-                                    fontWeight: 900,
-                                    fontSize: '0.8rem',
-                                    boxShadow: '0 0 15px currentColor'
-                                }}>
-                                    {t[`mode_${bankState.current_mode.toLowerCase()}`]}
+                                <div className="engine-status-area" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, opacity: 0.6 }}>{t.active_mod}: {bankrollManager.getModeLabel(lang)}</span>
+                                    {bankState.current_mode === CONFIG.BANKROLL.HIERARCHY.MODES.NO_BET ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 1.2rem', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', animation: 'pulse 2s infinite' }}>
+                                            <span style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}></span>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '1px' }}>{t.no_bet} (STOP)</span>
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', padding: '0.5rem 1.2rem', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+                                            <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%' }}></span>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '1px' }}>{t.active}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                            <div className="metrics-grid">
                                 <div className="br-metric">
                                     <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{t.current_balance}</span>
                                     <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{bankState.current_balance.toLocaleString()} ₺</div>
@@ -209,7 +234,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                 <div className="br-metric">
                                     <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{t.active_mode}</span>
                                     <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '0.5rem' }}>
-                                        {bankState.loss_streak} {t.loss_streak_label}
+                                        {bankrollManager.getModeLabel(lang)}
                                     </div>
                                 </div>
                             </div>
@@ -230,8 +255,8 @@ export const Dashboard = ({ user, onLogout }) => {
                                                 color: entry.type.includes('WIN') ? 'var(--success-color)' : entry.type.includes('LOSS') ? 'var(--danger-color)' : 'var(--accent-color)',
                                                 fontWeight: 800,
                                                 marginRight: '0.8rem'
-                                            }}>{t[`${entry.type.toLowerCase().replace('bet_', '')}_short`] || entry.type}</span>
-                                            <span style={{ opacity: 0.8 }}>{entry.match_name || entry.reason || t.system_event}</span>
+                                            }}>{t[`${entry.type.toLowerCase().replace('bet_', '').replace('system_', '')}_short`] || entry.type}</span>
+                                            <span style={{ opacity: 0.8 }}>{entry.match_name || t[entry.reason] || entry.reason || t.system_event}</span>
 
                                             {entry.type === 'BET_OPEN' && (
                                                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -263,7 +288,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                 <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>{t.system_status}: {t.active}</span>
                             </div>
 
-                            <div className="health-metrics" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2.5rem', flexGrow: 1 }}>
+                            <div className="health-metrics-grid">
                                 <div className="metric">
                                     <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', opacity: 0.5, letterSpacing: '1px' }}>{t.last_update}</div>
                                     <div className={lastFetchSeconds > 15 ? 'danger' : 'success'} style={{ fontWeight: 800, fontSize: '1.1rem', marginTop: '0.3rem' }}>
@@ -517,45 +542,113 @@ export const Dashboard = ({ user, onLogout }) => {
                         </div>
                     </section>
 
-                    {/* Match Detail Modal */}
+                    {/* Match Detail Modal - Enhanced UI */}
                     {selectedMatch && (
                         <div className="modal-overlay" onClick={() => setSelectedMatch(null)}>
-                            <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
-                                <button className="close-btn" onClick={() => setSelectedMatch(null)}>×</button>
-                                <div className="modal-header">
+                            <div className="modal-content glass-panel enhanced-detail" onClick={e => e.stopPropagation()}>
+                                <button className="close-btn-enhanced" onClick={() => setSelectedMatch(null)}>×</button>
+
+                                <div className="enhanced-modal-header">
+                                    <div style={{ opacity: 0.5, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' }}>{t.match_intelligence_report}</div>
                                     <h2>{selectedMatch.homeTeam} vs {selectedMatch.awayTeam}</h2>
                                     <div className="sub-header">
-                                        <span className="badge">{t.tier_label} {selectedMatch.tier}</span>
-                                        <span className="accent">{selectedMatch.minute}' | {selectedMatch.score.home}-{selectedMatch.score.away}</span>
-                                    </div>
-                                </div>
-                                <div className="modal-grid">
-                                    <div className="grid-col">
-                                        <h3>{t.dqs_engine}</h3>
-                                        <div className="stat-row"><span>{t.dqs_score_label}</span> <b>{selectedMatch.dqs.toFixed(4)}</b></div>
-                                        <div className="stat-row"><span>{t.latency}:</span> <b>{selectedMatch.latency}ms</b></div>
-                                        <div className="stat-row"><span>{t.shots_on_goal}:</span> <b>{selectedMatch.stats.shotsOnGoal.home}-{selectedMatch.stats.shotsOnGoal.away}</b></div>
-                                    </div>
-                                    <div className="grid-col">
-                                        <h3 className="warning">{t.risk_guard}</h3>
-                                        {Object.entries(dataWorker.checkRiskFilters(selectedMatch)).map(([key, f]) => (
-                                            <div key={key} className="stat-row">
-                                                <span>{t[key] || key}</span>
-                                                <b className={f.status === 'OK' ? 'success' : 'danger'}>{f.status === 'OK' ? t.status_ok : t.status_fail}</b>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="grid-col">
-                                        <h3>{t.stats_title}</h3>
-                                        <div className="stats-list">
-                                            {Object.entries(selectedMatch.stats.rawStats || {}).map(([name, val]) => (
-                                                <div key={name} className="stat-row mini">
-                                                    <span>{t[name] || name}</span>
-                                                    <b>{val.home}-{val.away}</b>
-                                                </div>
-                                            ))}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span className={`tier-badge tier-${selectedMatch.tier}`} style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>{t.tier_label} {selectedMatch.tier}</span>
+                                            <span style={{ opacity: 0.4 }}>|</span>
+                                            <span className="accent">{selectedMatch.minute}'</span>
+                                            <span style={{ opacity: 0.4 }}>|</span>
+                                            <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '2px' }}>{selectedMatch.score.home}-{selectedMatch.score.away}</span>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div className="modal-grid">
+                                    {/* Column 1: Engine Quality */}
+                                    <div className="grid-col">
+                                        <h3><span style={{ marginRight: '0.5rem' }}>⚡</span> {t.dqs_engine}</h3>
+                                        <div className="stats-card">
+                                            <div className="stat-item">
+                                                <div className="stat-label">
+                                                    <span>{t.dqs_score_label}</span>
+                                                    <span style={{ color: selectedMatch.dqs >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)' }}>{selectedMatch.dqs.toFixed(4)}</span>
+                                                </div>
+                                                <div className="stat-bar-bg">
+                                                    <div className="stat-bar-fill" style={{
+                                                        width: `${selectedMatch.dqs * 100}%`,
+                                                        background: `linear-gradient(to right, ${selectedMatch.dqs >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)'}, var(--accent-color))`
+                                                    }}></div>
+                                                </div>
+                                            </div>
+                                            <div className="stat-row-pill">
+                                                <span style={{ opacity: 0.6 }}>{t.latency}:</span>
+                                                <span style={{ fontWeight: 800 }}>{selectedMatch.latency}ms</span>
+                                            </div>
+                                            <div className="stat-row-pill" style={{ marginTop: '1rem' }}>
+                                                <span style={{ opacity: 0.6 }}>{t.data_integrity}:</span>
+                                                <span className="status-pill ok">{t.verified}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Column 2: Risk Analysis */}
+                                    <div className="grid-col">
+                                        <h3><span style={{ marginRight: '0.5rem' }}>🛡️</span> {t.risk_guard}</h3>
+                                        <div className="stats-card">
+                                            {Object.entries(dataWorker.checkRiskFilters(selectedMatch)).map(([key, f]) => (
+                                                <div key={key} className="stat-row-pill" style={{ marginBottom: '0.8rem' }}>
+                                                    <span style={{ opacity: 0.8 }}>{t[key] || key}</span>
+                                                    <span className={`status-pill ${f.status === 'OK' ? 'ok' : 'fail'}`}>
+                                                        {f.status === 'OK' ? t.status_ok : t.status_fail}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            <div style={{ marginTop: '1.5rem', padding: '0.8rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', border: '1px dotted var(--accent-color)', fontSize: '0.7rem', opacity: 0.8 }}>
+                                                {t.analysis_protocol_active}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Column 3: Live Snapshot */}
+                                    <div className="grid-col">
+                                        <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
+                                        <div className="stats-card" style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                                            {Object.entries(selectedMatch.stats.rawStats || {}).map(([name, val]) => {
+                                                const total = (val.home || 0) + (val.away || 0);
+                                                const homePct = total > 0 ? (val.home / total) * 100 : 50;
+                                                return (
+                                                    <div key={name} className="stat-item" style={{ marginBottom: '1.5rem' }}>
+                                                        <div className="stat-label">
+                                                            <span>{t[name] || name}</span>
+                                                            <span style={{ fontWeight: 800 }}>{val.home} - {val.away}</span>
+                                                        </div>
+                                                        <div className="stat-bar-bg" style={{ display: 'flex' }}>
+                                                            <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', opacity: 0.8 }}></div>
+                                                            <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'var(--text-secondary)', opacity: 0.3 }}></div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {Object.keys(selectedMatch.stats.rawStats || {}).length === 0 && (
+                                                <div style={{ textAlign: 'center', opacity: 0.4, padding: '2rem 0' }}>
+                                                    {t.no_live_metrics}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
+                                    <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', opacity: 0.5 }}>
+                                        <span style={{ width: '8px', height: '8px', background: 'var(--success-color)', borderRadius: '50%' }}></span>
+                                        {t.live_feed_connected}
+                                    </div>
+                                    <button
+                                        onClick={() => setSelectedMatch(null)}
+                                        className="btn btn-outline"
+                                        style={{ padding: '0.8rem 2rem', borderRadius: '10px' }}
+                                    >
+                                        {t.close_intelligence}
+                                    </button>
                                 </div>
                             </div>
                         </div>

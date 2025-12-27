@@ -4,6 +4,7 @@
  */
 
 import { CONFIG } from '../config';
+import { translations } from '../locales/translations';
 
 class BankrollManager {
     constructor() {
@@ -43,7 +44,7 @@ class BankrollManager {
                     this.state.daily_loss_count = 0;
                     this.state.last_reset_date = today;
                     this.saveState();
-                    this.addToLedger('SYSTEM_RESET', { reason: 'New Day Started' });
+                    this.addToLedger('SYSTEM_RESET', { reason: 'new_day_reason' });
                 }
             } catch (e) {
                 console.error('Error parsing bankroll state, resetting to default', e);
@@ -52,7 +53,10 @@ class BankrollManager {
         } else {
             this.state = defaultState;
             this.saveState();
-            this.addToLedger('SYSTEM_INIT', { balance: defaultState.starting_balance });
+            this.addToLedger('SYSTEM_INIT', {
+                balance: defaultState.starting_balance,
+                reason: 'system_init_reason'
+            });
         }
     }
 
@@ -116,7 +120,7 @@ class BankrollManager {
 
         this.addToLedger('BET_OPEN', {
             match_id: fixture.id,
-            match_name: `${fixture.homeName} vs ${fixture.awayName}`,
+            match_name: `${fixture.homeTeam} vs ${fixture.awayTeam}`,
             league: fixture.leagueName,
             tier: fixture.tier,
             stake_amount: approvedStake,
@@ -150,6 +154,7 @@ class BankrollManager {
 
         this.addToLedger(isWin ? 'BET_WIN' : 'BET_LOSS', {
             match_id: matchId,
+            match_name: this.state.ledger.find(l => l.match_id === matchId)?.match_name || 'Match',
             stake,
             profit,
             balance_before: balanceBefore,
@@ -179,13 +184,22 @@ class BankrollManager {
             this.addToLedger('MODE_CHANGE', {
                 from: prevMode,
                 to: newMode,
-                reason: `Triggered by ${newMode === h.MODES.NO_BET ? 'STOP' : 'CAUTION'} rules`
+                reason: newMode === h.MODES.NO_BET ? 'stop_rules_reason' : 'caution_rules_reason'
             });
         }
     }
 
     getState() {
         return this.state;
+    }
+
+    getModeLabel(lang) {
+        const mode = this.state.current_mode;
+        const t = translations[lang] || translations['tr'];
+        if (mode === CONFIG.BANKROLL.HIERARCHY.MODES.NORMAL) return t.mode_normal;
+        if (mode === CONFIG.BANKROLL.HIERARCHY.MODES.CAUTION) return t.mode_caution;
+        if (mode === CONFIG.BANKROLL.HIERARCHY.MODES.NO_BET) return t.mode_no_bet;
+        return mode;
     }
 
     reset() {

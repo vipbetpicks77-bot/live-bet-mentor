@@ -18,16 +18,8 @@ export const FAQ = ({ onClose, lang = 'tr' }) => {
             zIndex: 2000,
             backdropFilter: 'blur(20px)'
         }}>
-            <div className="glass-panel" style={{
-                width: '95%',
-                maxWidth: '1000px',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                padding: '4rem',
-                border: '1px solid var(--accent-color)',
-                position: 'relative',
+            <div className="glass-panel faq-modal-content" style={{
                 animation: 'modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                background: 'radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), rgba(3, 7, 18, 0.98))'
             }}>
                 <button
                     onClick={onClose}
@@ -59,7 +51,7 @@ export const FAQ = ({ onClose, lang = 'tr' }) => {
                     <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '1.1rem' }}>{t.faq_subtitle}</p>
                 </div>
 
-                <div style={{ display: 'grid', gap: '3.5rem' }}>
+                <div className="faq-grid">
                     {/* DQS Section */}
                     <section>
                         <h2 style={{ color: 'var(--accent-color)', fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -83,7 +75,7 @@ export const FAQ = ({ onClose, lang = 'tr' }) => {
                         <p style={{ lineHeight: '1.8', color: 'var(--text-secondary)', fontSize: '1rem' }}>
                             {t.faq_q2_desc}
                         </p>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+                        <div className="faq-bankroll-grid">
                             <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
                                 <h3 style={{ fontSize: '1.1rem', marginBottom: '0.8rem', color: 'var(--warning-color)', fontWeight: 800 }}>{t.faq_momentum_title}</h3>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: '1.6' }}>{t.faq_momentum_desc}</p>
@@ -132,7 +124,7 @@ export const FAQ = ({ onClose, lang = 'tr' }) => {
                             <span style={{ width: '8px', height: '24px', background: 'var(--accent-color)', borderRadius: '4px' }}></span>
                             {t.bankroll_panel} (FAQ)
                         </h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+                        <div className="faq-bankroll-grid">
                             <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(56, 189, 248, 0.02)' }}>
                                 <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '0.8rem' }}>{t.faq_bankroll_q1_title}</h3>
                                 <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_bankroll_q1_desc}</p>
@@ -191,7 +183,7 @@ export const FAQ = ({ onClose, lang = 'tr' }) => {
                             {t.faq_q7_desc}
                         </p>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+                        <div className="faq-modules-grid">
                             {/* xG */}
                             <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(56, 189, 248, 0.02)' }}>
                                 <h3 style={{ fontSize: '1.2rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '1rem' }}>{t.faq_q8_title}</h3>
