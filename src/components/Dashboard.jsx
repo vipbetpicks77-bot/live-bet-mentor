@@ -99,18 +99,19 @@ export const Dashboard = ({ user, onLogout }) => {
                         <button
                             onClick={onLogout}
                             style={{
-                                background: 'none',
-                                border: 'none',
-                                color: 'rgba(239, 68, 68, 0.7)',
-                                fontSize: '0.65rem',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                color: '#ef4444',
+                                fontSize: '0.6rem',
                                 fontWeight: 800,
                                 cursor: 'pointer',
-                                padding: 0,
-                                marginTop: '0.1rem',
-                                textDecoration: 'underline'
+                                padding: '0.3rem 0.6rem',
+                                borderRadius: '6px',
+                                marginTop: '0.4rem',
+                                transition: 'all 0.2s'
                             }}
                         >
-                            {lang === 'tr' ? 'GÜVENLİ ÇIKIŞ' : 'SECURE LOGOUT'}
+                            🚪 {lang === 'tr' ? 'ÇIKIŞ YAP' : 'LOGOUT'}
                         </button>
                     </div>
 
