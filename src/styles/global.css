@@ -368,3 +368,91 @@ body {
 .pulse {
   animation: pulse 2s infinite ease-in-out;
 }
+
+/* Mobile Responsive Optimization (Phase 15) */
+@media (max-width: 768px) {
+  :root {
+    --radius-lg: 12px;
+    --radius-md: 8px;
+  }
+
+  .dashboard-container {
+    padding: 1rem !important;
+  }
+
+  header.glass-panel {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem !important;
+    text-align: center;
+    align-items: center !important;
+  }
+
+  header .faq-btn {
+    margin: 0 auto;
+  }
+
+  .engine-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .bankroll-binding-panel {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .tier-filter-bar {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .tier-filter-bar button {
+    white-space: nowrap;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .match-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .modal-content {
+    padding: 1.5rem !important;
+    width: 98%;
+  }
+
+  .admin-container form {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Table responsiveness for Admin Panel */
+  .admin-container table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .admin-container td,
+  .admin-container th {
+    white-space: nowrap;
+    padding: 0.8rem !important;
+  }
+
+  .stat-group {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .glass-panel {
+    padding: 1rem !important;
+  }
+}

@@ -178,7 +178,7 @@ export const Dashboard = ({ user, onLogout }) => {
             ) : (
                 <>
                     {/* Bankroll Strategy Panel (Phase 13) */}
-                    <div className="bankroll-binding-panel" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
+                    <div className="bankroll-binding-panel" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '2rem', marginBottom: '3rem' }}>
                         <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '1px', color: 'var(--accent-color)' }}>{t.bankroll_panel}</h3>
@@ -336,7 +336,13 @@ export const Dashboard = ({ user, onLogout }) => {
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.5px' }}>DQS {t.analysis_candidates}</h2>
                             <span style={{ padding: '0.3rem 0.8rem', borderRadius: '8px', background: 'var(--success-color)', color: '#000', fontSize: '0.75rem', fontWeight: 800 }}>{eligibleMatches.filter(filterByTier).length}</span>
                         </div>
-                        <div className="matches-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}>
+                        {/* Active Matches Grid */}
+                        <div className="match-grid" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                            gap: '2rem',
+                            marginBottom: '4rem'
+                        }}>
                             {eligibleMatches.filter(filterByTier).map(match => {
                                 const signal = signals[match.id];
                                 if (!signal) return null;

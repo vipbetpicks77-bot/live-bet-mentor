@@ -26,19 +26,15 @@ export const Login = ({ onLogin, lang = 'tr' }) => {
     };
 
     return (
-        <div style={{
-            height: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)',
-            color: '#fff',
-            fontFamily: "'Inter', sans-serif"
+        <div className="login-container flex-center" style={{
+            minHeight: '100vh',
+            background: 'radial-gradient(circle at center, #1e293b, #030712)',
+            padding: '1rem'
         }}>
             <div className="glass-panel" style={{
                 width: '100%',
                 maxWidth: '400px',
-                padding: '3rem',
+                padding: '2.5rem',
                 borderRadius: '24px',
                 border: '1px solid rgba(56, 189, 248, 0.2)',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
