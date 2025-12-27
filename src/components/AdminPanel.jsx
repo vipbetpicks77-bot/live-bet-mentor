@@ -69,6 +69,22 @@ export const AdminPanel = ({ lang = 'tr' }) => {
         }
     };
 
+    const deleteUser = async (id) => {
+        if (!confirm(lang === 'tr' ? 'Bu kullanıcıyı tamamen silmek istediğine emin misin?' : 'Are you sure you want to completely delete this user?')) return;
+
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            setStatus({ type: 'error', message: error.message });
+        } else {
+            setStatus({ type: 'success', message: lang === 'tr' ? 'Kullanıcı silindi.' : 'User deleted.' });
+            fetchProfiles();
+        }
+    };
+
     return (
         <div className="admin-container" style={{ color: '#fff' }}>
             <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', border: '1px solid var(--warning-color)' }}>
@@ -142,12 +158,20 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                                     </td>
                                     <td style={{ padding: '1rem', textAlign: 'right' }}>
                                         {profile.email !== 'karabulut.hamza@gmail.com' && (
-                                            <button
-                                                onClick={() => toggleBan(profile.id, profile.is_banned)}
-                                                style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '0.7rem' }}
-                                            >
-                                                {profile.is_banned ? (lang === 'tr' ? 'YASAĞI KALDIR' : 'UNBAN') : (lang === 'tr' ? 'YASAKLA' : 'BAN')}
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button
+                                                    onClick={() => toggleBan(profile.id, profile.is_banned)}
+                                                    style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '0.7rem' }}
+                                                >
+                                                    {profile.is_banned ? (lang === 'tr' ? 'YASAĞI KALDIR' : 'UNBAN') : (lang === 'tr' ? 'YASAKLA' : 'BAN')}
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteUser(profile.id)}
+                                                    style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '0.7rem' }}
+                                                >
+                                                    {lang === 'tr' ? 'SİL' : 'DELETE'}
+                                                </button>
+                                            </div>
                                         )}
                                     </td>
                                 </tr>
