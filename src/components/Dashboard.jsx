@@ -23,8 +23,7 @@ export const Dashboard = ({ user, onLogout }) => {
         tier2: [...CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2]
     });
     const [advancedSettings, setAdvancedSettings] = useState({
-        ...CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES,
-        secondaryValidator: CONFIG.MODULAR_SYSTEM.SECONDARY_VALIDATOR.ENABLED
+        ...CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES
     });
     const [view, setView] = useState('DASHBOARD'); // 'DASHBOARD' or 'ADMIN'
     const isAdmin = user?.email === 'karabulut.hamza@gmail.com';
@@ -82,10 +81,10 @@ export const Dashboard = ({ user, onLogout }) => {
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>{t.subtitle}</p>
                     <div className="header-stats-bar" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', fontSize: '0.8rem' }}>
                         <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.2)', color: 'var(--success-color)', fontWeight: 600 }}>
-                            {t.pass_rate}: {analytics.passRate.toFixed(1)}%
+                            {t.pass_rate}: {(analytics.passRate || 0).toFixed(1)}%
                         </div>
                         <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                            {t.no_bet_rate}: {analytics.noBetRate.toFixed(1)}%
+                            {t.no_bet_rate}: {(analytics.noBetRate || 0).toFixed(1)}%
                         </div>
                         <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(56, 189, 248, 0.2)', color: 'var(--accent-color)', fontWeight: 600 }}>
                             {t.limit}: {bankState.daily_bet_count}/{CONFIG.BANKROLL.HIERARCHY.THRESHOLDS.DAILY_BET_LIMIT}
@@ -389,14 +388,19 @@ export const Dashboard = ({ user, onLogout }) => {
                                             <div>
                                                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>{match.homeTeam} <span style={{ opacity: 0.3 }}>vs</span> {match.awayTeam}</h3>
                                                 <div className="match-meta" style={{ marginTop: '0.5rem' }}>
-                                                    <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: 800 }}>{match.minute}' <span style={{ opacity: 0.5, margin: '0 0.5rem' }}>|</span> {match.score.home}-{match.score.away}</span>
+                                                    <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: 800 }}>
+                                                        {match.minute.includes('HT') || match.minute.includes('Halftime') ? t.halftime_short :
+                                                            (match.minute.replace("'", "") + '. ' + t.minute_label)}
+                                                        <span style={{ opacity: 0.5, margin: '0 0.5rem' }}>|</span>
+                                                        {match.score.home} - {match.score.away}
+                                                    </span>
                                                 </div>
                                             </div>
                                             <span className={`tier-badge tier-${match.tier}`} style={{ padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800, background: match.tier === 1 ? 'var(--success-color)' : match.tier === 2 ? 'var(--warning-color)' : 'var(--text-secondary)', color: '#000' }}>TIER {match.tier}</span>
                                         </div>
 
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                                            <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t.dqs_score_label.replace(':', '')}: <span style={{ color: 'var(--text-primary)', fontWeight: 800 }}>{match.dqs.toFixed(2)}</span></div>
+                                            <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t.dqs_score_label.replace(':', '')}: <span style={{ color: 'var(--text-primary)', fontWeight: 800 }}>{(match.dqs || 0).toFixed(2)}</span></div>
                                             <div style={{
                                                 padding: '0.5rem 1.2rem',
                                                 borderRadius: '8px',
@@ -455,10 +459,15 @@ export const Dashboard = ({ user, onLogout }) => {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <h4 style={{ fontSize: '0.95rem', fontWeight: 700 }}>{match.homeTeam} vs {match.awayTeam}</h4>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>{match.minute}' | {match.score.home}-{match.score.away}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>
+                                                {match.minute.includes('HT') || match.minute.includes('Halftime') ? t.halftime_short :
+                                                    (match.minute.replace("'", "") + '. ' + t.minute_label)}
+                                                <span style={{ margin: '0 0.4rem', opacity: 0.5 }}>|</span>
+                                                {match.score.home} - {match.score.away}
+                                            </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, opacity: 0.6 }}>{t.dqs_label} {match.dqs.toFixed(2)}</div>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, opacity: 0.6 }}>{t.dqs_label} {(match.dqs || 0).toFixed(2)}</div>
                                             <div style={{ fontSize: '0.6rem', fontWeight: 800, marginTop: '0.2rem', color: 'var(--danger-color)' }}>{t.rejected.toUpperCase()}</div>
                                         </div>
                                     </div>
@@ -571,12 +580,12 @@ export const Dashboard = ({ user, onLogout }) => {
                                             <div className="stat-item">
                                                 <div className="stat-label">
                                                     <span>{t.dqs_score_label}</span>
-                                                    <span style={{ color: selectedMatch.dqs >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)' }}>{selectedMatch.dqs.toFixed(4)}</span>
+                                                    <span style={{ color: (selectedMatch.dqs || 0) >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)' }}>{(selectedMatch.dqs || 0).toFixed(4)}</span>
                                                 </div>
                                                 <div className="stat-bar-bg">
                                                     <div className="stat-bar-fill" style={{
-                                                        width: `${selectedMatch.dqs * 100}%`,
-                                                        background: `linear-gradient(to right, ${selectedMatch.dqs >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)'}, var(--accent-color))`
+                                                        width: `${(selectedMatch.dqs || 0) * 100}%`,
+                                                        background: `linear-gradient(to right, ${(selectedMatch.dqs || 0) >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)'}, var(--accent-color))`
                                                     }}></div>
                                                 </div>
                                             </div>
@@ -612,24 +621,57 @@ export const Dashboard = ({ user, onLogout }) => {
                                     {/* Column 3: Live Snapshot */}
                                     <div className="grid-col">
                                         <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
-                                        <div className="stats-card" style={{ maxHeight: '350px', overflowY: 'auto' }}>
-                                            {Object.entries(selectedMatch.stats.rawStats || {}).map(([name, val]) => {
-                                                const total = (val.home || 0) + (val.away || 0);
-                                                const homePct = total > 0 ? (val.home / total) * 100 : 50;
-                                                return (
-                                                    <div key={name} className="stat-item" style={{ marginBottom: '1.5rem' }}>
-                                                        <div className="stat-label">
-                                                            <span>{t[name] || name}</span>
-                                                            <span style={{ fontWeight: 800 }}>{val.home} - {val.away}</span>
-                                                        </div>
-                                                        <div className="stat-bar-bg" style={{ display: 'flex' }}>
-                                                            <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', opacity: 0.8 }}></div>
-                                                            <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'var(--text-secondary)', opacity: 0.3 }}></div>
-                                                        </div>
+                                        <div className="stats-card" style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                            {selectedMatch.stats?.groups ? (
+                                                selectedMatch.stats.groups.map(group => (
+                                                    <div key={group.groupName} style={{ marginBottom: '1.8rem' }}>
+                                                        <h4 style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.8rem', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--accent-color)' }}>
+                                                            {t[group.groupName] || group.groupName}
+                                                        </h4>
+                                                        {group.statisticsItems.map(item => {
+                                                            const parseVal = (v) => parseFloat(v?.toString().replace('%', '')) || 0;
+                                                            const homeVal = parseVal(item.home);
+                                                            const awayVal = parseVal(item.away);
+                                                            const total = homeVal + awayVal;
+                                                            const homePct = total > 0 ? (homeVal / total) * 100 : 50;
+
+                                                            return (
+                                                                <div key={item.name} className="stat-item" style={{ marginBottom: '1rem' }}>
+                                                                    <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.75rem' }}>
+                                                                        <span style={{ opacity: 0.8, color: item.name.includes('Expected') ? 'var(--warning-color)' : 'inherit' }}>
+                                                                            {t[item.name] || item.name}
+                                                                        </span>
+                                                                        <span style={{ fontWeight: 800 }}>{item.home} - {item.away}</span>
+                                                                    </div>
+                                                                    <div className="stat-bar-bg" style={{ display: 'flex', height: '3px', borderRadius: '1.5px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
+                                                                        <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', transition: 'width 0.5s', opacity: 0.8 }}></div>
+                                                                        <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'rgba(255,255,255,0.1)', transition: 'width 0.5s' }}></div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
-                                                );
-                                            })}
-                                            {Object.keys(selectedMatch.stats.rawStats || {}).length === 0 && (
+                                                ))
+                                            ) : (
+                                                Object.entries(selectedMatch.stats || {}).map(([name, val]) => {
+                                                    if (typeof val !== 'object' || val === null || (!val.home && val.home !== 0)) return null;
+                                                    const total = (val.home || 0) + (val.away || 0);
+                                                    const homePct = total > 0 ? (val.home / total) * 100 : 50;
+                                                    return (
+                                                        <div key={name} className="stat-item" style={{ marginBottom: '1.5rem' }}>
+                                                            <div className="stat-label">
+                                                                <span style={{ textTransform: 'capitalize' }}>{t[name] || name}</span>
+                                                                <span style={{ fontWeight: 800 }}>{val.home} - {val.away}</span>
+                                                            </div>
+                                                            <div className="stat-bar-bg" style={{ display: 'flex' }}>
+                                                                <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', opacity: 0.8 }}></div>
+                                                                <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'var(--text-secondary)', opacity: 0.3 }}></div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                            {(!selectedMatch.stats || (Object.keys(selectedMatch.stats).length === 0 && (!selectedMatch.stats.groups || selectedMatch.stats.groups.length === 0))) && (
                                                 <div style={{ textAlign: 'center', opacity: 0.4, padding: '2rem 0' }}>
                                                     {t.no_live_metrics}
                                                 </div>
@@ -666,7 +708,6 @@ export const Dashboard = ({ user, onLogout }) => {
 
                                 <div className="settings-list">
                                     {[
-                                        { id: 'secondaryValidator', label: t.toggle_data_fusion },
                                         { id: 'XG_ANALYSIS', label: t.toggle_xg },
                                         { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
                                         { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
@@ -678,8 +719,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                                 onClick={() => {
                                                     const newVal = !advancedSettings[setting.id];
                                                     setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
-                                                    if (setting.id === 'secondaryValidator') CONFIG.MODULAR_SYSTEM.SECONDARY_VALIDATOR.ENABLED = newVal;
-                                                    else CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
+                                                    CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
                                                 }}
                                             ><div className="knob"></div></div>
                                         </div>

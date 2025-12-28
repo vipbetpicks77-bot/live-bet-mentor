@@ -10,7 +10,16 @@ export class XGModule {
 
         const { stats } = fixture;
 
-        // Simplified xG calculation for Live Test
+        // If data source already provides xG (like RedScores), use it
+        if (stats.xg) {
+            return {
+                ...stats.xg,
+                source: 'PRIMARY_DATA',
+                protocol: 'PRODUCTION'
+            };
+        }
+
+        // Simplified xG calculation for Live Test fallback
         // SOG = 0.3, Dangerous Attack = 0.05, Big Chance = 0.6
         const homeXG = (stats.shotsOnGoal?.home || 0) * 0.15 +
             (stats.dangerousAttacks?.home || 0) * 0.02 +
@@ -23,6 +32,7 @@ export class XGModule {
         return {
             home: parseFloat(homeXG.toFixed(2)),
             away: parseFloat(awayXG.toFixed(2)),
+            source: 'FALLBACK_CALC',
             protocol: '14_DAY_OBSERVATION'
         };
     }

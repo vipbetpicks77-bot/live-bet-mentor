@@ -6,9 +6,13 @@ import { bayesianModel } from './bayesianModel';
 export const analyzeMatch = (fixture, odds) => {
     const { stats, minute, score } = fixture;
 
-    // 1. Odds check (Requirement: No Odds = No Bet)
+    // 1. Odds check (Requirement: No Odds = No Bet, except for Discovery)
     if (!odds || Object.keys(odds).length === 0) {
-        return { verdict: 'PASS', reason: 'Eksik Oran Verisi (Odds Required)' };
+        const tier = leagueProfileModule.getTier(fixture.leagueName);
+        if (tier !== 3) {
+            return { verdict: 'PASS', reason: 'Eksik Oran Verisi (Odds Required)' };
+        }
+        // Tier 3 matches can proceed to observation without odds
     }
 
     // Phase 11: Modular Observational Units (Non-Destructive)

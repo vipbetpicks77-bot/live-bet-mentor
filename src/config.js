@@ -34,18 +34,16 @@ export const CONFIG = {
 
   // Data & Latency
   DATA: {
-    RAPIDAPI_HOST: 'api-football-v1.p.rapidapi.com',
-    APIFOOTBALL_API_BASE: 'https://apiv3.apifootball.com/',
     LATENCY_THRESHOLD_MS: 30000, // 30 seconds
     POLLING_INTERVAL_MS: 15000, // 15 seconds for API safety
     RELIABILITY_SCORE_MIN: 0.8, // Minimum reliability score to avoid NO-BET
-    USE_MOCK_DATA: false, // For Phase 11 testing
+    USE_MOCK_DATA: import.meta.env.VITE_USE_MOCK_DATA === 'true',
+    DATA_SOURCE: import.meta.env.VITE_DATA_SOURCE || 'SOFASCORE',
     DATA_SOURCE_OPTIONS: {
       SOFASCORE: 'SOFASCORE',
-      RAPIDAPI: 'RAPIDAPI',
-      LIVESCORE_API: 'LIVESCORE_API',
-      APIFOOTBALL: 'APIFOOTBALL'
-    }
+      REDSCORES: 'REDSCORES'
+    },
+    SOFASCORE_LOCAL_PROXY_URL: 'http://localhost:3001/api/sofascore/live'
   },
 
   // Bankroll Management
@@ -85,13 +83,11 @@ export const CONFIG = {
   MODULAR_SYSTEM: {
     OBSERVATION_MODE: true, // 14-day silent log protocol
     SECONDARY_VALIDATOR: {
-      ENABLED: true,
-      SOURCE: 'MACKOLIK_VALIDATOR',
-      MATCHING_STRICTNESS: 'HIGH', // 4D Matching (League + Time + Teams + Fuzzy)
+      ENABLED: false, // Mackolik removed
     },
     OPTIONAL_MODULES: {
-      XG_ANALYSIS: false,
-      LEAGUE_PROFILES: false,
+      XG_ANALYSIS: true,
+      LEAGUE_PROFILES: true,
       BAYESIAN_PRICING: false
     },
     // Phase 12: Tiered League System

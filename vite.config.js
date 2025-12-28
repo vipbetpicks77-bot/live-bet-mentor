@@ -9,29 +9,31 @@ export default defineConfig({
       '/api-sofascore': {
         target: 'https://api.sofascore.com',
         changeOrigin: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api-sofascore/, ''),
         headers: {
-          'Referer': 'https://www.sofascore.com/',
-          'x-requested-with': 'ede1af'
+          'Host': 'api.sofascore.com',
+          'User-Agent': 'SofaScore/24.11.1 (Android/13; Mobile; en_US)',
+          'x-requested-with': 'com.sofascore.results',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Connection': 'keep-alive'
         }
       },
-      '/api-mackolik-data': {
-        target: 'https://www.mackolik.com',
+      '/api-redscores': {
+        target: 'https://redscores.com',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api-mackolik-data/, ''),
+        followRedirects: true,
+        rewrite: (path) => path.replace(/^\/api-redscores/, ''),
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-          'Referer': 'https://www.mackolik.com/canli-sonuclar',
-          'Origin': 'https://www.mackolik.com',
-          'x-requested-with': 'XMLHttpRequest'
+          'Accept': 'application/json, text/plain, */*',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Referer': 'https://redscores.com/',
+          'Origin': 'https://redscores.com',
+          'Accept-Language': 'en-US,en;q=0.9'
         }
-      },
-      '/api-apifootball': {
-        target: 'https://apiv3.apifootball.com',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api-apifootball/, '/')
       }
     }
   }

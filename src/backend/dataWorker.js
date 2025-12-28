@@ -6,21 +6,20 @@
 
 import { CONFIG } from '../config';
 import { sofaScoreAdapter } from './sofaScoreAdapter';
-import { secondaryValidator } from '../logic/secondaryValidator';
+import { mockDataService } from './mockDataService';
+// import { secondaryValidator } from '../logic/secondaryValidator';
 import { analyzeMatch } from '../logic/matchAnalyzer';
-import { mackolikScraper } from './scraper';
 import { HealthMonitor } from './healthMonitor';
 import { leagueProfileModule } from '../logic/leagueProfileModule';
 import { bankrollManager } from '../logic/bankrollManager';
-import { liveScoreService } from './services/liveScoreService';
 
 class DataWorker {
     constructor() {
         this.fixtures = [];
+        this.matches = []; // Added for RedScores support
         this.odds = {};
         this.lastUpdated = null;
         this.isRunning = false;
-        this.dataSource = CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL; // Switch to APIFootball.com
         this.apiKey = import.meta.env.VITE_APIFOOTBALL_KEY || 'a790d8fed5077cd8afe4cbc667ecef3ee5791b3ec0db4c56c5818865e24cc7e';
         this.healthStats = {
             lastFetch: null,
@@ -29,14 +28,14 @@ class DataWorker {
             noBetCount: 0,
             dqsAbove: 0,
             dqsBelow: 0,
-            frozen: true
+            frozen: false
         };
         this.decisionMode = CONFIG.DECISION.MODES.CORE_DQS;
         this.decisionLogs = [];
-        this.secondaryFixtures = []; // Maçkolik Buffer
         this.healthMonitor = new HealthMonitor(); // Phase 11 Scenario 3
         this.lastFetchDuration = 0;
         this.tier3Performance = JSON.parse(localStorage.getItem('tier3_performance') || '{}');
+        this.dataSource = CONFIG.DATA.DATA_SOURCE;
     }
 
     setApiKey(key) {
@@ -58,17 +57,37 @@ class DataWorker {
             try {
                 const startTime = Date.now();
 
-                if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.SOFASCORE) {
-                    await this.fetchFromSofaScore();
-                } else if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API ||
-                    this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL) {
-                    await this.fetchFromLiveScoreApi();
+                // Mock Data Mode (for testing when external APIs are unavailable)
+                if (CONFIG.DATA.USE_MOCK_DATA) {
+                    this.matches = await mockDataService.fetchLiveMatches();
+                    console.log('[DATA_WORKER] Mock data mode active, fetched:', this.matches?.length || 0, 'matches');
+                } else {
+                    // Sole source: SofaScore (via local scraper)
+                    this.matches = await sofaScoreAdapter.fetchScheduledEvents();
                 }
 
-                // Phase 11: Maçkolik Polling (Validator Source)
-                if (CONFIG.MODULAR_SYSTEM.SECONDARY_VALIDATOR.ENABLED) {
-                    this.secondaryFixtures = await mackolikScraper.fetchLiveMatches();
+                // Normalize and process the fetched matches
+                if (Array.isArray(this.matches)) {
+                    // Phase 11 Improv: Sequential detail fetching for active matches to improve DQS
+                    const detailedMatches = await Promise.all(
+                        this.matches.map(async (match) => {
+                            // If it's a normalized match object, it has an ID
+                            const eventId = match.id;
+                            if (!eventId) return match;
+
+                            // Fetch updated details from local proxy (CDP Cache)
+                            const fullDetail = await sofaScoreAdapter.fetchEventDetails(eventId);
+                            return fullDetail || match;
+                        })
+                    );
+
+                    this.fixtures = this.normalizeFixtures(detailedMatches.filter(r => r !== null));
+                    console.log('[DATA_WORKER] Normalized fixtures with details:', this.fixtures?.length || 0);
+                } else {
+                    console.warn('[DATA_WORKER] Fetched matches is not an array:', this.matches);
+                    this.fixtures = [];
                 }
+
 
                 this.lastFetchDuration = Date.now() - startTime;
                 this.healthStats.lastFetch = Date.now();
@@ -92,92 +111,6 @@ class DataWorker {
         return this.healthMonitor.getReport();
     }
 
-    async fetchFromSofaScore() {
-        const events = await sofaScoreAdapter.fetchScheduledEvents();
-        // Remove static league filter, discover ALL live matches
-        const liveEvents = events.filter(e => e.status.type === 'inprogress');
-
-        const results = await Promise.all(
-            liveEvents.map(e => sofaScoreAdapter.fetchEventDetails(e.id))
-        );
-
-        this.fixtures = this.normalizeFixtures(results.filter(r => r !== null));
-    }
-
-    /**
-     * API üzerinden veri çeker. (Live-Score-API veya APIFootball.com için ortak poller)
-     */
-    async fetchFromLiveScoreApi() {
-        const matches = await liveScoreService.getLiveScores();
-
-        if (matches === null) {
-            console.warn('[DATA_WORKER] API returned null, clearing fixtures to avoid stale/mock data');
-            this.fixtures = [];
-            return;
-        }
-
-        if (matches.length === 0) {
-            this.fixtures = [];
-            return;
-        }
-
-        // Detaylı istatistikleri her maç için paralel çek
-        const results = await Promise.all(
-            matches.map(async (m) => {
-                const stats = await liveScoreService.getMatchStatistics(m.match_id || m.id);
-
-                // Skor ayrıştırma (APIFootball: match_hometeam_score, match_awayteam_score)
-                const homeScore = parseInt(m.match_hometeam_score ?? (m.score ? m.score.split(' - ')[0] : 0));
-                const awayScore = parseInt(m.match_awayteam_score ?? (m.score ? m.score.split(' - ')[1] : 0));
-
-                return {
-                    id: m.match_id || m.id,
-                    homeTeam: m.match_hometeam_name || m.home_name,
-                    awayTeam: m.match_awayteam_name || m.away_name,
-                    leagueName: m.league_name,
-                    score: { home: homeScore, away: awayScore },
-                    minute: m.match_status || m.time,
-                    stats: stats || {
-                        possession: { home: 0, away: 0 },
-                        shotsOnGoal: { home: 0, away: 0 },
-                        dangerousAttacks: { home: 0, away: 0 }
-                    },
-                    latency: 0,
-                    dataQuality: 'OK',
-                    source: this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL ? 'APIFootball' : 'Live-Score-API'
-                };
-            })
-        );
-
-        this.fixtures = this.normalizeFixtures(results);
-    }
-
-    async fetchLiveFixtures() {
-        if (!this.apiKey) {
-            console.warn('API Key missing. Using mock fallback.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`https://${CONFIG.DATA.RAPIDAPI_HOST}/v3/fixtures?live=all`, {
-                method: 'GET',
-                headers: {
-                    'X-RapidAPI-Key': this.apiKey,
-                    'X-RapidAPI-Host': CONFIG.DATA.RAPIDAPI_HOST
-                }
-            });
-            const data = await response.json();
-            if (data.response) {
-                // Filter by Allowed Leagues (Controlled Live Test)
-                const filtered = data.response.filter(item =>
-                    CONFIG.DECISION.ALLOWED_LEAGUES.includes(item.league.id)
-                );
-                this.fixtures = this.normalizeFixtures(filtered);
-            }
-        } catch (error) {
-            console.error('RapidAPI Fetch Error:', error);
-        }
-    }
 
     normalizeFixtures(rawFixtures) {
         let dqsAbove = 0;
@@ -236,7 +169,10 @@ class DataWorker {
 
         if (fixture.minute > 0) score += weights.FRESHNESS;
 
-        return Math.round(score * 100) / 100;
+        // Phase 11: xG Reward
+        if (fixture.stats?.xg) score += 0.1;
+
+        return Math.min(1.0, Math.round(score * 100) / 100);
     }
 
     /**
@@ -369,19 +305,6 @@ class DataWorker {
         const matchAnalysis = analyzeMatch(fixture, fixture.odds || {});
         signal.observations = matchAnalysis.observations || {};
 
-        // Secondary Validation (4D Match)
-        if (CONFIG.MODULAR_SYSTEM.SECONDARY_VALIDATOR.ENABLED) {
-            // Use the buffer populated by the poll() loop
-            signal.observations.secondaryValidation = secondaryValidator.validate(fixture, this.secondaryFixtures);
-
-            // CRITICAL: Trigger NO-BET on data conflict if validator is active
-            if (signal.observations.secondaryValidation?.consistent === false) {
-                signal.verdict = 'NO-BET';
-                signal.mainReason = 'Maçkolik Veri Çelişkisi (Risk)';
-                signal.reasonKey = 'data_conflict';
-                this.healthStats.noBetCount++;
-            }
-        }
 
         this.decisionLogs.push({ matchId, ...signal });
         if (this.decisionLogs.length > 100) this.decisionLogs.shift();
