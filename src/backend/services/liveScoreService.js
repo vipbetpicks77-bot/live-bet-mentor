@@ -32,13 +32,13 @@ class LiveScoreService {
                 return Array.isArray(response.data) ? response.data : [];
             }
 
-            if (response.data?.error === "404") {
-                console.log('[APIFootball] No live matches at the moment (404 info)');
-                return []; // Return empty array instead of null to indicate valid but empty result
+            if (response.data?.error == "404" || response.data?.error == 404) {
+                console.log('[APIFootball] Bilgi: Şu an canlı maç bulunamadı (404).');
+                return [];
             }
 
-            console.warn('APIFootball getLiveScores Warning:', response.data?.error || 'Empty response');
-            return null;
+            console.warn('APIFootball getLiveScores Uyarı:', response.data?.error || 'Boş yanıt');
+            return [];
         } catch (error) {
             console.error('Error fetching live scores from APIFootball:', error.message);
             return null;
