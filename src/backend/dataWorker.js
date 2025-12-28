@@ -20,8 +20,8 @@ class DataWorker {
         this.odds = {};
         this.lastUpdated = null;
         this.isRunning = false;
-        this.dataSource = CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API; // Default to Live-Score-API
-        this.apiKey = import.meta.env.VITE_RAPIDAPI_KEY || '';
+        this.dataSource = CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL; // Switch to APIFootball.com
+        this.apiKey = import.meta.env.VITE_APIFOOTBALL_KEY || 'a790d8fed5077cd8afe4cbc667ecef3ee5791b3ec0db4c56c5818865e24cc7e';
         this.healthStats = {
             lastFetch: null,
             totalDiscovered: 0,
@@ -60,7 +60,8 @@ class DataWorker {
 
                 if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.SOFASCORE) {
                     await this.fetchFromSofaScore();
-                } else if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API) {
+                } else if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API ||
+                    this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL) {
                     await this.fetchFromLiveScoreApi();
                 }
 
@@ -104,22 +105,38 @@ class DataWorker {
     }
 
     /**
-     * Live-Score-API üzerinden veri çeker.
+     * API üzerinden veri çeker. (Live-Score-API veya APIFootball.com için ortak poller)
      */
     async fetchFromLiveScoreApi() {
         const matches = await liveScoreService.getLiveScores();
 
+        if (matches === null) {
+            console.warn('[DATA_WORKER] API returned null, clearing fixtures to avoid stale/mock data');
+            this.fixtures = [];
+            return;
+        }
+
+        if (matches.length === 0) {
+            this.fixtures = [];
+            return;
+        }
+
         // Detaylı istatistikleri her maç için paralel çek
         const results = await Promise.all(
             matches.map(async (m) => {
-                const stats = await liveScoreService.getMatchStatistics(m.id);
+                const stats = await liveScoreService.getMatchStatistics(m.match_id || m.id);
+
+                // Skor ayrıştırma (APIFootball: match_hometeam_score, match_awayteam_score)
+                const homeScore = parseInt(m.match_hometeam_score ?? (m.score ? m.score.split(' - ')[0] : 0));
+                const awayScore = parseInt(m.match_awayteam_score ?? (m.score ? m.score.split(' - ')[1] : 0));
+
                 return {
-                    id: m.id,
-                    homeTeam: m.home_name,
-                    awayTeam: m.away_name,
+                    id: m.match_id || m.id,
+                    homeTeam: m.match_hometeam_name || m.home_name,
+                    awayTeam: m.match_awayteam_name || m.away_name,
                     leagueName: m.league_name,
-                    score: { home: parseInt(m.score.split(' - ')[0]), away: parseInt(m.score.split(' - ')[1]) },
-                    minute: m.time,
+                    score: { home: homeScore, away: awayScore },
+                    minute: m.match_status || m.time,
                     stats: stats || {
                         possession: { home: 0, away: 0 },
                         shotsOnGoal: { home: 0, away: 0 },
@@ -127,7 +144,7 @@ class DataWorker {
                     },
                     latency: 0,
                     dataQuality: 'OK',
-                    source: 'Live-Score-API'
+                    source: this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.APIFOOTBALL ? 'APIFootball' : 'Live-Score-API'
                 };
             })
         );

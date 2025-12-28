@@ -1,56 +1,66 @@
 import axios from 'axios';
-import { config } from '../../config.js';
 
 /**
- * Live-Score-API Service
- * Documentation: https://live-score-api.com/documentation
+ * APIFootball.com Service (Alternative to Live-Score-API)
+ * Documentation: https://apifootball.com/documentation/
  */
 class LiveScoreService {
     constructor() {
-        this.apiKey = process.env.LIVESCORE_API_KEY;
-        this.apiSecret = process.env.LIVESCORE_API_SECRET;
-        // Vite proxy yolunu kullan: /api-livescore -> https://live-score-api.com
-        this.baseUrl = '/api-livescore/api-client/';
+        this.apiKey = import.meta.env.VITE_APIFOOTBALL_KEY || 'a790d8fed5077cd8afe4cbc667ecef3ee5791b3ec0db4c56c5818865e24cc7e';
+        // Vite proxy yolunu kullan: /api-apifootball -> https://apiv3.apifootball.com/
+        this.baseUrl = '/api-apifootball';
     }
 
     /**
-     * Canlı maçları ve temel skorları çeker.
+     * Canlı maçları çeker.
      */
     async getLiveScores() {
         try {
-            const response = await axios.get(`${this.baseUrl}scores/live.json`, {
+            const today = new Date().toISOString().split('T')[0];
+            const response = await axios.get(`${this.baseUrl}`, {
                 params: {
-                    key: this.apiKey,
-                    secret: this.apiSecret
+                    action: 'get_events',
+                    from: today,
+                    to: today,
+                    match_live: 1,
+                    APIkey: this.apiKey
                 }
             });
 
-            if (response.data && response.data.success) {
-                return response.data.data.match;
+            // API error: 404 genelde "canlı maç yok" demektir
+            if (response.data && !response.data.error) {
+                return Array.isArray(response.data) ? response.data : [];
             }
-            throw new Error('Live-Score-API Error: ' + JSON.stringify(response.data.error));
+
+            if (response.data?.error === "404") {
+                console.log('[APIFootball] No live matches at the moment (404 info)');
+                return []; // Return empty array instead of null to indicate valid but empty result
+            }
+
+            console.warn('APIFootball getLiveScores Warning:', response.data?.error || 'Empty response');
+            return null;
         } catch (error) {
-            console.error('Error fetching live scores:', error.message);
-            return [];
+            console.error('Error fetching live scores from APIFootball:', error.message);
+            return null;
         }
     }
 
     /**
-     * Belirli bir maçın detaylı istatistiklerini (Tehlikeli Atak, Korner, Şut vb.) çeker.
-     * @param {number} matchId Live-Score-API match_id
+     * Belirli bir maçın detaylı istatistiklerini çeker.
+     * @param {string} matchId APIFootball match_id
      */
     async getMatchStatistics(matchId) {
         try {
-            const response = await axios.get(`${this.baseUrl}matches/stats.json`, {
+            const response = await axios.get(`${this.baseUrl}`, {
                 params: {
-                    key: this.apiKey,
-                    secret: this.apiSecret,
-                    match_id: matchId
+                    action: 'get_statistics',
+                    match_id: matchId,
+                    APIkey: this.apiKey
                 }
             });
 
-            if (response.data && response.data.success) {
-                return this._normalizeStats(response.data.data.stats);
+            if (response.data && response.data[matchId]) {
+                return this._normalizeStats(response.data[matchId].statistics);
             }
             return null;
         } catch (error) {
@@ -61,33 +71,44 @@ class LiveScoreService {
 
     /**
      * API verisini projedeki iç formata çevirir.
-     * Örnek: "33:56" formatındaki tehlikeli atakları ayırır.
      */
-    _normalizeStats(rawStats) {
-        const normalized = {};
+    _normalizeStats(statsArray) {
+        if (!Array.isArray(statsArray)) return null;
 
-        // Tehlikeli Atak (Dangerous Attacks)
-        if (rawStats.dangerous_attacks) {
-            const [home, away] = rawStats.dangerous_attacks.split(':').map(Number);
-            normalized.dangerousAttacks = { home, away };
+        const normalized = {
+            possession: { home: 0, away: 0 },
+            shotsOnGoal: { home: 0, away: 0 },
+            dangerousAttacks: { home: 0, away: 0 },
+            corners: { home: 0, away: 0 }
+        };
+
+        const findStat = (type) => statsArray.find(s => s.type.toLowerCase() === type.toLowerCase());
+
+        // Tehlikeli Atak
+        const da = findStat('Dangerous Attacks');
+        if (da) {
+            normalized.dangerousAttacks = { home: parseInt(da.home) || 0, away: parseInt(da.away) || 0 };
         }
 
-        // Şutlar (Shots on Target)
-        if (rawStats.shots_on_target) {
-            const [home, away] = rawStats.shots_on_target.split(':').map(Number);
-            normalized.shotsOnTarget = { home, away };
+        // Şutlar
+        const sog = findStat('Shots On Goal');
+        if (sog) {
+            normalized.shotsOnGoal = { home: parseInt(sog.home) || 0, away: parseInt(sog.away) || 0 };
         }
 
-        // Kornerler (Corners)
-        if (rawStats.corners) {
-            const [home, away] = rawStats.corners.split(':').map(Number);
-            normalized.corners = { home, away };
+        // Kornerler
+        const corn = findStat('Corners');
+        if (corn) {
+            normalized.corners = { home: parseInt(corn.home) || 0, away: parseInt(corn.away) || 0 };
         }
 
-        // Topla Oynama (Possession)
-        if (rawStats.possession) {
-            const [home, away] = rawStats.possession.replace(/%/g, '').split(':').map(Number);
-            normalized.possession = { home, away };
+        // Topla Oynama
+        const poss = findStat('Ball Possession');
+        if (poss) {
+            normalized.possession = {
+                home: parseInt(poss.home.replace('%', '')) || 0,
+                away: parseInt(poss.away.replace('%', '')) || 0
+            };
         }
 
         return normalized;

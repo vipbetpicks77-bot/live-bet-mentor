@@ -27,10 +27,11 @@ export default defineConfig({
           'x-requested-with': 'XMLHttpRequest'
         }
       },
-      '/api-livescore': {
-        target: 'https://live-score-api.com',
+      '/api-apifootball': {
+        target: 'https://apiv3.apifootball.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api-livescore/, ''),
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api-apifootball/, '/')
       }
     }
   }

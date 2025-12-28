@@ -35,22 +35,23 @@ export const Dashboard = ({ user, onLogout }) => {
         dataWorker.start();
         const interval = setInterval(() => {
             const currentFixtures = dataWorker.fixtures;
+            if (currentFixtures.length === 0) {
+                setMatches([]);
+                setSignals({});
+                return;
+            }
+
             setMatches(currentFixtures);
 
+            const updatedSignals = {};
             currentFixtures.forEach(m => {
-                dataWorker.getSignalForMatch(m.id);
+                const sig = dataWorker.getSignalForMatch(m.id);
+                if (sig) {
+                    updatedSignals[m.id] = sig;
+                    bankrollManager.logVerdict(sig.verdict);
+                }
             });
-            setSignals(prev => {
-                const updated = {};
-                currentFixtures.forEach(m => {
-                    const sig = dataWorker.getSignalForMatch(m.id);
-                    if (sig) {
-                        updated[m.id] = sig;
-                        bankrollManager.logVerdict(sig.verdict);
-                    }
-                });
-                return updated;
-            });
+            setSignals(updatedSignals);
             setBankState(bankrollManager.getState());
 
             if (dataWorker.healthStats.lastFetch) {
