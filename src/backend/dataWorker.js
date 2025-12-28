@@ -12,6 +12,7 @@ import { mackolikScraper } from './scraper';
 import { HealthMonitor } from './healthMonitor';
 import { leagueProfileModule } from '../logic/leagueProfileModule';
 import { bankrollManager } from '../logic/bankrollManager';
+import { liveScoreService } from './services/liveScoreService';
 
 class DataWorker {
     constructor() {
@@ -19,7 +20,7 @@ class DataWorker {
         this.odds = {};
         this.lastUpdated = null;
         this.isRunning = false;
-        this.dataSource = 'SOFASCORE'; // 'SOFASCORE' or 'RAPIDAPI'
+        this.dataSource = CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API; // Default to Live-Score-API
         this.apiKey = import.meta.env.VITE_RAPIDAPI_KEY || '';
         this.healthStats = {
             lastFetch: null,
@@ -55,8 +56,12 @@ class DataWorker {
     async poll() {
         while (this.isRunning) {
             try {
-                if (this.dataSource === 'SOFASCORE') {
+                const startTime = Date.now();
+
+                if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.SOFASCORE) {
                     await this.fetchFromSofaScore();
+                } else if (this.dataSource === CONFIG.DATA.DATA_SOURCE_OPTIONS.LIVESCORE_API) {
+                    await this.fetchFromLiveScoreApi();
                 }
 
                 // Phase 11: Maçkolik Polling (Validator Source)
@@ -64,6 +69,7 @@ class DataWorker {
                     this.secondaryFixtures = await mackolikScraper.fetchLiveMatches();
                 }
 
+                this.lastFetchDuration = Date.now() - startTime;
                 this.healthStats.lastFetch = Date.now();
                 this.lastUpdated = Date.now();
             } catch (error) {
@@ -95,6 +101,38 @@ class DataWorker {
         );
 
         this.fixtures = this.normalizeFixtures(results.filter(r => r !== null));
+    }
+
+    /**
+     * Live-Score-API üzerinden veri çeker.
+     */
+    async fetchFromLiveScoreApi() {
+        const matches = await liveScoreService.getLiveScores();
+
+        // Detaylı istatistikleri her maç için paralel çek
+        const results = await Promise.all(
+            matches.map(async (m) => {
+                const stats = await liveScoreService.getMatchStatistics(m.id);
+                return {
+                    id: m.id,
+                    homeTeam: m.home_name,
+                    awayTeam: m.away_name,
+                    leagueName: m.league_name,
+                    score: { home: parseInt(m.score.split(' - ')[0]), away: parseInt(m.score.split(' - ')[1]) },
+                    minute: m.time,
+                    stats: stats || {
+                        possession: { home: 0, away: 0 },
+                        shotsOnGoal: { home: 0, away: 0 },
+                        dangerousAttacks: { home: 0, away: 0 }
+                    },
+                    latency: 0,
+                    dataQuality: 'OK',
+                    source: 'Live-Score-API'
+                };
+            })
+        );
+
+        this.fixtures = this.normalizeFixtures(results);
     }
 
     async fetchLiveFixtures() {

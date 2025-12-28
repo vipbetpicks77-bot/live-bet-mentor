@@ -36,10 +36,16 @@ export const CONFIG = {
   DATA: {
     RAPIDAPI_HOST: 'api-football-v1.p.rapidapi.com',
     SOFASCORE_API_BASE: 'https://api.sofascore.com/api/v1',
+    LIVESCORE_API_HOST: 'live-score-api.com',
     LATENCY_THRESHOLD_MS: 30000, // 30 seconds
     POLLING_INTERVAL_MS: 10000, // 10 seconds for live updates
     RELIABILITY_SCORE_MIN: 0.8, // Minimum reliability score to avoid NO-BET
     USE_MOCK_DATA: false, // For Phase 11 testing
+    DATA_SOURCE_OPTIONS: {
+      SOFASCORE: 'SOFASCORE',
+      RAPIDAPI: 'RAPIDAPI',
+      LIVESCORE_API: 'LIVESCORE_API'
+    }
   },
 
   // Bankroll Management

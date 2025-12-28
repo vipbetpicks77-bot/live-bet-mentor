@@ -7,7 +7,7 @@
  */
 
 export const mackolikScraper = {
-    MACKOLIK_LIVE_ENDPOINT: 'https://arsiv.mackolik.com/Live/LiveScore.aspx',
+    MACKOLIK_LIVE_ENDPOINT: '/api-mackolik/v1/list',
     simulateConflict: false, // For Negative Testing (Phase 11)
     simulateFailure: false, // For Failover Testing (Scenario 2)
 
@@ -17,41 +17,38 @@ export const mackolikScraper = {
      */
     fetchLiveMatches: async () => {
         try {
-            console.log('[MACKOLIK] Fetching live data prototype...');
+            console.log('[MACKOLIK] Fetching live data via HTML parsing...');
 
-            // Scenario 2: Simulate network failure / service unavailable
             if (mackolikScraper.simulateFailure) {
                 console.warn('[MACKOLIK] Simulated failure - returning empty dataset');
                 return [];
             }
 
-            // In reality, this would be an fetch() call to their API or a proxy
-            // Simulation of proxy fetch
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(mackolikScraper.MACKOLIK_LIVE_ENDPOINT)}`;
-            await fetch(proxyUrl); // Just to verify connectivity in prototype
+            // JSON endpoint'i bot korumasına (502/403) takıldığı için ana sayfadan SSR verisini çek
+            const response = await fetch('/api-mackolik-data/canli-sonuclar');
+            if (!response.ok) throw new Error(`Mackolik HTML status: ${response.status}`);
 
-            const mockMackolikData = [
-                {
-                    id: 'mk_123',
-                    home: 'Real Madrid',
-                    away: 'Barcelona',
-                    score: mackolikScraper.simulateConflict ? '3 - 1' : '2 - 1', // Simulate mismatch
-                    minute: '75',
-                    league: 'La Liga',
-                    kickoff: new Date().setHours(22, 0, 0, 0)
-                },
-                {
-                    id: 'mk_456',
-                    home: 'Galatasaray',
-                    away: 'Fenerbahce',
-                    score: '0 - 0',
-                    minute: '18',
-                    league: 'Super Lig',
-                    kickoff: new Date().setHours(21, 0, 0, 0)
+            const html = await response.text();
+
+            // Maçkolik verisi genellikle window.renderData içinde JSON olarak bulunur
+            const pattern = /window\.renderData\s*=\s*({.*?});/s;
+            const match = html.match(pattern);
+
+            if (match && match[1]) {
+                try {
+                    const parsed = JSON.parse(match[1]);
+                    // liveMatches listesini bul (farklı property isimleri olabiliyor)
+                    const liveData = parsed.liveMatches ||
+                        (parsed.props && parsed.props.pageProps && parsed.props.pageProps.liveMatches);
+
+                    if (liveData) return mackolikScraper.normalize(liveData);
+                } catch (parseErr) {
+                    console.error('[MACKOLIK] JSON parse error in HTML:', parseErr);
                 }
-            ];
+            }
 
-            return mackolikScraper.normalize(mockMackolikData);
+            console.warn('[MACKOLIK] Could not find liveMatches in HTML');
+            return [];
         } catch (error) {
             console.error('Maçkolik Scraper Error:', error);
             return [];
@@ -62,18 +59,24 @@ export const mackolikScraper = {
      * Normalizes Maçkolik data to matches our 4D Matching schema.
      */
     normalize: (rawList) => {
-        return rawList.map(item => {
-            const [homeScore, awayScore] = item.score.split('-').map(s => parseInt(s.trim()));
+        if (!Array.isArray(rawList)) return [];
 
+        return rawList.map(item => {
+            // Maçkolik JSON yapısı: 
+            // i: id, h: home, a: away, hsc: homeScore, asc: awayScore, m: minute, l: league, st: startTime
             return {
-                id: item.id,
-                homeTeam: item.home,
-                awayTeam: item.away,
-                score: { home: homeScore, away: awayScore },
-                minute: item.minute,
-                leagueName: item.league,
-                kickoff: item.kickoff,
-                source: 'Mackolik'
+                id: item.i || item.id,
+                homeTeam: item.h || 'Unknown',
+                awayTeam: item.a || 'Unknown',
+                score: {
+                    home: parseInt(item.hsc) || 0,
+                    away: parseInt(item.asc) || 0
+                },
+                minute: item.m ? `${item.m}'` : '0\'',
+                leagueName: item.ln || item.l || 'Unknown League',
+                kickoff: item.st || '',
+                source: 'Mackolik',
+                original: item
             };
         });
     }

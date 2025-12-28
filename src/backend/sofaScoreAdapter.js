@@ -10,33 +10,24 @@ export const sofaScoreAdapter = {
      * Fetches the match list for the current day.
      */
     fetchScheduledEvents: async () => {
-        const today = new Date().toISOString().split('T')[0];
-        const url = `${CONFIG.DATA.SOFASCORE_API_BASE}/sport/football/scheduled-events/${today}`;
+        // Use live events endpoint for immediate results
+        // Using local proxy /api-sofascore to bypass CORS and Cloudflare blocks
+        const url = '/api-sofascore/api/v1/sport/football/events/live';
 
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
         try {
-            const response = await fetch(proxyUrl);
-            const proxyData = await response.json();
-            const data = JSON.parse(proxyData.contents);
+            const response = await fetch(url);
+            const data = await response.json();
 
-            // FALLBACK: If no live matches, use mock for testing Phase 11
-            if ((!data.events || data.events.length === 0) || CONFIG.DATA.USE_MOCK_DATA) {
-                console.log('[SOFASCORE] Using Mock Data Fallback');
-                return [
-                    { id: 'sim_1', status: { type: 'inprogress' }, homeTeam: { name: 'Man City' }, awayTeam: { name: 'Liverpool' }, league: { name: 'Premier League' } },
-                    { id: 'sim_2', status: { type: 'inprogress' }, homeTeam: { name: 'Galatasaray' }, awayTeam: { name: 'Fenerbahce' }, league: { name: 'Süper Lig' } },
-                    { id: 'sim_3', status: { type: 'inprogress' }, homeTeam: { name: 'Besiktas' }, awayTeam: { name: 'Trabzonspor' }, league: { name: 'Süper Lig' } },
-                    { id: 'sim_4', status: { type: 'inprogress' }, homeTeam: { name: 'Bayern' }, awayTeam: { name: 'Dortmund' }, league: { name: 'Bundesliga' } }
-                ];
+            // FALLBACK: Removed mock for production testing
+            if (!data.events || data.events.length === 0) {
+                console.log('[SOFASCORE] No live matches found in current feed');
+                return [];
             }
 
             return data.events || [];
         } catch (error) {
             console.error('SofaScore fetchScheduledEvents Error:', error);
-            // Even on error, return mock if in dev/test
-            return [
-                { id: 'sim_1', status: { type: 'inprogress' }, homeTeam: { name: 'Real Madrid' }, awayTeam: { name: 'Barcelona' } }
-            ];
+            return [];
         }
     },
 
@@ -45,91 +36,22 @@ export const sofaScoreAdapter = {
      */
     fetchEventDetails: async (eventId) => {
         if (eventId.startsWith('sim_')) {
-            // Mock Detail Simulation
-            const mockDetails = {
-                sim_1: {
-                    event: {
-                        id: 'sim_1',
-                        homeTeam: { name: 'Man City' },
-                        awayTeam: { name: 'Liverpool' },
-                        tournament: { name: 'Premier League' },
-                        homeScore: { current: 1 },
-                        awayScore: { current: 1 },
-                        status: { type: 'inprogress', description: '65\'' },
-                        statusTime: { timestamp: Math.floor(Date.now() / 1000) - 4000, initial: 0 }
-                    }
-                },
-                sim_2: {
-                    event: {
-                        id: 'sim_2',
-                        homeTeam: { name: 'Galatasaray' },
-                        awayTeam: { name: 'Fenerbahce' },
-                        tournament: { name: 'Süper Lig' },
-                        homeScore: { current: 0 },
-                        awayScore: { current: 0 },
-                        status: { type: 'inprogress', description: '22\'' },
-                        statusTime: { timestamp: Math.floor(Date.now() / 1000) - 1300, initial: 0 }
-                    }
-                },
-                sim_3: {
-                    event: {
-                        id: 'sim_3',
-                        homeTeam: { name: 'Besiktas' },
-                        awayTeam: { name: 'Trabzonspor' },
-                        tournament: { name: 'Süper Lig' },
-                        homeScore: { current: 0 },
-                        awayScore: { current: 0 },
-                        status: { type: 'inprogress', description: '30\'' },
-                        statusTime: { timestamp: Math.floor(Date.now() / 1000) - 1800, initial: 0 }
-                    }
-                },
-                sim_4: {
-                    event: {
-                        id: 'sim_4',
-                        homeTeam: { name: 'Bayern' },
-                        awayTeam: { name: 'Dortmund' },
-                        tournament: { name: 'Bundesliga' },
-                        homeScore: { current: 1 },
-                        awayScore: { current: 0 },
-                        status: { type: 'inprogress', description: '15\'' },
-                        statusTime: { timestamp: Math.floor(Date.now() / 1000) - 900, initial: 0 }
-                    }
-                }
-            };
-
-            const mockStats = {
-                statistics: [{
-                    period: 'ALL',
-                    groups: [{
-                        statisticsItems: [
-                            { name: 'Ball possession', home: '55', away: '45' },
-                            { name: 'Shots on target', home: '6', away: '4' },
-                            { name: 'Big chances', home: '3', away: '2' }
-                        ]
-                    }]
-                }]
-            };
-
-            return sofaScoreAdapter.normalize(mockDetails[eventId], mockStats);
+            console.warn('[SOFASCORE] Sim match detail requested but mock data is disabled');
+            return null;
         }
 
-        const detailUrl = `${CONFIG.DATA.SOFASCORE_API_BASE}/event/${eventId}`;
-        const statsUrl = `${CONFIG.DATA.SOFASCORE_API_BASE}/event/${eventId}/statistics`;
+        // Using local proxy paths
+        const detailUrl = `/api-sofascore/api/v1/event/${eventId}`;
+        const statsUrl = `/api-sofascore/api/v1/event/${eventId}/statistics`;
 
         try {
-            const proxyDetailUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(detailUrl)}`;
-            const proxyStatsUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(statsUrl)}`;
-
             const [detailRes, statsRes] = await Promise.all([
-                fetch(proxyDetailUrl),
-                fetch(proxyStatsUrl)
+                fetch(detailUrl),
+                fetch(statsUrl)
             ]);
 
-            const detailProxyData = await detailRes.json();
-            const statsProxyData = await statsRes.json();
-
-            const detail = JSON.parse(detailProxyData.contents);
-            const stats = JSON.parse(statsProxyData.contents);
+            const detail = await detailRes.json();
+            const stats = await statsRes.json();
 
             return sofaScoreAdapter.normalize(detail, stats);
         } catch (error) {
