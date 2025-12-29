@@ -25,6 +25,7 @@ class BankrollManager {
             daily_loss_count: 0,
             last_reset_date: new Date().toDateString(),
             ledger: [],
+            processedToday: {},
             stats: {
                 passCount: 0,
                 noBetCount: 0,
@@ -34,23 +35,34 @@ class BankrollManager {
 
         if (saved) {
             try {
-                this.state = JSON.parse(saved);
-                if (!this.state.stats) this.state.stats = defaultState.stats;
+                const parsed = JSON.parse(saved);
+                // Deep merge logic to ensure nested objects exist
+                this.state = {
+                    ...defaultState,
+                    ...parsed,
+                    stats: { ...defaultState.stats, ...(parsed.stats || {}) },
+                    processedToday: parsed.processedToday || {}
+                };
+
                 // Dynamic daily reset
                 const today = new Date().toDateString();
                 if (this.state.last_reset_date !== today) {
+                    console.log('[BankrollManager] New day detected. Resetting daily counters.');
                     this.state.daily_pl = 0;
                     this.state.daily_bet_count = 0;
                     this.state.daily_loss_count = 0;
                     this.state.last_reset_date = today;
+                    this.state.processedToday = {};
                     this.saveState();
                     this.addToLedger('SYSTEM_RESET', { reason: 'new_day_reason' });
                 }
+                console.log('[BankrollManager] Loaded state. Balance:', this.state.current_balance);
             } catch (e) {
-                console.error('Error parsing bankroll state, resetting to default', e);
+                console.error('[BankrollManager] Error parsing saved state, resetting to default', e);
                 this.state = defaultState;
             }
         } else {
+            console.log('[BankrollManager] No saved state found, initializing system.');
             this.state = defaultState;
             this.saveState();
             this.addToLedger('SYSTEM_INIT', {
@@ -61,6 +73,7 @@ class BankrollManager {
     }
 
     saveState() {
+        console.log('[BankrollManager] Saving state. Balance:', this.state.current_balance);
         localStorage.setItem('lbm_bankroll_state', JSON.stringify(this.state));
     }
 
@@ -81,18 +94,27 @@ class BankrollManager {
         this.saveState();
     }
 
-    logVerdict(verdict) {
+    logVerdict(matchId, verdict) {
+        if (!this.state.processedToday) this.state.processedToday = {};
+
+        const key = `${matchId}_${verdict}`;
+        if (this.state.processedToday[key]) return; // Already counted this verdict for this match
+
+        console.log(`[BankrollManager] Logging new verdict: ${verdict} for match: ${matchId}`);
         if (verdict === 'PASS') this.state.stats.passCount++;
         if (verdict === 'NO-BET') this.state.stats.noBetCount++;
         if (verdict === 'BET') this.state.stats.betCount++;
+
+        this.state.processedToday[key] = true;
         this.saveState();
     }
 
     getAnalytics() {
-        const total = (this.state.stats.passCount || 0) + (this.state.stats.noBetCount || 0) + (this.state.stats.betCount || 0);
+        const stats = this.state.stats || { passCount: 0, noBetCount: 0, betCount: 0 };
+        const total = (stats.passCount || 0) + (stats.noBetCount || 0) + (stats.betCount || 0);
         return {
-            passRate: total > 0 ? (this.state.stats.passCount / total) * 100 : 0,
-            noBetRate: total > 0 ? (this.state.stats.noBetCount / total) * 100 : 0,
+            passRate: total > 0 ? (stats.passCount / total) * 100 : 0,
+            noBetRate: total > 0 ? (stats.noBetCount / total) * 100 : 0,
             totalAnalysed: total
         };
     }
@@ -118,21 +140,28 @@ class BankrollManager {
             return false;
         }
 
+        const balanceBefore = Number(this.state.current_balance);
+        const stake = Number(approvedStake);
+
+        this.state.current_balance = balanceBefore - stake;
+        console.log(`[BankrollManager] Bet Approved. Balance: ${balanceBefore} -> ${this.state.current_balance}`);
+
         this.addToLedger('BET_OPEN', {
             match_id: fixture.id,
             match_name: `${fixture.homeTeam} vs ${fixture.awayTeam}`,
             league: fixture.leagueName,
             tier: fixture.tier,
-            stake_amount: approvedStake,
-            balance_before: this.state.current_balance,
+            stake_amount: stake,
+            balance_before: balanceBefore,
             reason: signal.mainReason
         });
 
+        this.saveState(); // Explict save after ledger
         return true;
     }
 
     processResult(matchId, isWin, stake, odds = 2.0) {
-        const profit = isWin ? stake * (odds - 1) : -stake;
+        const profit = isWin ? stake * odds : 0; // Stake was already deducted
         const balanceBefore = this.state.current_balance;
 
         this.state.current_balance += profit;
@@ -190,7 +219,8 @@ class BankrollManager {
     }
 
     getState() {
-        return this.state;
+        // Return a copy to ensure React re-renders on state change
+        return JSON.parse(JSON.stringify(this.state));
     }
 
     getModeLabel(lang) {

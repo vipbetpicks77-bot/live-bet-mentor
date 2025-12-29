@@ -13,7 +13,7 @@ export const CONFIG = {
     MIN_SELECTIVITY_PASS_RATE: 0.60, // Target selectivity
     MAX_COUNTER_ARGUMENTS: 2, // Max allowed counter-args before automatic PASS
     DAILY_TRANSACTION_LIMIT: 2, // Max 2 approved trades per day
-    DQS_THRESHOLD: 0.70, // Min Data Quality Score to allow analysis
+    DQS_THRESHOLD: 0.40, // Min Data Quality Score to allow analysis
     DQS_WEIGHTS: {
       LATENCY: 0.4,
       STATS_AVAILABILITY: 0.4,
@@ -43,7 +43,7 @@ export const CONFIG = {
       SOFASCORE: 'SOFASCORE',
       REDSCORES: 'REDSCORES'
     },
-    SOFASCORE_LOCAL_PROXY_URL: 'http://localhost:3001/api/sofascore/live'
+    SOFASCORE_LOCAL_PROXY_URL: (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001') + '/api/sofascore/live'
   },
 
   // Bankroll Management

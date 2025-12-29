@@ -47,7 +47,7 @@ export const Dashboard = ({ user, onLogout }) => {
                 const sig = dataWorker.getSignalForMatch(m.id);
                 if (sig) {
                     updatedSignals[m.id] = sig;
-                    bankrollManager.logVerdict(sig.verdict);
+                    bankrollManager.logVerdict(m.id, sig.verdict);
                 }
             });
             setSignals(updatedSignals);

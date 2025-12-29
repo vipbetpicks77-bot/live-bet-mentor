@@ -75,8 +75,8 @@ export const sofaScoreAdapter = {
      * Fetches full details for a specific event.
      */
     fetchEventDetails: async (eventId) => {
-        // Use local proxy to bypass 403 blocks for details and stats
-        const baseUrl = 'http://localhost:3001/api/sofascore/event';
+        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+        const baseUrl = `${apiBase}/api/sofascore/event`;
         const detailUrl = `${baseUrl}/${eventId}`;
         const statsUrl = `${baseUrl}/${eventId}/statistics`;
 
