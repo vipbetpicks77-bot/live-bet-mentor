@@ -46,6 +46,7 @@ def capture_sofascore():
         driver.get(url)
         time.sleep(15)
         last_live_fetch = 0
+        last_page_refresh = time.time()
 
         while True:
             # Check for generic event fetch requests or specific detail requests
@@ -85,28 +86,30 @@ def capture_sofascore():
                                 body = response_body.get('body', '')
                                 if body:
                                     json_data = json.loads(body)
-                                    # Don't save if it's an error response
                                     if "error" not in json_data:
                                         with open(target_path, 'w', encoding='utf-8') as f:
                                             json.dump(json_data, f)
-                                        print(f"[SCRAPER] Captured {type_label} for {match_id} -> {target_path}")
+                                        logger.info(f"Captured {type_label} for {match_id} -> {target_path}")
                                     else:
-                                        print(f"[SCRAPER] API Error for {match_id} ({type_label}), skipping save.")
+                                        logger.warning(f"API Error for {match_id} ({type_label}), skipping save.")
                             except Exception as e:
-                                # logger.debug(f"Could not get body for {request_url}: {e}")
                                 continue
 
                 except Exception:
                     continue
             
-            # Polling: Explicitly trigger a live list fetch if it's been more than 60 seconds
-            # This ensures we don't just wait for the browser to naturally trigger it
-            if time.time() - last_live_fetch > 60:
-                print("[SCRAPER] Periodic manual fetch for LIVE_LIST")
-                driver.execute_script("fetch('https://www.sofascore.com/api/v1/sport/football/events/live');")
+            if time.time() - last_live_fetch > 30:
+                logger.info(f"Periodic manual fetch for LIVE_LIST (TS: {int(time.time())})")
+                cb = int(time.time())
+                driver.execute_script(f"fetch('https://www.sofascore.com/api/v1/sport/football/events/live?cache_buster={cb}');")
                 last_live_fetch = time.time()
 
-            # Maintenance: If there's a "stats_request.json" from the proxy, fulfill it
+            if time.time() - last_page_refresh > 600:
+                logger.info("Safety net: Refreshing page...")
+                driver.refresh()
+                time.sleep(10)
+                last_page_refresh = time.time()
+
             request_queue = 'server/stats_request.json'
             if os.path.exists(request_queue):
                 try:
@@ -114,17 +117,20 @@ def capture_sofascore():
                         req_data = json.load(rq)
                     os.remove(request_queue)
                     
-                    for match_id in req_data.get('ids', []):
-                        print(f"[SCRAPER] Automated fetch for Match ID: {match_id}")
-                        driver.execute_script(f"""
-                            fetch('https://www.sofascore.com/api/v1/event/{match_id}');
-                            fetch('https://www.sofascore.com/api/v1/event/{match_id}/statistics');
-                        """)
+                    ids = req_data.get('ids', [])
+                    if ids:
+                        logger.info(f"Processing queue: {len(ids)} matches")
+                        for match_id in ids:
+                            logger.info(f"Targeted fetch for Match ID: {match_id}")
+                            # Add a small delay between fetches to avoid being flagged
+                            driver.execute_script(f"fetch('https://www.sofascore.com/api/v1/event/{match_id}');")
+                            time.sleep(0.5)
+                            driver.execute_script(f"fetch('https://www.sofascore.com/api/v1/event/{match_id}/statistics');")
+                            time.sleep(1.0)
                 except Exception as e:
-                    print(f"[SCRAPER] Queue processing error: {e}")
+                    logger.error(f"Queue processing error: {e}")
 
-            # Polling interval
-            time.sleep(10)
+            time.sleep(2)
             
     except Exception as e:
         logger.error(f"FATAL ERROR in capture loop: {e}", exc_info=True)

@@ -59,12 +59,15 @@ export const sofaScoreAdapter = {
                 home: event.homeScore?.current ?? 0,
                 away: event.awayScore?.current ?? 0
             },
-            minute: event.status?.description || '0\'',
+            minute: this.calculateMinute(event),
             stats: {
                 possession: { home: 0, away: 0 },
                 shotsOnGoal: { home: 0, away: 0 },
-                dangerousAttacks: { home: 0, away: 0 }
+                dangerousAttacks: { home: 0, away: 0 },
+                corners: { home: 0, away: 0 },
+                xg: { home: 0, away: 0 }
             },
+            isPartial: true,
             latency: 0,
             dataQuality: 'BASIC',
             source: 'SOFASCORE'
@@ -111,10 +114,15 @@ export const sofaScoreAdapter = {
      */
     normalize: (detail, stats) => {
         const event = detail.event;
+        let isPartial = false;
+
         const normalizedStats = {
             possession: { home: 0, away: 0 },
             shotsOnGoal: { home: 0, away: 0 },
             dangerousAttacks: { home: 0, away: 0 },
+            corners: { home: 0, away: 0 },
+            xg: { home: 0, away: 0 },
+            cards: { home: { yellow: 0, red: 0 }, away: { yellow: 0, red: 0 } },
             rawStats: {}
         };
 
@@ -127,37 +135,68 @@ export const sofaScoreAdapter = {
                         const homeVal = item.home;
                         const awayVal = item.away;
 
-                        // Clean values (remove % for possession, etc.)
-                        const parseVal = (v) => parseInt(v.toString().replace('%', '')) || 0;
+                        const parseVal = (v) => {
+                            if (typeof v === 'string') {
+                                return parseFloat(v.replace('%', '')) || 0;
+                            }
+                            return parseFloat(v) || 0;
+                        };
 
                         if (name.includes('possession')) {
                             normalizedStats.possession.home = parseVal(homeVal);
                             normalizedStats.possession.away = parseVal(awayVal);
                         }
-                        if (name.includes('shots on target')) {
+                        if (name.includes('shots on target') || name === 'shots on goal') {
                             normalizedStats.shotsOnGoal.home = parseVal(homeVal);
                             normalizedStats.shotsOnGoal.away = parseVal(awayVal);
                         }
-                        // Priority for Dangerous Attacks: 
-                        // 1. "Dangerous attacks"
-                        // 2. "Final third entries"
-                        // 3. "Big chances" (fallback)
+
                         if (name === 'dangerous attacks') {
                             normalizedStats.dangerousAttacks.home = parseVal(homeVal);
                             normalizedStats.dangerousAttacks.away = parseVal(awayVal);
-                        } else if (name === 'final third entries' && normalizedStats.dangerousAttacks.home === 0) {
+                        } else if ((name === 'final third entries' || name === 'big chances') && normalizedStats.dangerousAttacks.home === 0) {
                             normalizedStats.dangerousAttacks.home = parseVal(homeVal);
                             normalizedStats.dangerousAttacks.away = parseVal(awayVal);
-                        } else if (name === 'big chances' && normalizedStats.dangerousAttacks.home === 0) {
-                            normalizedStats.dangerousAttacks.home = parseVal(homeVal);
-                            normalizedStats.dangerousAttacks.away = parseVal(awayVal);
+                        }
+
+                        if (name.includes('expected goals') || name === 'xg') {
+                            normalizedStats.xg.home = parseVal(homeVal);
+                            normalizedStats.xg.away = parseVal(awayVal);
+                        }
+
+                        if (name === 'corner kicks' || name === 'corners') {
+                            normalizedStats.corners.home = parseVal(homeVal);
+                            normalizedStats.corners.away = parseVal(awayVal);
+                        }
+
+                        if (name === 'yellow cards') {
+                            normalizedStats.cards.home.yellow = parseVal(homeVal);
+                            normalizedStats.cards.away.yellow = parseVal(awayVal);
+                        }
+                        if (name === 'red cards') {
+                            normalizedStats.cards.home.red = parseVal(homeVal);
+                            normalizedStats.cards.away.red = parseVal(awayVal);
                         }
 
                         normalizedStats.rawStats[item.name] = { home: homeVal, away: awayVal };
                     });
                 });
                 normalizedStats.groups = allStats.groups;
+
+                // If major stats are missing AFTER checking all groups, it might be a limited coverage match
+                const hasMajorStats = normalizedStats.shotsOnGoal.home > 0 || normalizedStats.shotsOnGoal.away > 0 ||
+                    normalizedStats.dangerousAttacks.home > 0 || normalizedStats.dangerousAttacks.away > 0;
+
+                if (!hasMajorStats) {
+                    // Check if other groups exist to decide if it's partial or just limited
+                    const totalItems = allStats.groups.reduce((acc, g) => acc + g.statisticsItems.length, 0);
+                    if (totalItems < 5) isPartial = true;
+                }
+            } else {
+                isPartial = true;
             }
+        } else {
+            isPartial = true;
         }
 
         return {
@@ -166,11 +205,45 @@ export const sofaScoreAdapter = {
             awayTeam: event.awayTeam.name,
             leagueName: event.tournament?.name || 'Unknown League',
             score: { home: event.homeScore.current, away: event.awayScore.current },
-            minute: event.status.description,
+            minute: this.calculateMinute(event),
             stats: normalizedStats,
+            isPartial: isPartial,
             latency: 0,
-            dataQuality: 'OK',
+            dataQuality: isPartial ? 'PARTIAL' : (normalizedStats.shotsOnGoal.home === 0 && normalizedStats.shotsOnGoal.away === 0 ? 'LIMITED' : 'OK'),
             source: 'SOFASCORE'
         };
+    },
+
+    /**
+     * Calculates the current live minute from SofaScore statusTime.
+     */
+    calculateMinute(event) {
+        if (!event || !event.status) return '0\'';
+
+        const statusType = event.status.type;
+        const description = event.status.description || 'Live';
+
+        if (statusType !== 'inprogress') return description;
+
+        // If it's halftime, return the description
+        if (description.toLowerCase().includes('half') && description.toLowerCase().includes('time')) {
+            return description;
+        }
+
+        const statusTime = event.statusTime || event.time;
+        if (statusTime && statusTime.timestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const start = statusTime.timestamp;
+            const initial = statusTime.initial || 0;
+            const elapsed = Math.floor((now - start) / 60);
+            const calcMinute = Math.floor(initial / 60) + elapsed;
+
+            // Limit to reasonable values (e.g. max 90 + injury)
+            if (elapsed >= 0 && elapsed < 60) {
+                return calcMinute.toString();
+            }
+        }
+
+        return description;
     }
 };

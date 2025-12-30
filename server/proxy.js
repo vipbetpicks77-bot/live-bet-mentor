@@ -14,6 +14,13 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Request Logger Middleware
+app.use((req, res, next) => {
+    const log = `${new Date().toISOString()} ${req.method} ${req.url}\n`;
+    fs.appendFileSync(path.join(__dirname, 'proxy.log'), log);
+    next();
+});
+
 const SOFASCORE_FILE = path.join(__dirname, 'sofascore_live.json');
 const STATS_DIR = path.join(__dirname, 'stats');
 const REQUEST_QUEUE = path.join(__dirname, 'stats_request.json');
@@ -31,38 +38,46 @@ app.get('/api/sofascore/live', (req, res) => {
     res.status(404).json({ error: 'Data not found yet' });
 });
 
-// 2. Match Details (from local cache)
+// 2. Match Details (with freshness check)
 app.get('/api/sofascore/event/:id', (req, res) => {
     const id = req.params.id;
     const filePath = path.join(STATS_DIR, `${id}_detail.json`);
 
     if (fs.existsSync(filePath)) {
-        const data = fs.readFileSync(filePath, 'utf8');
-        const json = JSON.parse(data);
-        if (!json.error) {
-            return res.json(json);
+        const stats = fs.statSync(filePath);
+        const ageInSeconds = (Date.now() - stats.mtimeMs) / 1000;
+
+        // TTL: 60 seconds for live details
+        if (ageInSeconds < 60) {
+            const data = fs.readFileSync(filePath, 'utf8');
+            const json = JSON.parse(data);
+            if (!json.error) return res.json(json);
         }
     }
 
     queueRequest(id);
-    res.status(202).json({ status: 'queued', message: 'Detail not in cache' });
+    res.status(202).json({ status: 'queued', message: 'Detail stale or missing' });
 });
 
-// 3. Match Statistics (from local cache)
+// 3. Match Statistics (with freshness check)
 app.get('/api/sofascore/event/:id/statistics', (req, res) => {
     const id = req.params.id;
     const filePath = path.join(STATS_DIR, `${id}_stats.json`);
 
     if (fs.existsSync(filePath)) {
-        const data = fs.readFileSync(filePath, 'utf8');
-        const json = JSON.parse(data);
-        if (!json.error) {
-            return res.json(json);
+        const stats = fs.statSync(filePath);
+        const ageInSeconds = (Date.now() - stats.mtimeMs) / 1000;
+
+        // TTL: 60 seconds for live statistics
+        if (ageInSeconds < 60) {
+            const data = fs.readFileSync(filePath, 'utf8');
+            const json = JSON.parse(data);
+            if (!json.error) return res.json(json);
         }
     }
 
     queueRequest(id);
-    res.status(202).json({ status: 'queued', message: 'Stats not in cache' });
+    res.status(202).json({ status: 'queued', message: 'Stats stale or missing' });
 });
 
 function queueRequest(id) {

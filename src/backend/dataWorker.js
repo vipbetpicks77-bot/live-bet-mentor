@@ -159,20 +159,30 @@ class DataWorker {
         let score = 0;
         const weights = CONFIG.DECISION.DQS_WEIGHTS;
 
+        // 1. Latency (Gecikme)
         if (fixture.latency < 5000) score += weights.LATENCY;
         else if (fixture.latency < CONFIG.DATA.LATENCY_THRESHOLD_MS) score += weights.LATENCY * 0.5;
 
-        const hasSOG = fixture.stats?.shotsOnGoal?.home !== 0 || fixture.stats?.shotsOnGoal?.away !== 0;
-        const hasAttacks = fixture.stats?.dangerousAttacks?.home !== 0 || fixture.stats?.dangerousAttacks?.away !== 0;
-        if (hasSOG && hasAttacks) score += weights.STATS_AVAILABILITY;
-        else if (hasSOG || hasAttacks) score += weights.STATS_AVAILABILITY * 0.5;
+        // 2. Statistics Availability (İstatistik Mevcudiyeti)
+        const hasSOG = fixture.stats?.shotsOnGoal?.home > 0 || fixture.stats?.shotsOnGoal?.away > 0;
+        const hasAttacks = fixture.stats?.dangerousAttacks?.home > 0 || fixture.stats?.dangerousAttacks?.away > 0;
+        const hasCorners = fixture.stats?.corners?.home > 0 || fixture.stats?.corners?.away > 0;
+        const hasXG = (fixture.stats?.xg?.home > 0 || fixture.stats?.xg?.away > 0);
 
+        if (hasSOG && hasAttacks) score += weights.STATS_AVAILABILITY;
+        else if (hasSOG || hasAttacks) score += weights.STATS_AVAILABILITY * 0.7;
+
+        // 3. Freshness (Güncellik)
         if (fixture.minute > 0) score += weights.FRESHNESS;
 
-        // Phase 11: xG Reward
-        if (fixture.stats?.xg) score += 0.1;
+        // 4. Detailed Data Rewards (Detaylı Veri Ödülleri)
+        if (hasXG) score += 0.1;
+        if (hasCorners) score += 0.05;
 
-        return Math.min(1.0, Math.round(score * 100) / 100);
+        // 5. Partial Data Penalty (Kısmi Veri Cezası)
+        if (fixture.isPartial) score -= 0.1;
+
+        return Math.max(0.1, Math.min(1.0, Math.round(score * 100) / 100));
     }
 
     /**

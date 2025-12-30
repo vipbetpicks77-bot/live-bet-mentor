@@ -389,8 +389,9 @@ export const Dashboard = ({ user, onLogout }) => {
                                                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>{match.homeTeam} <span style={{ opacity: 0.3 }}>vs</span> {match.awayTeam}</h3>
                                                 <div className="match-meta" style={{ marginTop: '0.5rem' }}>
                                                     <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: 800 }}>
-                                                        {match.minute.includes('HT') || match.minute.includes('Halftime') ? t.halftime_short :
-                                                            (match.minute.replace("'", "") + '. ' + t.minute_label)}
+                                                        {match.minute?.includes('HT') || match.minute?.includes('Halftime') ? t.halftime_short :
+                                                            (match.minute?.includes('half') || match.minute?.includes('Half')) ? match.minute :
+                                                                (match.minute ? (match.minute.toString().replace("'", "") + '. ' + t.minute_label) : ("0'"))}
                                                         <span style={{ opacity: 0.5, margin: '0 0.5rem' }}>|</span>
                                                         {match.score.home} - {match.score.away}
                                                     </span>
@@ -398,6 +399,49 @@ export const Dashboard = ({ user, onLogout }) => {
                                             </div>
                                             <span className={`tier-badge tier-${match.tier}`} style={{ padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800, background: match.tier === 1 ? 'var(--success-color)' : match.tier === 2 ? 'var(--warning-color)' : 'var(--text-secondary)', color: '#000' }}>TIER {match.tier}</span>
                                         </div>
+
+                                        {/* Match Stats & Status */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.2rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <div style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', marginBottom: '0.4rem' }}>{t.shots_on_target || 'SOG'}</div>
+                                                <div style={{ fontWeight: 800, color: 'var(--success-color)' }}>
+                                                    {match.stats?.shotsOnGoal?.home || 0} - {match.stats?.shotsOnGoal?.away || 0}
+                                                </div>
+                                            </div>
+                                            <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', marginBottom: '0.4rem' }}>{t.dangerous_attacks || 'DA'}</div>
+                                                <div style={{ fontWeight: 800, color: '#ff9800' }}>
+                                                    {match.stats?.dangerousAttacks?.home || 0} - {match.stats?.dangerousAttacks?.away || 0}
+                                                </div>
+                                            </div>
+                                            {match.stats?.xg && (match.stats.xg.home > 0 || match.stats.xg.away > 0) && (
+                                                <div style={{ textAlign: 'center', gridColumn: 'span 2', marginTop: '0.4rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.6rem' }}>
+                                                    <div style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', marginBottom: '0.2rem' }}>xG (Expected Goals)</div>
+                                                    <div style={{ fontWeight: 800, color: 'var(--warning-color)', fontSize: '0.9rem' }}>
+                                                        {match.stats.xg.home.toFixed(2)} - {match.stats.xg.away.toFixed(2)}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Partial Data Indicator */}
+                                        {match.isPartial && (
+                                            <div style={{
+                                                padding: '0.5rem',
+                                                background: 'rgba(255, 152, 0, 0.1)',
+                                                borderRadius: '8px',
+                                                fontSize: '0.65rem',
+                                                color: '#ff9800',
+                                                marginBottom: '1rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem',
+                                                border: '1px solid rgba(255, 152, 0, 0.2)'
+                                            }}>
+                                                <span style={{ fontSize: '1rem' }}>⚠️</span>
+                                                {t.partial_data_warning || 'Temel veri kullanılıyor, detaylar yükleniyor...'}
+                                            </div>
+                                        )}
 
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                                             <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t.dqs_score_label.replace(':', '')}: <span style={{ color: 'var(--text-primary)', fontWeight: 800 }}>{(match.dqs || 0).toFixed(2)}</span></div>
@@ -460,10 +504,20 @@ export const Dashboard = ({ user, onLogout }) => {
                                         <div>
                                             <h4 style={{ fontSize: '0.95rem', fontWeight: 700 }}>{match.homeTeam} vs {match.awayTeam}</h4>
                                             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>
-                                                {match.minute.includes('HT') || match.minute.includes('Halftime') ? t.halftime_short :
-                                                    (match.minute.replace("'", "") + '. ' + t.minute_label)}
-                                                <span style={{ margin: '0 0.4rem', opacity: 0.5 }}>|</span>
+                                                {match.minute?.includes('HT') || match.minute?.includes('Halftime') ? t.halftime_short :
+                                                    (match.minute?.includes('half') || match.minute?.includes('Half')) ? match.minute :
+                                                        (match.minute ? (match.minute.toString().replace("'", "") + '. ' + t.minute_label) : "0'")}
                                                 {match.score.home} - {match.score.away}
+                                                {match.stats?.xg && (match.stats.xg.home > 0 || match.stats.xg.away > 0) && (
+                                                    <span style={{ fontSize: '0.7rem', color: 'var(--warning-color)', marginLeft: '0.5rem', fontWeight: 800 }}>
+                                                        (xG {match.stats.xg.home.toFixed(2)} - {match.stats.xg.away.toFixed(2)})
+                                                    </span>
+                                                )}
+                                                {match.isPartial && (
+                                                    <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginLeft: '0.8rem', opacity: 0.5 }}>
+                                                        [BASIC]
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
@@ -525,7 +579,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                                     <div style={{ fontWeight: 800 }}>{m.homeTeam} <span style={{ opacity: 0.3 }}>-</span> {m.awayTeam}</div>
                                                     <div style={{ fontSize: '0.75rem', color: 'var(--accent-color)', marginTop: '0.25rem', fontWeight: 600 }}>{m.score.home} : {m.score.away}</div>
                                                 </td>
-                                                <td style={{ padding: '1.5rem 1rem', fontWeight: 800 }}>{m.minute}'</td>
+                                                <td style={{ padding: '1.5rem 1rem', fontWeight: 800 }}>{m.minute?.includes('half') || m.minute?.includes('Half') || m.minute?.includes('HT') ? m.minute : (m.minute ? m.minute + "'" : "0'")}</td>
                                                 <td style={{ padding: '1rem', fontWeight: 800, color: (m.dqs || 0) >= CONFIG.DECISION.DQS_THRESHOLD ? 'var(--success-color)' : 'var(--danger-color)' }}>
                                                     {m.dqs ? m.dqs.toFixed(2) : '0.00'}
                                                 </td>
@@ -552,154 +606,147 @@ export const Dashboard = ({ user, onLogout }) => {
                         </div>
                     </section>
 
-                    {/* Match Detail Modal - Enhanced UI */}
+                    {/* Match Details Modal */}
                     {selectedMatch && (
-                        <div className="modal-overlay" onClick={() => setSelectedMatch(null)}>
-                            <div className="modal-content glass-panel enhanced-detail" onClick={e => e.stopPropagation()}>
-                                <button className="close-btn-enhanced" onClick={() => setSelectedMatch(null)}>×</button>
+                        (() => {
+                            const currentMatch = matches.find(m => m.id === selectedMatch?.id) || selectedMatch;
+                            if (!currentMatch) return null;
 
-                                <div className="enhanced-modal-header">
-                                    <div style={{ opacity: 0.5, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' }}>{t.match_intelligence_report}</div>
-                                    <h2>{selectedMatch.homeTeam} vs {selectedMatch.awayTeam}</h2>
-                                    <div className="sub-header">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span className={`tier-badge tier-${selectedMatch.tier}`} style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }}>{t.tier_label} {selectedMatch.tier}</span>
-                                            <span style={{ opacity: 0.4 }}>|</span>
-                                            <span className="accent">{selectedMatch.minute}'</span>
-                                            <span style={{ opacity: 0.4 }}>|</span>
-                                            <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '2px' }}>{selectedMatch.score.home}-{selectedMatch.score.away}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            return (
+                                <div className="modal-overlay" onClick={() => setSelectedMatch(null)}>
+                                    <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
+                                        <button className="close-btn" onClick={() => setSelectedMatch(null)}>×</button>
 
-                                <div className="modal-grid">
-                                    {/* Column 1: Engine Quality */}
-                                    <div className="grid-col">
-                                        <h3><span style={{ marginRight: '0.5rem' }}>⚡</span> {t.dqs_engine}</h3>
-                                        <div className="stats-card">
-                                            <div className="stat-item">
-                                                <div className="stat-label">
-                                                    <span>{t.dqs_score_label}</span>
-                                                    <span style={{ color: (selectedMatch.dqs || 0) >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)' }}>{(selectedMatch.dqs || 0).toFixed(4)}</span>
-                                                </div>
-                                                <div className="stat-bar-bg">
-                                                    <div className="stat-bar-fill" style={{
-                                                        width: `${(selectedMatch.dqs || 0) * 100}%`,
-                                                        background: `linear-gradient(to right, ${(selectedMatch.dqs || 0) >= 0.7 ? 'var(--success-color)' : 'var(--warning-color)'}, var(--accent-color))`
-                                                    }}></div>
+                                        <div className="modal-header">
+                                            <div className="header-top">
+                                                <span className="label-text">MAÇ İSTİHBARAT RAPORU</span>
+                                                <h2>{currentMatch.homeTeam} vs {currentMatch.awayTeam}</h2>
+                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.5rem' }}>
+                                                    <span className="tier-badge">TIER {currentMatch.tier}</span>
+                                                    <span className="minute-badge">{currentMatch.minute}'</span>
+                                                    <span className="score-badge">{currentMatch.score.home} - {currentMatch.score.away}</span>
                                                 </div>
                                             </div>
-                                            <div className="stat-row-pill">
-                                                <span style={{ opacity: 0.6 }}>{t.latency}:</span>
-                                                <span style={{ fontWeight: 800 }}>{selectedMatch.latency}ms</span>
-                                            </div>
-                                            <div className="stat-row-pill" style={{ marginTop: '1rem' }}>
-                                                <span style={{ opacity: 0.6 }}>{t.data_integrity}:</span>
-                                                <span className="status-pill ok">{t.verified}</span>
-                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Column 2: Risk Analysis */}
-                                    <div className="grid-col">
-                                        <h3><span style={{ marginRight: '0.5rem' }}>🛡️</span> {t.risk_guard}</h3>
-                                        <div className="stats-card">
-                                            {Object.entries(dataWorker.checkRiskFilters(selectedMatch)).map(([key, f]) => (
-                                                <div key={key} className="stat-row-pill" style={{ marginBottom: '0.8rem' }}>
-                                                    <span style={{ opacity: 0.8 }}>{t[key] || key}</span>
-                                                    <span className={`status-pill ${f.status === 'OK' ? 'ok' : 'fail'}`}>
-                                                        {f.status === 'OK' ? t.status_ok : t.status_fail}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                            <div style={{ marginTop: '1.5rem', padding: '0.8rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', border: '1px dotted var(--accent-color)', fontSize: '0.7rem', opacity: 0.8 }}>
-                                                {t.analysis_protocol_active}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Column 3: Live Snapshot */}
-                                    <div className="grid-col">
-                                        <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
-                                        <div className="stats-card" style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                                            {selectedMatch.stats?.groups ? (
-                                                selectedMatch.stats.groups.map(group => (
-                                                    <div key={group.groupName} style={{ marginBottom: '1.8rem' }}>
-                                                        <h4 style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.8rem', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--accent-color)' }}>
-                                                            {t[group.groupName] || group.groupName}
-                                                        </h4>
-                                                        {group.statisticsItems.map(item => {
-                                                            const parseVal = (v) => parseFloat(v?.toString().replace('%', '')) || 0;
-                                                            const homeVal = parseVal(item.home);
-                                                            const awayVal = parseVal(item.away);
-                                                            const total = homeVal + awayVal;
-                                                            const homePct = total > 0 ? (homeVal / total) * 100 : 50;
-
-                                                            return (
-                                                                <div key={item.name} className="stat-item" style={{ marginBottom: '1rem' }}>
-                                                                    <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.75rem' }}>
-                                                                        <span style={{ opacity: 0.8, color: item.name.includes('Expected') ? 'var(--warning-color)' : 'inherit' }}>
-                                                                            {t[item.name] || item.name}
-                                                                        </span>
-                                                                        <span style={{ fontWeight: 800 }}>{item.home} - {item.away}</span>
-                                                                    </div>
-                                                                    <div className="stat-bar-bg" style={{ display: 'flex', height: '3px', borderRadius: '1.5px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
-                                                                        <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', transition: 'width 0.5s', opacity: 0.8 }}></div>
-                                                                        <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'rgba(255,255,255,0.1)', transition: 'width 0.5s' }}></div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                Object.entries(selectedMatch.stats || {}).map(([name, val]) => {
-                                                    if (typeof val !== 'object' || val === null || (!val.home && val.home !== 0)) return null;
-                                                    const total = (val.home || 0) + (val.away || 0);
-                                                    const homePct = total > 0 ? (val.home / total) * 100 : 50;
-                                                    return (
-                                                        <div key={name} className="stat-item" style={{ marginBottom: '1.5rem' }}>
-                                                            <div className="stat-label">
-                                                                <span style={{ textTransform: 'capitalize' }}>{t[name] || name}</span>
-                                                                <span style={{ fontWeight: 800 }}>{val.home} - {val.away}</span>
-                                                            </div>
-                                                            <div className="stat-bar-bg" style={{ display: 'flex' }}>
-                                                                <div style={{ width: `${homePct}%`, height: '100%', background: 'var(--accent-color)', opacity: 0.8 }}></div>
-                                                                <div style={{ width: `${100 - homePct}%`, height: '100%', background: 'var(--text-secondary)', opacity: 0.3 }}></div>
-                                                            </div>
+                                        <div className="modal-grid">
+                                            {/* Column 1: Engine Quality */}
+                                            <div className="grid-col">
+                                                <h3><span style={{ marginRight: '0.5rem' }}>⚡</span> DQS MOTORU</h3>
+                                                <div className="stats-card">
+                                                    <div className="dqs-display">
+                                                        <div className="dqs-label">
+                                                            <span>DQS Skoru:</span>
+                                                            <span style={{ color: 'var(--accent-color)', fontWeight: 800 }}>{currentMatch.dqs.toFixed(4)}</span>
                                                         </div>
-                                                    );
-                                                })
-                                            )}
-                                            {(!selectedMatch.stats || (Object.keys(selectedMatch.stats).length === 0 && (!selectedMatch.stats.groups || selectedMatch.stats.groups.length === 0))) && (
-                                                <div style={{ textAlign: 'center', opacity: 0.4, padding: '2rem 0' }}>
-                                                    {t.no_live_metrics}
+                                                        <div className="dqs-bar-bg">
+                                                            <div className="dqs-bar-fill" style={{ width: `${currentMatch.dqs * 100}%` }}></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="stat-row-pill" style={{ marginTop: '1.5rem' }}>
+                                                        <span style={{ opacity: 0.6 }}>LATANS:</span>
+                                                        <span style={{ fontWeight: 700 }}>{currentMatch.latency || 0}ms</span>
+                                                    </div>
+
+                                                    <div className="stat-row-pill" style={{ marginTop: '1rem' }}>
+                                                        <span style={{ opacity: 0.6 }}>{t.data_integrity}:</span>
+                                                        <span className={`status-pill ${currentMatch.dataQuality === 'OK' ? 'ok' : (currentMatch.dataQuality === 'LIMITED' ? 'warning' : 'fail')}`}>
+                                                            {currentMatch.dataQuality === 'PARTIAL' ? 'BEKLENİYOR' : (currentMatch.dataQuality === 'LIMITED' ? 'KISITLI' : 'TAM')}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            )}
+                                            </div>
+
+                                            {/* Column 2: Risk Analysis */}
+                                            <div className="grid-col">
+                                                <h3><span style={{ marginRight: '0.5rem' }}>🛡️</span> {t.risk_guard}</h3>
+                                                <div className="stats-card">
+                                                    {Object.entries(dataWorker.checkRiskFilters(currentMatch)).map(([key, f]) => (
+                                                        <div key={key} className="stat-row-pill" style={{ marginBottom: '0.8rem' }}>
+                                                            <span style={{ opacity: 0.8 }}>{t[key] || key}</span>
+                                                            <span className={`status-pill ${f.status === 'OK' ? 'ok' : f.status === 'FAIL' ? 'fail' : 'warning'}`}>
+                                                                {f.status === 'OK' ? t.status_ok : t.status_fail}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                    <div style={{ marginTop: '1.5rem', padding: '0.8rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', border: '1px dotted var(--accent-color)', fontSize: '0.7rem', opacity: 0.8 }}>
+                                                        {t.analysis_protocol_active}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Column 3: Live Snapshot */}
+                                            <div className="grid-col">
+                                                <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
+                                                <div className="stats-card" style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                                    {currentMatch.stats?.groups && currentMatch.stats.groups.length > 0 ? (
+                                                        currentMatch.stats.groups.map(group => (
+                                                            <div key={group.groupName} style={{ marginBottom: '1.8rem' }}>
+                                                                <h4 style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.8rem', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--accent-color)' }}>
+                                                                    {t[group.groupName] || group.groupName}
+                                                                </h4>
+                                                                {group.statisticsItems.map(item => {
+                                                                    const parseVal = (v) => {
+                                                                        if (typeof v === 'string') return parseFloat(v.replace('%', '')) || 0;
+                                                                        return parseFloat(v) || 0;
+                                                                    };
+                                                                    const homeVal = parseVal(item.home);
+                                                                    const awayVal = parseVal(item.away);
+                                                                    const total = homeVal + awayVal;
+                                                                    const homePct = total > 0 ? (homeVal / total) * 100 : 50;
+
+                                                                    const isXG = item.name.toLowerCase().includes('expected') || item.name.toLowerCase() === 'xg';
+
+                                                                    return (
+                                                                        <div key={item.name} className="stat-item" style={{ marginBottom: '1rem' }}>
+                                                                            <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.75rem' }}>
+                                                                                <span style={{ opacity: 0.8, color: isXG ? 'var(--warning-color)' : 'inherit' }}>
+                                                                                    {t[item.name] || item.name}
+                                                                                </span>
+                                                                                <span style={{ fontWeight: 800 }}>
+                                                                                    {isXG ? `${homeVal.toFixed(2)} - ${awayVal.toFixed(2)}` : `${item.home} - ${item.away}`}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="stat-bar-bg" style={{ display: 'flex', height: '3px', borderRadius: '1.5px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                                                                <div className="stat-bar-home" style={{ width: `${homePct}%`, background: isXG ? 'var(--warning-color)' : 'var(--accent-color)', height: '100%', transition: 'width 0.5s ease' }}></div>
+                                                                                <div className="stat-bar-away" style={{ width: `${100 - homePct}%`, background: 'rgba(255,255,255,0.15)', height: '100%', transition: 'width 0.5s ease' }}></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
+                                                            {currentMatch.isPartial ? (t.loading_stats || 'Detaylar yükleniyor...') : (t.no_stats_available || 'İstatistik verisi bulunamadı')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
+                                            <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', opacity: 0.5 }}>
+                                                <span style={{ width: '8px', height: '8px', background: 'var(--success-color)', borderRadius: '50%' }}></span>
+                                                {t.live_feed_connected}
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedMatch(null)}
+                                                className="btn btn-outline"
+                                                style={{ padding: '0.8rem 2rem', borderRadius: '10px' }}
+                                            >
+                                                {t.close_intelligence}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
-                                    <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', opacity: 0.5 }}>
-                                        <span style={{ width: '8px', height: '8px', background: 'var(--success-color)', borderRadius: '50%' }}></span>
-                                        {t.live_feed_connected}
-                                    </div>
-                                    <button
-                                        onClick={() => setSelectedMatch(null)}
-                                        className="btn btn-outline"
-                                        style={{ padding: '0.8rem 2rem', borderRadius: '10px' }}
-                                    >
-                                        {t.close_intelligence}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })()
                     )}
 
                     {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} />}
 
-                    {/* Advanced Settings Modal */}
                     {showAdvanced && (
                         <div className="modal-overlay" onClick={() => setShowAdvanced(false)}>
                             <div className="modal-content settings glass-panel" onClick={e => e.stopPropagation()}>
