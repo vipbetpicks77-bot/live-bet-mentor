@@ -13,7 +13,7 @@ import { velocityModule } from './velocityModule';
  * "enerji değişimine" bakar. Vitesi yükselten (Velocity) ve rakibi bunaltan (Pressure) 
  * takımları yakalayarak risk-kazanç oranını optimize eder.
  */
-export const analyzeMatch = (fixture, odds) => {
+export const analyzeMatch = (fixture, odds, consensusReport) => {
     const { stats, minute, score, history } = fixture;
 
     // 1. Odds check (Requirement: No Odds = No Bet, except for Discovery)
@@ -28,12 +28,29 @@ export const analyzeMatch = (fixture, odds) => {
     const pressure = pressureIndex.calculate(stats);
     const velocity = velocityModule.calculate(history || []);
 
+    // Reverse Signal Implementation (Pre-match Consensus vs Live Reality)
+    let reverseSignal = false;
+    if (CONFIG.MODULAR_SYSTEM.ADVANCED_ANALYSIS.REVERSE_SIGNAL.ENABLED && consensusReport && consensusReport.agreement) {
+        const topPred = Object.entries(consensusReport.agreement).sort((a, b) => b[1] - a[1])[0]?.[0];
+        const dqs = fixture.dqs || 0;
+
+        // If consensus was Home (1) but live pressure is Away (2) + high DQS
+        if (topPred === '1' && pressure.dominantTeam === 'AWAY' && dqs >= CONFIG.MODULAR_SYSTEM.ADVANCED_ANALYSIS.REVERSE_SIGNAL.DQS_THRESHOLD) {
+            reverseSignal = true;
+        }
+        // If consensus was Away (2) but live pressure is Home (1) + high DQS
+        else if (topPred === '2' && pressure.dominantTeam === 'HOME' && dqs >= CONFIG.MODULAR_SYSTEM.ADVANCED_ANALYSIS.REVERSE_SIGNAL.DQS_THRESHOLD) {
+            reverseSignal = true;
+        }
+    }
+
     const observations = {
         xg: xGModule.calculate(fixture),
         leagueProfile: leagueProfileModule.getProfile(fixture.leagueName),
         pressure,
         velocity,
-        bayesian: null
+        bayesian: null,
+        reverseSignal
     };
 
     // 2. Advanced EdgeScore Calculation

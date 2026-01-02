@@ -10,12 +10,25 @@ import '../styles/global.css';
 
 const RADAR_SOURCES = [
     { id: 'forebet', label: 'Forebet', color: '#34d399' },
+    { id: 'prosoccer', label: 'ProSoccer', color: '#38bdf8' },
     { id: 'predictz', label: 'PredictZ', color: '#f87171' },
     { id: 'windrawwin', label: 'WDW', color: '#60a5fa' },
     { id: 'statarea', label: 'Statarea', color: '#fbbf24' },
     { id: 'vitibet', label: 'Vitibet', color: '#a78bfa' },
-    { id: 'zulubet', label: 'Zulubet', color: '#f472b6' }
+    { id: 'zulubet', label: 'Zulubet', color: '#f472b6' },
+    { id: 'olbg', label: 'OLBG', color: '#00f2fe' }
 ];
+
+const RADAR_BASE_URLS = {
+    forebet: 'https://www.forebet.com',
+    predictz: 'https://www.predictz.com',
+    windrawwin: 'https://www.windrawwin.com',
+    statarea: 'https://www.statarea.com',
+    vitibet: 'https://www.vitibet.com',
+    zulubet: 'https://www.zulubet.com',
+    prosoccer: 'https://www.prosoccer.eu',
+    olbg: 'https://www.olbg.com/betting-tips/Football/1'
+};
 
 export const Dashboard = ({ user, onLogout }) => {
     const [matches, setMatches] = useState([]);
@@ -25,6 +38,7 @@ export const Dashboard = ({ user, onLogout }) => {
     const [selectedMatch, setSelectedMatch] = useState(null);
     const [decisionMode, setDecisionMode] = useState(dataWorker.decisionMode);
     const [showFAQ, setShowFAQ] = useState(false);
+    const [faqMode, setFaqMode] = useState('live');
     const [lang, setLang] = useState('tr');
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [activeTierFilter, setActiveTierFilter] = useState('ALL');
@@ -40,14 +54,18 @@ export const Dashboard = ({ user, onLogout }) => {
 
     // Radar Filters State
     const [radarFilters, setRadarFilters] = useState({
-        sources: ['forebet', 'predictz', 'windrawwin', 'statarea', 'vitibet', 'zulubet'],
+        sources: ['forebet', 'predictz', 'windrawwin', 'statarea', 'vitibet', 'zulubet', 'prosoccer', 'olbg'],
         minSources: 1,
-        search: ''
+        search: '',
+        valueOnly: false,
+        hideDivergent: false,
+        todayOnly: true
     });
+    const [selectedMarket, setSelectedMarket] = useState('1X2');
 
     const radarMatches = React.useMemo(() => {
-        return consensusAdapter.getAllConsensusSummary(consensusData);
-    }, [consensusData]);
+        return consensusAdapter.getAllConsensusSummary(consensusData, selectedMarket);
+    }, [consensusData, selectedMarket]);
 
     const filteredRadarMatches = React.useMemo(() => {
         return radarMatches.filter(m => {
@@ -57,9 +75,20 @@ export const Dashboard = ({ user, onLogout }) => {
             if (activeMatchSources.length === 0) return false;
             if (activeMatchSources.length < radarFilters.minSources) return false;
 
+            if (radarFilters.valueOnly && !m.isValue) return false;
+            if (radarFilters.hideDivergent && m.divergence > CONFIG.MODULAR_SYSTEM.ADVANCED_ANALYSIS.DIVERGENCE_RADAR.THRESHOLD) return false;
+
             if (radarFilters.search) {
                 const query = radarFilters.search.toLowerCase();
-                return m.home.toLowerCase().includes(query) || m.away.toLowerCase().includes(query);
+                return m.home.toLowerCase().includes(query) ||
+                    m.away.toLowerCase().includes(query) ||
+                    (m.league && m.league.toLowerCase().includes(query));
+            }
+
+            if (radarFilters.todayOnly) {
+                const d = new Date();
+                const todayStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+                if (m.date !== todayStr) return false;
             }
 
             return true;
@@ -142,7 +171,7 @@ export const Dashboard = ({ user, onLogout }) => {
                         <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(56, 189, 248, 0.2)', color: 'var(--accent-color)', fontWeight: 600 }}>
                             {t.limit}: {bankState.daily_bet_count}/{CONFIG.BANKROLL.HIERARCHY.THRESHOLDS.DAILY_BET_LIMIT}
                         </div>
-                        <button onClick={() => setShowFAQ(true)} className="faq-btn" style={{ width: '1.8rem', height: '1.8rem', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.7rem' }}>?</button>
+                        <button onClick={() => { setFaqMode('live'); setShowFAQ(true); }} className="faq-btn" style={{ width: '1.8rem', height: '1.8rem', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.7rem' }}>?</button>
                     </div>
                 </div>
 
@@ -275,6 +304,57 @@ export const Dashboard = ({ user, onLogout }) => {
                             <div style={{ marginTop: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>
                                 {filteredRadarMatches.length} / {radarMatches.length} {t.matches_found || 'Maç Bulundu'}
                             </div>
+
+                            {/* Market Selector Tabs */}
+                            <div className="market-tabs" style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+                                {[
+                                    { id: '1X2', label: '1X2', icon: '🎯' },
+                                    { id: 'OU25', label: lang === 'tr' ? 'Alt/Üst 2.5' : 'Over/Under 2.5', icon: '📊' },
+                                    { id: 'BTTS', label: lang === 'tr' ? 'KG Var/Yok' : 'Both Teams to Score', icon: '🔥' }
+                                ].map(m => (
+                                    <button
+                                        key={m.id}
+                                        onClick={() => setSelectedMarket(m.id)}
+                                        style={{
+                                            padding: '0.6rem 1.2rem',
+                                            borderRadius: '10px',
+                                            border: '1px solid ' + (selectedMarket === m.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'),
+                                            background: selectedMarket === m.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.03)',
+                                            color: selectedMarket === m.id ? '#000' : 'var(--text-secondary)',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 800,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}
+                                    >
+                                        <span>{m.icon}</span> {m.label}
+                                    </button>
+                                ))}
+
+                                <button
+                                    onClick={() => { setFaqMode('radar'); setShowFAQ(true); }}
+                                    style={{
+                                        padding: '0.6rem 1.2rem',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--accent-color)',
+                                        background: 'rgba(0, 242, 254, 0.05)',
+                                        color: 'var(--accent-color)',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        marginLeft: '1.5rem'
+                                    }}
+                                >
+                                    <span>❓</span> {lang === 'tr' ? 'Ortak Akıl Rehberi' : 'Consensus Guide'}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Radar Filter Bar */}
@@ -296,13 +376,26 @@ export const Dashboard = ({ user, onLogout }) => {
                                         return (
                                             <button
                                                 key={source.id}
-                                                onClick={() => {
-                                                    setRadarFilters(prev => ({
-                                                        ...prev,
-                                                        sources: isActive
-                                                            ? prev.sources.filter(s => s !== source.id)
-                                                            : [...prev.sources, source.id]
-                                                    }));
+                                                onClick={(e) => {
+                                                    const isMultiSelect = e.shiftKey || e.ctrlKey || e.metaKey;
+                                                    setRadarFilters(prev => {
+                                                        if (isMultiSelect) {
+                                                            // Toggle logic for multi-select
+                                                            return {
+                                                                ...prev,
+                                                                sources: isActive
+                                                                    ? prev.sources.filter(s => s !== source.id)
+                                                                    : [...prev.sources, source.id]
+                                                            };
+                                                        } else {
+                                                            // Single-select focus (standard click)
+                                                            // If already active and only one, keep it OR if many, focus this one
+                                                            return {
+                                                                ...prev,
+                                                                sources: [source.id]
+                                                            };
+                                                        }
+                                                    });
                                                 }}
                                                 style={{
                                                     background: isActive ? source.color + '22' : 'rgba(255,255,255,0.03)',
@@ -367,11 +460,44 @@ export const Dashboard = ({ user, onLogout }) => {
                                 />
                             </div>
 
+                            <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+                                <button
+                                    onClick={() => setRadarFilters(prev => ({ ...prev, valueOnly: !prev.valueOnly }))}
+                                    style={{
+                                        background: radarFilters.valueOnly ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.03)',
+                                        color: radarFilters.valueOnly ? 'var(--success-color)' : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${radarFilters.valueOnly ? 'var(--success-color)' : 'rgba(255,255,255,0.1)'}`,
+                                        borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
+                                    }}
+                                >💎 VALUE</button>
+                                <button
+                                    onClick={() => setRadarFilters(prev => ({ ...prev, hideDivergent: !prev.hideDivergent }))}
+                                    style={{
+                                        background: radarFilters.hideDivergent ? 'rgba(244, 63, 94, 0.2)' : 'rgba(255,255,255,0.03)',
+                                        color: radarFilters.hideDivergent ? 'var(--danger-color)' : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${radarFilters.hideDivergent ? 'var(--danger-color)' : 'rgba(255,255,255,0.1)'}`,
+                                        borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
+                                    }}
+                                >⚠️ SAFE MODE</button>
+                                <button
+                                    onClick={() => setRadarFilters(prev => ({ ...prev, todayOnly: !prev.todayOnly }))}
+                                    style={{
+                                        background: radarFilters.todayOnly ? 'rgba(124, 58, 237, 0.2)' : 'rgba(255,255,255,0.03)',
+                                        color: radarFilters.todayOnly ? '#a78bfa' : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${radarFilters.todayOnly ? '#a78bfa66' : 'rgba(255,255,255,0.1)'}`,
+                                        borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
+                                    }}
+                                >📅 {radarFilters.todayOnly ? (lang === 'tr' ? 'BUGÜN' : 'TODAY') : (lang === 'tr' ? 'HEPSİ' : 'ALL')}</button>
+                            </div>
+
                             <button
                                 onClick={() => setRadarFilters({
                                     sources: RADAR_SOURCES.map(s => s.id),
                                     minSources: 1,
-                                    search: ''
+                                    search: '',
+                                    valueOnly: false,
+                                    hideDivergent: false,
+                                    todayOnly: true
                                 })}
                                 style={{
                                     background: 'transparent',
@@ -409,8 +535,11 @@ export const Dashboard = ({ user, onLogout }) => {
                                             padding: '2rem',
                                             position: 'relative',
                                             overflow: 'hidden',
-                                            transition: 'all 0.3s ease',
-                                            border: s.totalSources >= 4 ? '1px solid var(--success-color)' : '1px solid var(--glass-border)',
+                                            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                            border: s.totalSources >= 6 ? '2px solid var(--accent-color)' : '1px solid var(--glass-border)',
+                                            boxShadow: s.totalSources >= 7
+                                                ? '0 10px 30px rgba(0, 242, 254, 0.2), 0 0 15px rgba(0, 242, 254, 0.1)'
+                                                : (s.totalSources >= 6 ? '0 5px 20px rgba(0, 242, 254, 0.1)' : 'none'),
                                             background: 'rgba(15, 23, 42, 0.4)',
                                             cursor: s.forebetUrl ? 'pointer' : 'default',
                                         }}
@@ -426,11 +555,30 @@ export const Dashboard = ({ user, onLogout }) => {
                                         }}
                                     >
                                         {s.totalSources >= 4 && (
-                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.3rem 1rem', fontSize: '0.65rem', fontWeight: 900, borderBottomLeftRadius: '12px', letterSpacing: '1px' }}>HIGH CONSENSUS</div>
+                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.3rem 1rem', fontSize: '0.65rem', fontWeight: 900, borderBottomLeftRadius: '12px', letterSpacing: '1px', zIndex: 10 }}>HIGH CONSENSUS</div>
                                         )}
 
+                                        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
+                                            {s.isValue && (
+                                                <div title="High Edge Detection" style={{ background: 'var(--accent-color)', color: '#000', padding: '0.2rem 0.6rem', fontSize: '0.6rem', fontWeight: 900, borderRadius: '4px' }}>VALUE</div>
+                                            )}
+                                            {s.divergence > CONFIG.MODULAR_SYSTEM.ADVANCED_ANALYSIS.DIVERGENCE_RADAR.THRESHOLD && (
+                                                <div title="Conflicting Source Predictions" style={{ background: 'var(--danger-color)', color: '#fff', padding: '0.2rem 0.6rem', fontSize: '0.6rem', fontWeight: 900, borderRadius: '4px' }}>DİKKAT</div>
+                                            )}
+                                        </div>
+
                                         <div style={{ marginBottom: '1.5rem' }}>
-                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' }}>{t.match_overview || 'MAÇ ÖZETİ'}</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                <div style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-color)', fontWeight: 800 }}>
+                                                    {s.league && s.league !== 'Others' && s.league !== 'Unknown' ? s.league : (t.match_overview || 'MAÇ ÖZETİ')}
+                                                </div>
+                                                {s.date && (
+                                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent-color)', display: 'flex', gap: '0.5rem' }}>
+                                                        <span>🗓️ {s.date}</span>
+                                                        {s.time && <span style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.5rem' }}>🕒 {s.time}</span>}
+                                                    </div>
+                                                )}
+                                            </div>
                                             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                                                 {s.home} <span style={{ opacity: 0.3, fontWeight: 400 }}>vs</span> {s.away}
                                             </div>
@@ -440,31 +588,45 @@ export const Dashboard = ({ user, onLogout }) => {
                                         </div>
 
                                         <div style={{ marginBottom: '2rem' }}>
-                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '1rem' }}>{t.global_consensus_report || 'DIŞ KAYNAK ANALİZLERİ'} ({s.totalSources} Kaynak)</div>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '1rem' }}>{t.global_consensus_report} ({s.totalSources}/{RADAR_SOURCES.length} {t.active_badges || 'Kaynak'})</div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                                                 {Object.entries(s.predictions).map(([site, pred]) => {
-                                                    const colorMap = {
-                                                        forebet: '#34d399',
-                                                        predictz: '#f87171',
-                                                        windrawwin: '#60a5fa',
-                                                        statarea: '#fbbf24',
-                                                        vitibet: '#a78bfa',
-                                                        zulubet: '#f472b6'
-                                                    };
-                                                    const color = colorMap[site] || '#94a3b8';
+                                                    const sourceConfig = RADAR_SOURCES.find(rs => rs.id === site);
+                                                    const color = sourceConfig ? sourceConfig.color : '#94a3b8';
+                                                    const url = RADAR_BASE_URLS[site];
 
                                                     return (
-                                                        <div key={site} style={{
-                                                            padding: '0.8rem',
-                                                            background: 'rgba(255,255,255,0.02)',
-                                                            borderRadius: '10px',
-                                                            border: `1px solid ${color}33`,
-                                                            display: 'flex',
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center'
-                                                        }}>
-                                                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: color, textTransform: 'uppercase' }}>{site}</span>
-                                                            <span style={{ fontWeight: 900, fontSize: '0.9rem' }}>{pred}</span>
+                                                        <div
+                                                            key={site}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (url) window.open(url, '_blank');
+                                                            }}
+                                                            title={url ? `${sourceConfig?.label || site} sitesine git` : ''}
+                                                            style={{
+                                                                padding: '0.8rem',
+                                                                background: 'rgba(255,255,255,0.02)',
+                                                                borderRadius: '10px',
+                                                                border: `1px solid ${color}33`,
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                alignItems: 'center',
+                                                                cursor: url ? 'pointer' : 'default',
+                                                                transition: 'transform 0.2s, background 0.2s'
+                                                            }}
+                                                        >
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                                {url && <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>🔗</span>}
+                                                                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: color, textTransform: 'uppercase' }}>{site}</span>
+                                                            </div>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                                <span style={{ fontWeight: 900, fontSize: '0.9rem' }}>{pred}</span>
+                                                                {s.probabilities[site] && (
+                                                                    <span style={{ fontSize: '0.65rem', color: color, opacity: 0.8, fontWeight: 700 }}>
+                                                                        (%{s.probabilities[site]}{s.tipCounts[site] ? ` - ${s.tipCounts[site]}` : ''})
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     );
                                                 })}
@@ -692,7 +854,10 @@ export const Dashboard = ({ user, onLogout }) => {
                                         boxShadow: isVip ? '0 0 20px rgba(16, 185, 129, 0.15)' : 'none'
                                     }} onClick={() => setSelectedMatch(match)}>
                                         {isVip && (
-                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.2rem 1rem', fontSize: '0.6rem', fontWeight: 900, borderBottomLeftRadius: '10px', letterSpacing: '1px' }}>VIP</div>
+                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.2rem 1rem', fontSize: '0.6rem', fontWeight: 900, borderBottomLeftRadius: '10px', letterSpacing: '1px', zIndex: 10 }}>VIP</div>
+                                        )}
+                                        {signal.observations?.reverseSignal && (
+                                            <div style={{ position: 'absolute', top: isVip ? '25px' : 0, right: 0, background: 'var(--danger-color)', color: '#fff', padding: '0.2rem 1rem', fontSize: '0.6rem', fontWeight: 900, borderBottomLeftRadius: '10px', letterSpacing: '1px', animation: 'pulse 2s infinite', zIndex: 10 }}>REVERSE SIGNAL</div>
                                         )}
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                                             <div>
@@ -733,25 +898,6 @@ export const Dashboard = ({ user, onLogout }) => {
                                                 </div>
                                             )}
                                         </div>
-
-                                        {/* Partial Data Indicator */}
-                                        {match.isPartial && (
-                                            <div style={{
-                                                padding: '0.5rem',
-                                                background: 'rgba(255, 152, 0, 0.1)',
-                                                borderRadius: '8px',
-                                                fontSize: '0.65rem',
-                                                color: '#ff9800',
-                                                marginBottom: '1rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                border: '1px solid rgba(255, 152, 0, 0.2)'
-                                            }}>
-                                                <span style={{ fontSize: '1rem' }}>⚠️</span>
-                                                {t.partial_data_warning || 'Temel veri kullanılıyor, detaylar yükleniyor...'}
-                                            </div>
-                                        )}
 
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                                             <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t.dqs_score_label.replace(':', '')}: <span style={{ color: 'var(--text-primary)', fontWeight: 800 }}>{(match.dqs || 0).toFixed(2)}</span></div>
@@ -952,7 +1098,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                                             {currentMatch.consensusReport?.totalSources > 0 ? (
                                                                 <>
                                                                     <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--success-color)' }}>
-                                                                        {currentMatch.consensusReport.totalSources}/6 <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 400 }}>{t.active_badges}</span>
+                                                                        {currentMatch.consensusReport.totalSources}/{RADAR_SOURCES.length} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 400 }}>{t.active_badges}</span>
                                                                     </div>
                                                                     <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', opacity: 0.7 }}>
                                                                         {Object.entries(currentMatch.consensusReport.agreement).map(([pred, count]) => (
@@ -1114,60 +1260,61 @@ export const Dashboard = ({ user, onLogout }) => {
                             );
                         })()
                     )}
-
-                    {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} />}
-
-                    {showAdvanced && (
-                        <div className="modal-overlay" onClick={() => setShowAdvanced(false)}>
-                            <div className="modal-content settings glass-panel" onClick={e => e.stopPropagation()}>
-                                <button className="close-btn" onClick={() => setShowAdvanced(false)}>×</button>
-                                <h2>{t.advanced_settings_title}</h2>
-
-                                <div className="settings-list">
-                                    {[
-                                        { id: 'XG_ANALYSIS', label: t.toggle_xg },
-                                        { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
-                                        { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
-                                    ].map(setting => (
-                                        <div key={setting.id} className="setting-item">
-                                            <span>{setting.label}</span>
-                                            <div
-                                                className={`toggle ${advancedSettings[setting.id] ? 'on' : ''}`}
-                                                onClick={() => {
-                                                    const newVal = !advancedSettings[setting.id];
-                                                    setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
-                                                    CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
-                                                }}
-                                            ><div className="knob"></div></div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="league-management">
-                                    <h4>{t.league_tier_management}</h4>
-                                    {['tier1', 'tier2'].map(tierKey => (
-                                        <div key={tierKey} className="tier-group">
-                                            <label>{tierKey === 'tier1' ? t.tier_1_label : t.tier_2_label}</label>
-                                            <div className="leagues">
-                                                {leagueTierMap[tierKey].map(league => (
-                                                    <span key={league} className="league-chip" onClick={() => {
-                                                        const otherTier = tierKey === 'tier1' ? 'tier2' : 'tier1';
-                                                        const newMap = { ...leagueTierMap };
-                                                        newMap[tierKey] = newMap[tierKey].filter(l => l !== league);
-                                                        newMap[otherTier].push(league);
-                                                        setLeagueTierMap(newMap);
-                                                        CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1 = newMap.tier1;
-                                                        CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2 = newMap.tier2;
-                                                    }}>{league} ⇄</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    {/* Match Details Modal end */}
                 </>
+            )}
+
+            {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} mode={faqMode} />}
+
+            {showAdvanced && (
+                <div className="modal-overlay" onClick={() => setShowAdvanced(false)}>
+                    <div className="modal-content settings glass-panel" onClick={e => e.stopPropagation()}>
+                        <button className="close-btn" onClick={() => setShowAdvanced(false)}>×</button>
+                        <h2>{t.advanced_settings_title}</h2>
+
+                        <div className="settings-list">
+                            {[
+                                { id: 'XG_ANALYSIS', label: t.toggle_xg },
+                                { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
+                                { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
+                            ].map(setting => (
+                                <div key={setting.id} className="setting-item">
+                                    <span>{setting.label}</span>
+                                    <div
+                                        className={`toggle ${advancedSettings[setting.id] ? 'on' : ''}`}
+                                        onClick={() => {
+                                            const newVal = !advancedSettings[setting.id];
+                                            setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
+                                            CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
+                                        }}
+                                    ><div className="knob"></div></div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="league-management">
+                            <h4>{t.league_tier_management}</h4>
+                            {['tier1', 'tier2'].map(tierKey => (
+                                <div key={tierKey} className="tier-group">
+                                    <label>{tierKey === 'tier1' ? t.tier_1_label : t.tier_2_label}</label>
+                                    <div className="leagues">
+                                        {leagueTierMap[tierKey].map(league => (
+                                            <span key={league} className="league-chip" onClick={() => {
+                                                const otherTier = tierKey === 'tier1' ? 'tier2' : 'tier1';
+                                                const newMap = { ...leagueTierMap };
+                                                newMap[tierKey] = newMap[tierKey].filter(l => l !== league);
+                                                newMap[otherTier].push(league);
+                                                setLeagueTierMap(newMap);
+                                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1 = newMap.tier1;
+                                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2 = newMap.tier2;
+                                            }}>{league} ⇄</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

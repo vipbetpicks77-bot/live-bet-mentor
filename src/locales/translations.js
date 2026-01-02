@@ -48,8 +48,10 @@ export const translations = {
         shots_on_goal: "İsabetli Şut",
 
         // FAQ
-        faq_title: "SİSTEM KILAVUZU (A-Z)",
-        faq_subtitle: "Live Bet Mentor Algoritmik Karar Destek Sistemi",
+        faq_live_title: "CANLI ANALİZ REHBERİ",
+        faq_live_subtitle: "DQS Motoru, Risk Guard ve Kasa Yönetimi Hakkında Her Şey",
+        faq_radar_title: "ORTAK AKIL REHBERİ",
+        faq_radar_subtitle: "Radar, Konsensüs ve Küresel Tahmin Havuzu Hakkında Her Şey",
         faq_q1_title: "1. DQS (Veri Kalitesi) Nedir?",
         faq_q1_desc: "DQS, analiz sırasında kullanılan verinin 'tazelik', tutarlılık, kaynak güveni ve latans birleşimi olan genel kalite puanıdır.",
         faq_q1_example: "Örnek: Maçta gol oldu ama sistemin verisi hala 5 dakika önceki skoru gösteriyorsa DQS puanı 0.70'in altına düşer. Sistem otomatik olarak 'NO-BET' (Bahis Yok) der. Çünkü yanlış veriyle analiz yapmak intihar etmektir.",
@@ -93,6 +95,19 @@ export const translations = {
         faq_tier3_desc: "Sistemin henüz tam güvenmediği veya yeni eklenen liglerdir. Bu liglerde asla 'BET' sinyali üretilmez, sadece veri toplama amaçlı izlenir.",
         faq_footer_main: "UNUTMAYIN: Sistem bir tahmin oyuncağı değil, bir disiplin filtresidir.",
         faq_footer_sub: "Görevi size maç bulmak değil, sizi riskli maçlardan korumaktır.",
+
+        // Radar FAQ
+        radar_faq_title: "RADAR REHBERİ",
+        radar_faq_q1_title: "1. Radar Sistemi Nedir?",
+        radar_faq_q1_desc: "Radar, 7 farklı küresel tahmin kaynağından (Forebet, Zulubet, OLBG vb.) gelen verileri tek bir havuzda toplayıp analiz eden bir 'Ortak Akıl' mekanizmasıdır.",
+        radar_faq_q2_title: "2. Ortak Akıl Skoru Nasıl Hesaplanır?",
+        radar_faq_q2_desc: "Tüm kaynakların verdiği tahminler ağırlıklandırılarak birleştirilir. Eğer kaynakların çoğu aynı sonuca işaret ediyorsa skor %100'e yaklaşır.",
+        radar_faq_q3_title: "3. Value (Değer) Tespiti Nedir?",
+        radar_faq_q3_desc: "Bir kaynağın (özellikle Forebet veya OLBG) verdiği kazanma olasılığı, algoritmik eşik değerle (%70+) kıyaslanır. Eğer olasılık çok yüksekse maç 'VALUE' olarak işaretlenir.",
+        radar_faq_q4_title: "4. Divergence (Sapma) Nedir?",
+        radar_faq_q4_desc: "Kaynaklar arasındaki görüş ayrılığıdır. Kaynaklar farklı tahminler veriyorsa 'Sapma' yükselir ve risk artar.",
+        radar_faq_q5_title: "5. Safe Mode Neyi Filtreler?",
+        radar_faq_q5_desc: "Sadece yüksek uyum (%80+) ve düşük sapma olan maçları göstererek en güvenli 'Konsensüs' listesini sunar.",
 
         // Risk filters descriptions
         deadMatch: "Ölü Maç",
@@ -194,7 +209,7 @@ export const translations = {
         minute_label: "DK",
         halftime_short: "İY",
         ai_expert_summary: "🤖 AI UZMAN ÖZETİ (Gemini)",
-        global_consensus_report: "🌍 GLOBAL KONSENSUS (6 Kaynak)",
+        global_consensus_report: "🌍 GLOBAL KONSENSUS",
         consensus_agreement: "Ortak Akıl Skoru:",
         daily_radar: "GÜNLÜK RADAR (PRE-MATCH)",
         status_wait: "BEKLENİYOR",
@@ -329,8 +344,10 @@ export const translations = {
         shots_on_goal: "Shots On Goal",
 
         // FAQ
-        faq_title: "SYSTEM GUIDE (A-Z)",
-        faq_subtitle: "Live Bet Mentor Algorithmic Decision Support System",
+        faq_live_title: "LIVE ANALYSIS GUIDE",
+        faq_live_subtitle: "Everything About DQS Engine, Risk Guard, and Bankroll Management",
+        faq_radar_title: "CONSENSUS GUIDE",
+        faq_radar_subtitle: "Everything About Radar, Consensus, and Global Prediction Pool",
         faq_q1_title: "1. What is DQS (Data Quality Score)?",
         faq_q1_desc: "DQS is the overall quality score that combines data freshness, consistency, source trust, and latency used during analysis.",
         faq_q1_example: "Example: If a goal is scored but the system's data still shows the score from 5 minutes ago, the DQS score drops below 0.70. The system automatically says 'NO-BET'. Because analyzing with wrong data is suicide.",
@@ -374,6 +391,19 @@ export const translations = {
         faq_tier3_desc: "Leagues that the system does not yet fully trust or are newly added. 'BET' signals are never generated for these leagues; they are monitored for data collection only.",
         faq_footer_main: "REMEMBER: The system is not a prediction toy, it is a discipline filter.",
         faq_footer_sub: "Its job is not to find matches for you, but to protect you from risky matches.",
+
+        // Radar FAQ
+        radar_faq_title: "RADAR GUIDE",
+        radar_faq_q1_title: "1. What is the Radar System?",
+        radar_faq_q1_desc: "Radar is a 'Collective Intelligence' mechanism that aggregates and analyzes data from 7 different global prediction sources (Forebet, Zulubet, OLBG, etc.).",
+        radar_faq_q2_title: "2. How is the Consensus Score Calculated?",
+        radar_faq_q2_desc: "Predictions from all sources are weighted and combined. If most sources point to the same outcome, the score approaches 100%.",
+        radar_faq_q3_title: "3. What is Value Detection?",
+        radar_faq_q3_desc: "The win probability provided by a source (especially Forebet or OLBG) is compared against an algorithmic threshold (70%+). If the probability is high, the match is marked as 'VALUE'.",
+        radar_faq_q4_title: "4. What is Divergence?",
+        radar_faq_q4_desc: "It represents a disagreement between sources. If sources provide different predictions, 'Divergence' increases, indicating higher risk.",
+        radar_faq_q5_title: "5. What does Safe Mode Filter?",
+        radar_faq_q5_desc: "It provides the safest 'Consensus' list by showing only matches with high agreement (80%+) and low divergence.",
 
         // Risk filters descriptions
         deadMatch: "Dead Match",
@@ -479,7 +509,7 @@ export const translations = {
         minute_label: "MIN",
         halftime_short: "HT",
         ai_expert_summary: "🤖 AI EXPERT SUMMARY (Gemini)",
-        global_consensus_report: "🌍 GLOBAL CONSENSUS (6 Sources)",
+        global_consensus_report: "🌍 GLOBAL CONSENSUS",
         consensus_agreement: "Consensus Score:",
         daily_radar: "DAILY RADAR (PRE-MATCH)",
         status_wait: "WAITING",

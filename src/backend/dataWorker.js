@@ -183,7 +183,7 @@ class DataWorker {
             if (history.length > 10) history.pop();
 
             const leagueProfile = leagueProfileModule.getProfile(f.league || f.leagueName);
-            const analysis = analyzeMatch(f, this.odds[f.id] || {});
+            const analysis = analyzeMatch(f, this.odds[f.id] || {}, consensusReport);
 
             return {
                 ...f,

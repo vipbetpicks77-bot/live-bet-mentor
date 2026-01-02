@@ -1,184 +1,5179 @@
 {
-    "forebet": [],
-    "predictz": [],
-    "windrawwin": [],
-    "statarea": [
+    "forebet": [
         {
-            "home": "Rayo Vallecano",
-            "away": "Getafe",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:40.900535"
+            "home": "Mirassol U20",
+            "away": "Forte U20",
+            "league": "Brazil Copa Sao Paulo de Juniores",
+            "timestamp": "2026-01-02T22:06:24.196789",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "37"
+                }
+            },
+            "date": "02.01",
+            "time": "20:15"
+        },
+        {
+            "home": "Eibar",
+            "away": "Mirandés",
+            "league": "Spain Segunda Division",
+            "timestamp": "2026-01-02T22:06:24.257916",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "45"
+                }
+            },
+            "date": "02.01",
+            "time": "20:30"
+        },
+        {
+            "home": "Cwmbran Celtic",
+            "away": "Treowen Stars",
+            "league": "Wales Cymru Championship",
+            "timestamp": "2026-01-02T22:06:24.308823",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "47"
+                }
+            },
+            "date": "02.01",
+            "time": "20:30"
         },
         {
             "home": "Cagliari",
-            "away": "AC Milan",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:12:42.578890"
+            "away": "Milan",
+            "league": "Italy Serie A",
+            "timestamp": "2026-01-02T22:06:24.374774",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "63"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
         },
         {
             "home": "Toulouse",
             "away": "Lens",
-            "prediction": "X",
-            "timestamp": "2026-01-02T05:12:44.425643"
+            "league": "France Ligue 1",
+            "timestamp": "2026-01-02T22:06:24.454745",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "56"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
         },
         {
-            "home": "Gil Vicente",
-            "away": "Sporting CP",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:12:44.926963"
+            "home": "Larne",
+            "away": "Coleraine FC",
+            "league": "Northern Ireland NIFL Premiership",
+            "timestamp": "2026-01-02T22:06:24.510691",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "36"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
         },
         {
-            "home": "Guimaraes",
-            "away": "Nacional",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:45.305774"
+            "home": "Aveley FC",
+            "away": "Canvey Island",
+            "league": "England Isthmian League",
+            "timestamp": "2026-01-02T22:06:24.564597",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "57"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
         },
         {
-            "home": "JS Kabylie",
-            "away": "MC Alger",
-            "prediction": "X",
-            "timestamp": "2026-01-02T05:12:45.811438"
+            "home": "Hearts Youth",
+            "away": "Stirling University",
+            "league": "Scotland Lowland League",
+            "timestamp": "2026-01-02T22:06:24.614890",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "38"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
         },
         {
-            "home": "Melbourne Victory FC",
-            "away": "Perth Glory FC",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:46.273683"
+            "home": "Rayo Vallecano",
+            "away": "Getafe",
+            "league": "Spain La Liga",
+            "timestamp": "2026-01-02T22:06:24.666057",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "44"
+                }
+            },
+            "date": "02.01",
+            "time": "21:00"
         },
         {
-            "home": "Hapoel Kfar Saba",
-            "away": "Maccabi Petah Tikva",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:12:46.581837"
+            "home": "Vitória",
+            "away": "Nacional Madeira",
+            "league": "Portugal Liga Portugal",
+            "timestamp": "2026-01-02T22:06:24.718029",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "37"
+                }
+            },
+            "date": "02.01",
+            "time": "21:45"
         },
         {
-            "home": "Hapoel Rishon LeZion",
-            "away": "Hapoel Afula",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:46.877874"
+            "home": "Gremio U20",
+            "away": "Falcon U20",
+            "league": "Brazil Copa Sao Paulo de Juniores",
+            "timestamp": "2026-01-02T22:06:24.766814",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "37"
+                }
+            },
+            "date": "02.01",
+            "time": "22:00"
         },
         {
-            "home": "Hapoel Ramat Gan",
-            "away": "Maccabi Kabilio Jaffa",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:47.167124"
+            "home": "Sport Recife U20",
+            "away": "Linense U20",
+            "league": "Brazil Copa Sao Paulo de Juniores",
+            "timestamp": "2026-01-02T22:06:24.811518",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "72"
+                }
+            },
+            "date": "02.01",
+            "time": "22:30"
+        }
+    ],
+    "predictz": [
+        {
+            "home": "Larne",
+            "away": "Coleraine",
+            "league": "Northern Ireland Premier League Tips\n1\nX\n2",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.451038",
+            "date": "02.01"
         },
         {
-            "home": "Maccabi Herzliya",
-            "away": "Hapoel Raanana",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:47.512425"
+            "home": "Rayo Vallecano",
+            "away": "Getafe",
+            "league": "Spain La Liga Tips",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.483994",
+            "date": "02.01"
         },
         {
             "home": "Eibar",
             "away": "Mirandes",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:48.698406"
-        },
-        {
-            "home": "Omonia Aradippou",
-            "away": "Krasava Ypsonas FC",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:49.860262"
-        },
-        {
-            "home": "Al-Kuwait",
-            "away": "Al-Tadhamon",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:50.398890"
-        },
-        {
-            "home": "Al-Shabab Al Ahmadi",
-            "away": "Al-Arabi Kuwait City",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:12:50.743218"
-        },
-        {
-            "home": "Aveley",
-            "away": "Canvey Island",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:12:51.510859"
-        }
-    ],
-    "vitibet": [],
-    "zulubet": [
-        {
-            "home": "Melbourne Victory",
-            "away": "Perth Glory",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:23.821845"
-        },
-        {
-            "home": "Araba",
-            "away": "Maccabi K. Ata Bialik",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:07:28.724663"
-        },
-        {
-            "home": "Tersana",
-            "away": "El Entag EL Harby",
-            "prediction": "X",
-            "timestamp": "2026-01-02T05:07:31.703350"
-        },
-        {
-            "home": "El Mansura",
-            "away": "Tanta SC",
-            "prediction": "X",
-            "timestamp": "2026-01-02T05:07:34.144236"
-        },
-        {
-            "home": "Khorfakkan",
-            "away": "Al-Dhafra",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:34.700758"
-        },
-        {
-            "home": "Kelantan United",
-            "away": "Kuching FA",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:07:35.809230"
-        },
-        {
-            "home": "Al Kuwait",
-            "away": "Al Tadhamon",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:36.313530"
-        },
-        {
-            "home": "CR Béni Thour",
-            "away": "IB Khémis El Khechna",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:38.946008"
-        },
-        {
-            "home": "JS Kabylie",
-            "away": "MC Alger",
-            "prediction": "X",
-            "timestamp": "2026-01-02T05:07:40.290671"
-        },
-        {
-            "home": "GIL Vicente",
-            "away": "Sporting CP",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:07:40.662854"
+            "league": "Spain Segunda Division Tips",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.552261",
+            "date": "02.01"
         },
         {
             "home": "Cagliari",
             "away": "AC Milan",
-            "prediction": "2",
-            "timestamp": "2026-01-02T05:07:41.961196"
+            "league": "Italy Serie A Tips",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.610655",
+            "date": "02.01"
+        },
+        {
+            "home": "Toulouse",
+            "away": "Lens",
+            "league": "France Ligue 1 Tips",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.659597",
+            "date": "02.01"
         },
         {
             "home": "Guimaraes",
             "away": "Nacional",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:42.341373"
+            "league": "Portugal Primeira Liga Tips",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T20:09:20.700300",
+            "date": "02.01"
+        }
+    ],
+    "windrawwin": [
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "league": "Unknown",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:07:36.058413",
+            "date": "02.01",
+            "time": ""
+        }
+    ],
+    "statarea": [
+        {
+            "home": "Rayo Vallecano",
+            "away": "Getafe",
+            "timestamp": "2026-01-02T14:43:05.570149",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Cagliari",
+            "away": "AC Milan",
+            "timestamp": "2026-01-02T14:43:05.588978",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Toulouse",
+            "away": "Lens",
+            "timestamp": "2026-01-02T14:43:05.608728",
+            "markets": {
+                "1X2": {
+                    "pred": "X",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Gil Vicente",
+            "away": "Sporting CP",
+            "timestamp": "2026-01-02T14:43:05.631544",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "timestamp": "2026-01-02T14:43:05.652809",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "JS Kabylie",
+            "away": "MC Alger",
+            "timestamp": "2026-01-02T14:43:05.673513",
+            "markets": {
+                "1X2": {
+                    "pred": "X",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Melbourne Victory FC",
+            "away": "Perth Glory FC",
+            "timestamp": "2026-01-02T14:43:05.693947",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Hapoel Kfar Saba",
+            "away": "Maccabi Petah Tikva",
+            "timestamp": "2026-01-02T14:43:05.713368",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Hapoel Rishon LeZion",
+            "away": "Hapoel Afula",
+            "timestamp": "2026-01-02T14:43:05.734963",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Hapoel Ramat Gan",
+            "away": "Maccabi Kabilio Jaffa",
+            "timestamp": "2026-01-02T14:43:05.756381",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Maccabi Herzliya",
+            "away": "Hapoel Raanana",
+            "timestamp": "2026-01-02T14:43:05.776905",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Eibar",
+            "away": "Mirandes",
+            "timestamp": "2026-01-02T14:43:05.796034",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Omonia Aradippou",
+            "away": "Krasava Ypsonas FC",
+            "timestamp": "2026-01-02T14:43:05.823993",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Al-Kuwait",
+            "away": "Al-Tadhamon",
+            "timestamp": "2026-01-02T14:43:05.843246",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Al-Shabab Al Ahmadi",
+            "away": "Al-Arabi Kuwait City",
+            "timestamp": "2026-01-02T14:43:05.862425",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                }
+            }
+        },
+        {
+            "home": "Aveley",
+            "away": "Canvey Island",
+            "timestamp": "2026-01-02T14:43:05.881629",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                }
+            }
+        }
+    ],
+    "vitibet": [
+        {
+            "home": "Rayo Vallecano Madrid",
+            "away": "Getafe CF",
+            "league": "Spain  LaLiga",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.093601"
+        },
+        {
+            "home": "Toulouse FC",
+            "away": "Racing Club de Lens",
+            "league": "France  Ligue 1",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.141954"
+        },
+        {
+            "home": "Cagliari Calcio",
+            "away": "AC Milano",
+            "league": "Italy  Serie A",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.189463"
+        },
+        {
+            "home": "Vitória de Guimaraes",
+            "away": "CD Nacional Funchal",
+            "league": "Portugal  Primeira Liga",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.234114"
+        },
+        {
+            "home": "Gil Vicente FC",
+            "away": "Sporting CP Lisboa",
+            "league": "Portugal  Primeira Liga",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.270587"
+        },
+        {
+            "home": "Al Najma",
+            "away": "Al-Khaleej Club Saihat",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.307659"
+        },
+        {
+            "home": "Al-Ettifaq",
+            "away": "Al Akhdoud",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.333557"
+        },
+        {
+            "home": "Al Ahli SC",
+            "away": "Al-Nassr",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.362571"
+        },
+        {
+            "home": "SD Eibar",
+            "away": "CD Mirandés",
+            "league": "Spain  Segunda Division",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.414484"
+        },
+        {
+            "home": "Larne FC",
+            "away": "Coleraine FC",
+            "league": "Northern Ireland  IFA Premiership",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.462059"
+        },
+        {
+            "home": "Melbourne Victory",
+            "away": "Perth Glory",
+            "league": "Australia  A-League",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.505557"
+        },
+        {
+            "home": "Omonia Aradippou",
+            "away": "Ypsonas",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.546884"
+        },
+        {
+            "home": "Kfar Kassem",
+            "away": "Hapoel Acre",
+            "league": "Israel  Liga Leumit",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.584655"
+        },
+        {
+            "home": "Hapoel Kfar Saba",
+            "away": "Maccabi Petah Tikva",
+            "league": "Israel  Liga Leumit",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.614328"
+        },
+        {
+            "home": "Hapoel Rishon LeZion",
+            "away": "Hapoel Afula",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.656133"
+        },
+        {
+            "home": "Maccabi Herzliya",
+            "away": "Hapoel Ra'anana",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.687832"
+        },
+        {
+            "home": "Hapoel Ramat Gan",
+            "away": "Maccabi Kabilio Jaffa",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "02.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.718833"
+        },
+        {
+            "home": "Brighton Hove Albion",
+            "away": "Burnley FC",
+            "league": "England  Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.762031"
+        },
+        {
+            "home": "Aston Villa Birmingham",
+            "away": "Nottingham Forest",
+            "league": "England  Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.792712"
+        },
+        {
+            "home": "Wolverhampton Wanderers",
+            "away": "West Ham United",
+            "league": "England  Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.823609"
+        },
+        {
+            "home": "AFC Bournemouth",
+            "away": "Arsenal London",
+            "league": "England  Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.853175"
+        },
+        {
+            "home": "Espanyol Barcelona",
+            "away": "FC Barcelona",
+            "league": "Spain  LaLiga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.892033"
+        },
+        {
+            "home": "Atlético Osasuna",
+            "away": "Athletic Club Bilbao",
+            "league": "Spain  LaLiga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.920837"
+        },
+        {
+            "home": "RC Celta Vigo",
+            "away": "Valencia CF",
+            "league": "Spain  LaLiga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.948750"
+        },
+        {
+            "home": "Elche CF",
+            "away": "Villarreal CF",
+            "league": "Spain  LaLiga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:56.978712"
+        },
+        {
+            "home": "OGC Nice",
+            "away": "Racing Club Strasbourg",
+            "league": "France  Ligue 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.018128"
+        },
+        {
+            "home": "AS Monaco",
+            "away": "Olympique Lyonnais",
+            "league": "France  Ligue 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.046304"
+        },
+        {
+            "home": "Lille Olympique SC",
+            "away": "Stade Rennais FC",
+            "league": "France  Ligue 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.073957"
+        },
+        {
+            "home": "Calcio Como",
+            "away": "Udinese Calcio",
+            "league": "Italy  Serie A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.120014"
+        },
+        {
+            "home": "Genoa CFC",
+            "away": "Pisa Calcio",
+            "league": "Italy  Serie A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.154861"
+        },
+        {
+            "home": "Sassuolo Calcio",
+            "away": "AC Parma",
+            "league": "Italy  Serie A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.189545"
+        },
+        {
+            "home": "Juventus Torino",
+            "away": "US Lecce",
+            "league": "Italy  Serie A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.221741"
+        },
+        {
+            "home": "Atalanta Bergamo",
+            "away": "AS Roma",
+            "league": "Italy  Serie A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.256860"
+        },
+        {
+            "home": "CF Estrela da Amadora",
+            "away": "SC de Braga",
+            "league": "Portugal  Primeira Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.306847"
+        },
+        {
+            "home": "CD Tondela",
+            "away": "FC Arouca",
+            "league": "Portugal  Primeira Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.338891"
+        },
+        {
+            "home": "AVS Futebol SAD",
+            "away": "Moreirense FC",
+            "league": "Portugal  Primeira Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.371728"
+        },
+        {
+            "home": "SL Benfica Lisboa",
+            "away": "GD Estoril Praia",
+            "league": "Portugal  Primeira Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.407953"
+        },
+        {
+            "home": "Celtic Glasgow",
+            "away": "Glasgow Rangers",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.456525"
+        },
+        {
+            "home": "Dundee United",
+            "away": "Dundee FC",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.490750"
+        },
+        {
+            "home": "Motherwell FC",
+            "away": "St. Mirren FC",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.518636"
+        },
+        {
+            "home": "Kilmarnock FC",
+            "away": "Hibernian Edinburgh",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.546095"
+        },
+        {
+            "home": "Hearts of Midlothian",
+            "away": "Livingston FC",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.573834"
+        },
+        {
+            "home": "Falkirk FC",
+            "away": "Aberdeen FC",
+            "league": "Scotland  Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.601769"
+        },
+        {
+            "home": "Mali",
+            "away": "Tunisia",
+            "league": "Africa Cup",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.638908"
+        },
+        {
+            "home": "Senegal",
+            "away": "Sudan",
+            "league": "Africa Cup",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.665406"
+        },
+        {
+            "home": "Al-Fateh",
+            "away": "Al-Shabab",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.704099"
+        },
+        {
+            "home": "Al-Ittihad FC",
+            "away": "Al-Taawon",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.732763"
+        },
+        {
+            "home": "Al Feiha",
+            "away": "Al Kholood",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.764093"
+        },
+        {
+            "home": "Cultural Leonesa",
+            "away": "Real Sociedad B",
+            "league": "Spain  Segunda Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.805674"
+        },
+        {
+            "home": "Córdoba CF",
+            "away": "Burgos CF",
+            "league": "Spain  Segunda Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.832099"
+        },
+        {
+            "home": "CD Castellón",
+            "away": "SD Huesca",
+            "league": "Spain  Segunda Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.858777"
+        },
+        {
+            "home": "UD Almería",
+            "away": "Granada 74 CF",
+            "league": "Spain  Segunda Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.886773"
+        },
+        {
+            "home": "Real Valladolid CF",
+            "away": "Real RC Santander",
+            "league": "Spain  Segunda Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.914581"
+        },
+        {
+            "home": "ES Troyes",
+            "away": "Red Star 93",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.952343"
+        },
+        {
+            "home": "Pau FC",
+            "away": "Rodez Aveyron",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:57.979365"
+        },
+        {
+            "home": "Stade de Reims",
+            "away": "Annecy FC",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.005556"
+        },
+        {
+            "home": "SC Bastia",
+            "away": "Grenoble Foot 38",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.031970"
+        },
+        {
+            "home": "En Avant Guingamp",
+            "away": "US Boulogne Cote d´Opale",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.058644"
+        },
+        {
+            "home": "Clermont Foot Auvergne",
+            "away": "Stade Lavallois",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.092285"
+        },
+        {
+            "home": "Le Mans UC 72",
+            "away": "AS de Saint Etienne",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.127335"
+        },
+        {
+            "home": "Amiens SC",
+            "away": "AS Nancy Lorraine",
+            "league": "France  Ligue 2",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.154330"
+        },
+        {
+            "home": "Crusaders Belfast",
+            "away": "Dungannon Swifts",
+            "league": "Northern Ireland  IFA Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.192943"
+        },
+        {
+            "home": "Portadown FC",
+            "away": "Cliftonville FC",
+            "league": "Northern Ireland  IFA Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.219405"
+        },
+        {
+            "home": "Carrick Rangers",
+            "away": "FC Glentoran Belfast",
+            "league": "Northern Ireland  IFA Premiership",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.245925"
+        },
+        {
+            "home": "FC Linfield Belfast",
+            "away": "Bangor FC",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.282595"
+        },
+        {
+            "home": "Ballymena United FC",
+            "away": "Glenavon FC",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.308769"
+        },
+        {
+            "home": "Melbourne Heart",
+            "away": "Sydney FC",
+            "league": "Australia  A-League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.351528"
+        },
+        {
+            "home": "Brisbane Roar",
+            "away": "Wellington Phoenix",
+            "league": "Australia  A-League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.385182"
+        },
+        {
+            "home": "Akritas Chlorakas",
+            "away": "Omonia Nicosia",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.423490"
+        },
+        {
+            "home": "Ethnikos Achna FC",
+            "away": "AEL Limassol",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.449825"
+        },
+        {
+            "home": "APOEL Nicosia",
+            "away": "Enosis Neon Paralimni",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.477475"
+        },
+        {
+            "home": "Boston United FC",
+            "away": "Eastleigh FC",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.519683"
+        },
+        {
+            "home": "Forest Green Rovers",
+            "away": "Halifax Town",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.546835"
+        },
+        {
+            "home": "Carlisle United",
+            "away": "Wealdstone FC",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.572816"
+        },
+        {
+            "home": "Aldershot Town",
+            "away": "Solihull Moors",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.600067"
+        },
+        {
+            "home": "Altrincham FC",
+            "away": "Morecambe FC",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.626498"
+        },
+        {
+            "home": "Boreham Wood",
+            "away": "York City",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.653108"
+        },
+        {
+            "home": "Woking FC",
+            "away": "Hartlepool United",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.679212"
+        },
+        {
+            "home": "Yeovil Town",
+            "away": "Braintree Town",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.705701"
+        },
+        {
+            "home": "Southend United",
+            "away": "Truro City",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.732399"
+        },
+        {
+            "home": "Tamworth FC",
+            "away": "Gateshead FC",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.768420"
+        },
+        {
+            "home": "Scunthorpe United",
+            "away": "Sutton United",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.802930"
+        },
+        {
+            "home": "Rochdale AFC",
+            "away": "Brackley Town",
+            "league": "England  Conference",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.834221"
+        },
+        {
+            "home": "Persija Jakarta",
+            "away": "Persijap Jepara",
+            "league": "Indonesia  Liga 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.871315"
+        },
+        {
+            "home": "Pusamania Borneo",
+            "away": "PSM Makassar",
+            "league": "Indonesia  Liga 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.898925"
+        },
+        {
+            "home": "Madura United F.C",
+            "away": "Persebaya Surabaya",
+            "league": "Indonesia  Liga 1",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.924745"
+        },
+        {
+            "home": "Hapoel Petah Tikva",
+            "away": "Maccabi Bnei Raina",
+            "league": "Israel  Israeli Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.961381"
+        },
+        {
+            "home": "Bnei Sakhnin FC",
+            "away": "Hapoel Beer Sheva",
+            "league": "Israel  Israeli Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:58.987878"
+        },
+        {
+            "home": "Ironi Tiberias",
+            "away": "Maccabi Netanya",
+            "league": "Israel  Israeli Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.013592"
+        },
+        {
+            "home": "Hapoel Jerusalem",
+            "away": "Maccabi Tel Aviv",
+            "league": "Israel  Israeli Premier League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.040590"
+        },
+        {
+            "home": "Dunfermline Athletic",
+            "away": "Ross County",
+            "league": "Scotland  First Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.082982"
+        },
+        {
+            "home": "Partick Thistle",
+            "away": "Greenock Morton",
+            "league": "Scotland  First Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.109359"
+        },
+        {
+            "home": "Ayr United",
+            "away": "Queen´s Park FC",
+            "league": "Scotland  First Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.135269"
+        },
+        {
+            "home": "St. Johnstone",
+            "away": "Arbroath FC",
+            "league": "Scotland  First Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.162293"
+        },
+        {
+            "home": "Airdrie United",
+            "away": "Raith Rovers",
+            "league": "Scotland  First Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.188555"
+        },
+        {
+            "home": "AC Renate",
+            "away": "US Pergolettese 1932",
+            "league": "Italy  Serie C - Girone A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.226720"
+        },
+        {
+            "home": "AC Ospitaletto",
+            "away": "Calcio Lecco 1912",
+            "league": "Italy  Serie C - Girone A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.253684"
+        },
+        {
+            "home": "Trento",
+            "away": "A.S. Giana Erminio",
+            "league": "Italy  Serie C - Girone A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.280863"
+        },
+        {
+            "home": "AS Cittadella",
+            "away": "Virtus Verona",
+            "league": "Italy  Serie C - Girone A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.308018"
+        },
+        {
+            "home": "FC Pro Vercelli",
+            "away": "Pro Patria Calcio",
+            "league": "Italy  Serie C - Girone A",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.338944"
+        },
+        {
+            "home": "Juventus Torino U23",
+            "away": "Carpi FC 1909",
+            "league": "Italy  Serie C - Girone B",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.377540"
+        },
+        {
+            "home": "FC Forli",
+            "away": "AC Arezzo",
+            "league": "Italy  Serie C - Girone B",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.405598"
+        },
+        {
+            "home": "Vis Pesaro",
+            "away": "ASD Pineto Calcio",
+            "league": "Italy  Serie C - Girone B",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.437863"
+        },
+        {
+            "home": "Citta di Pontedera",
+            "away": "SEF Torres 1903",
+            "league": "Italy  Serie C - Girone B",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.468779"
+        },
+        {
+            "home": "US Pianese",
+            "away": "Ascoli Calcio",
+            "league": "Italy  Serie C - Girone B",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.497050"
+        },
+        {
+            "home": "AZ Picerno",
+            "away": "Audace Cerignola",
+            "league": "Italy  Serie C - Girone C",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.533474"
+        },
+        {
+            "home": "Cavese 1919",
+            "away": "Sorrento FC",
+            "league": "Italy  Serie C - Girone C",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.559907"
+        },
+        {
+            "home": "FC Felgueiras 1932",
+            "away": "UD Oliveirense",
+            "league": "Portugal  Segunda Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.595845"
+        },
+        {
+            "home": "CD Feirense",
+            "away": "Uniao Leiria",
+            "league": "Portugal  Segunda Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.621638"
+        },
+        {
+            "home": "SC Farense",
+            "away": "Portimonense SC",
+            "league": "Portugal  Segunda Liga",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.647198"
+        },
+        {
+            "home": "Cove Rangers",
+            "away": "Montrose FC",
+            "league": "Scotland  Second Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.683615"
+        },
+        {
+            "home": "Inverness Caledonian",
+            "away": "Peterhead FC",
+            "league": "Scotland  Second Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.709633"
+        },
+        {
+            "home": "Hamilton AFC",
+            "away": "East Fife FC",
+            "league": "Scotland  Second Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.736557"
+        },
+        {
+            "home": "Stenhousemuir FC",
+            "away": "Queen of the South",
+            "league": "Scotland  Second Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.762714"
+        },
+        {
+            "home": "Kelty Hearts",
+            "away": "Alloa Athletic",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.799961"
+        },
+        {
+            "home": "Elgin City FC",
+            "away": "East Kilbride",
+            "league": "Scotland  Third Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.836791"
+        },
+        {
+            "home": "Clyde FC",
+            "away": "Forfar Athletic",
+            "league": "Scotland  Third Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.863456"
+        },
+        {
+            "home": "Stranraer FC",
+            "away": "Edinburgh City",
+            "league": "Scotland  Third Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.890889"
+        },
+        {
+            "home": "Spartans FC",
+            "away": "Dumbarton FC",
+            "league": "Scotland  Third Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.917284"
+        },
+        {
+            "home": "Stirling Albion",
+            "away": "Annan Athletic",
+            "league": "Scotland  Third Division",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.943599"
+        },
+        {
+            "home": "Terengganu",
+            "away": "Penang",
+            "league": "Malaysia  Super League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:03:59.980722"
+        },
+        {
+            "home": "DPMM FC",
+            "away": "PDRM",
+            "league": "Malaysia  Super League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.006448"
+        },
+        {
+            "home": "Melaka FC",
+            "away": "Sabah",
+            "league": "Malaysia  Super League",
+            "date": "03.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.033710"
+        },
+        {
+            "home": "Leeds United",
+            "away": "Manchester United",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.070043"
+        },
+        {
+            "home": "Manchester City",
+            "away": "Chelsea London",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.096092"
+        },
+        {
+            "home": "Newcastle United",
+            "away": "Crystal Palace",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.121960"
+        },
+        {
+            "home": "Tottenham Hotspur",
+            "away": "Sunderland AFC",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.148346"
+        },
+        {
+            "home": "Everton Liverpool",
+            "away": "Brentford FC",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.174728"
+        },
+        {
+            "home": "Fulham FC",
+            "away": "FC Liverpool",
+            "league": "England  Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.202904"
+        },
+        {
+            "home": "Sevilla FC",
+            "away": "Levante UD",
+            "league": "Spain  LaLiga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.239872"
+        },
+        {
+            "home": "Real Madrid CF",
+            "away": "Real Betis Sevilla",
+            "league": "Spain  LaLiga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.266800"
+        },
+        {
+            "home": "Deportivo Alavés",
+            "away": "Real Oviedo",
+            "league": "Spain  LaLiga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.293783"
+        },
+        {
+            "home": "Real Sociedad",
+            "away": "Atlético de Madrid",
+            "league": "Spain  LaLiga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.328029"
+        },
+        {
+            "home": "Real CD Mallorca",
+            "away": "Girona FC",
+            "league": "Spain  LaLiga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.369539"
+        },
+        {
+            "home": "Le Havre AC",
+            "away": "Angers SC l´Ouest",
+            "league": "France  Ligue 1",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.423337"
+        },
+        {
+            "home": "Paris Saint - Germain",
+            "away": "Paris FC 98",
+            "league": "France  Ligue 1",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.452299"
+        },
+        {
+            "home": "FC Lorient Bretagne",
+            "away": "FC Metz",
+            "league": "France  Ligue 1",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.479361"
+        },
+        {
+            "home": "Stade Brestois 29",
+            "away": "AJ Auxerre",
+            "league": "France  Ligue 1",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.506700"
+        },
+        {
+            "home": "Olympique de Marseille",
+            "away": "FC Nantes Atlantique",
+            "league": "France  Ligue 1",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.533231"
+        },
+        {
+            "home": "Hellas Verona",
+            "away": "FC Torino",
+            "league": "Italy  Serie A",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.571414"
+        },
+        {
+            "home": "Inter Milano",
+            "away": "Bologna FC",
+            "league": "Italy  Serie A",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.598408"
+        },
+        {
+            "home": "ACF Fiorentina",
+            "away": "US Cremonese",
+            "league": "Italy  Serie A",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.625401"
+        },
+        {
+            "home": "SS Lazio Roma",
+            "away": "SSC Napoli",
+            "league": "Italy  Serie A",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.656366"
+        },
+        {
+            "home": "CD Santa Clara",
+            "away": "FC Porto",
+            "league": "Portugal  Primeira Liga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.697855"
+        },
+        {
+            "home": "Rio Ave FC",
+            "away": "Casa Pia",
+            "league": "Portugal  Primeira Liga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.728056"
+        },
+        {
+            "home": "FC Alverca",
+            "away": "FC Famalicao",
+            "league": "Portugal  Primeira Liga",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.755905"
+        },
+        {
+            "home": "Morocco",
+            "away": "Tanzania",
+            "league": "Africa Cup",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.793762"
+        },
+        {
+            "home": "South Africa",
+            "away": "Cameroon",
+            "league": "Africa Cup",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.820523"
+        },
+        {
+            "home": "Al-Hazem",
+            "away": "Neom SC",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.857631"
+        },
+        {
+            "home": "Al Qadisiya",
+            "away": "Al Riyadh SC",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.884112"
+        },
+        {
+            "home": "Damac FC",
+            "away": "Al-Hilal",
+            "league": "Saudi Arabia  Saudi Professional League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.910758"
+        },
+        {
+            "home": "Hull City AFC",
+            "away": "FC Watford",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.956273"
+        },
+        {
+            "home": "Queens Park Rangers",
+            "away": "Sheffield Wednesday",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:00.995095"
+        },
+        {
+            "home": "Sheffield United",
+            "away": "Oxford United",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.027604"
+        },
+        {
+            "home": "Bristol City",
+            "away": "Preston North End",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.057291"
+        },
+        {
+            "home": "Norwich City",
+            "away": "Stoke City",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.087284"
+        },
+        {
+            "home": "Millwall FC",
+            "away": "Swansea City",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.120423"
+        },
+        {
+            "home": "Derby County",
+            "away": "Wrexham AFC",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.161461"
+        },
+        {
+            "home": "Birmingham City",
+            "away": "Coventry City",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.203006"
+        },
+        {
+            "home": "Portsmouth",
+            "away": "Ipswich Town",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.247590"
+        },
+        {
+            "home": "Blackburn Rovers",
+            "away": "Charlton Athletic",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.284502"
+        },
+        {
+            "home": "Middlesbrough",
+            "away": "Southampton FC",
+            "league": "England  Championship",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.322586"
+        },
+        {
+            "home": "AD Ceuta FC",
+            "away": "FC Andorra",
+            "league": "Spain  Segunda Division",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.367762"
+        },
+        {
+            "home": "Sporting de Gijón",
+            "away": "Malaga CF",
+            "league": "Spain  Segunda Division",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.398968"
+        },
+        {
+            "home": "Albacete Balompié",
+            "away": "CD Leganés",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.439933"
+        },
+        {
+            "home": "Real Zaragoza",
+            "away": "UD Las Palmas",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.467946"
+        },
+        {
+            "home": "Deportivo de La Coruňa",
+            "away": "Cádiz CF",
+            "league": "(adsbygoogle = window.adsbygoogle || []).push({});",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.497846"
+        },
+        {
+            "home": "Adelaide United",
+            "away": "Central Coast Mariners",
+            "league": "Australia  A-League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.537126"
+        },
+        {
+            "home": "AEK Larnaca",
+            "away": "Anorthosis Famagusta",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.574824"
+        },
+        {
+            "home": "Apollon Limassol",
+            "away": "AE Paphos",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.611330"
+        },
+        {
+            "home": "Olympiakos Nikosia",
+            "away": "Aris Limassol",
+            "league": "Cyprus  Protathlima Cyta",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.636086"
+        },
+        {
+            "home": "Doncaster Rovers",
+            "away": "Luton Town",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.671948"
+        },
+        {
+            "home": "Huddersfield Town",
+            "away": "Exeter City",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.697614"
+        },
+        {
+            "home": "Plymouth Argyle",
+            "away": "Burton Albion",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.724094"
+        },
+        {
+            "home": "Port Vale FC",
+            "away": "Barnsley FC",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.749119"
+        },
+        {
+            "home": "Reading FC",
+            "away": "Stockport County",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.776235"
+        },
+        {
+            "home": "Rotherham United",
+            "away": "Mansfield Town",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.818152"
+        },
+        {
+            "home": "Stevenage Borough",
+            "away": "Leyton Orient",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.850567"
+        },
+        {
+            "home": "Wycombe Wanderers",
+            "away": "AFC Wimbledon",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.878574"
+        },
+        {
+            "home": "Lincoln City",
+            "away": "Peterborough United",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.905298"
+        },
+        {
+            "home": "Bolton Wanderers",
+            "away": "Northampton Town",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.936965"
+        },
+        {
+            "home": "Cardiff City",
+            "away": "Wigan Athletic",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.967146"
+        },
+        {
+            "home": "Blackpool FC",
+            "away": "Bradford City",
+            "league": "England  League One",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:01.992680"
+        },
+        {
+            "home": "Notts County",
+            "away": "Gillingham FC",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.028824"
+        },
+        {
+            "home": "Cambridge United",
+            "away": "Grimsby Town",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.054151"
+        },
+        {
+            "home": "Salford City FC",
+            "away": "Shrewsbury Town",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.080082"
+        },
+        {
+            "home": "Barrow AFC",
+            "away": "Bristol Rovers",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.105020"
+        },
+        {
+            "home": "Bromley FC",
+            "away": "Oldham Athletic",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.133964"
+        },
+        {
+            "home": "Milton Keynes FC",
+            "away": "Chesterfield FC",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.162239"
+        },
+        {
+            "home": "Barnet FC",
+            "away": "Crewe Alexandra",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.188003"
+        },
+        {
+            "home": "Walsall FC",
+            "away": "Fleetwood Town",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.216715"
+        },
+        {
+            "home": "Cheltenham Town",
+            "away": "Crawley Town",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.242763"
+        },
+        {
+            "home": "Colchester United",
+            "away": "Accrington Stanley",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.268176"
+        },
+        {
+            "home": "Newport County",
+            "away": "Tranmere Rovers",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.293312"
+        },
+        {
+            "home": "Harrogate Town",
+            "away": "Swindon Town",
+            "league": "England  League Two",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.318439"
+        },
+        {
+            "home": "Nations FC",
+            "away": "Karela United FC",
+            "league": "Ghana  Ghana Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.354637"
+        },
+        {
+            "home": "Samartex",
+            "away": "Young Apostles",
+            "league": "Ghana  Ghana Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "No"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.380606"
+        },
+        {
+            "home": "Hohoe United",
+            "away": "Heart of Lions",
+            "league": "Ghana  Ghana Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                },
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.404995"
+        },
+        {
+            "home": "Eleven Wonders",
+            "away": "Bibiani Gold Stars",
+            "league": "Ghana  Ghana Premier League",
+            "date": "04.01",
+            "markets": {
+                "BTTS": {
+                    "pred": "Yes"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                },
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:04:02.428998"
+        }
+    ],
+    "zulubet": [
+        {
+            "home": "Melbourne Victory",
+            "away": "Perth Glory",
+            "league": "Australia A-League",
+            "date": "02.01",
+            "time": "08:35",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.115216"
+        },
+        {
+            "home": "Maccabi Yavne",
+            "away": "Beitar Yavne",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "10:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.193388"
+        },
+        {
+            "home": "Maccabi Kiryat Gat",
+            "away": "Hapoel Herzliya",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "10:35",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.235362"
+        },
+        {
+            "home": "Maccabi Ahi Nazareth",
+            "away": "Hapoel Ironi Karmiel",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "10:40",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.278404"
+        },
+        {
+            "home": "Araba",
+            "away": "Maccabi K. Ata Bialik",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "11:00",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.318221"
+        },
+        {
+            "home": "Maccabi Nujeidat Ahmed",
+            "away": "Hapoel Umm al-Fahm",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "12:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.369342"
+        },
+        {
+            "home": "Tersana",
+            "away": "El Entag EL Harby",
+            "league": "Egypt Second League",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.429097"
+        },
+        {
+            "home": "Proxy",
+            "away": "El Dakhleya",
+            "league": "Egypt Second League",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.475517"
+        },
+        {
+            "home": "La Viena FC",
+            "away": "El Seka El Hadid",
+            "league": "Egypt Second League",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.518226"
+        },
+        {
+            "home": "El Mansura",
+            "away": "Tanta SC",
+            "league": "Egypt Second League",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.559068"
+        },
+        {
+            "home": "Al-Wasl FC",
+            "away": "Al Wahda FC",
+            "league": "United-Arab-Emirates Pro League",
+            "date": "02.01",
+            "time": "12:55",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.607531"
+        },
+        {
+            "home": "Khorfakkan",
+            "away": "Al-Dhafra",
+            "league": "United-Arab-Emirates Pro League",
+            "date": "02.01",
+            "time": "12:55",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.653347"
+        },
+        {
+            "home": "Hapoel Rishon LeZion",
+            "away": "Hapoel Afula",
+            "league": "Israel Liga Leumit",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.696321"
+        },
+        {
+            "home": "Ironi Baka El Garbiya",
+            "away": "Hapoel Tirat HaCarmel",
+            "league": "Israel Liga Alef",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.736273"
+        },
+        {
+            "home": "Kelantan United",
+            "away": "Kuching FA",
+            "league": "Malaysia Super League",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.777858"
+        },
+        {
+            "home": "Hapoel Kfar Saba",
+            "away": "Maccabi Petah Tikva",
+            "league": "Israel Liga Leumit",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.822463"
+        },
+        {
+            "home": "Kafr Qasim",
+            "away": "Hapoel Acre",
+            "league": "Israel Liga Leumit",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.863136"
+        },
+        {
+            "home": "Maccabi Herzliya",
+            "away": "Hapoel Ra'anana",
+            "league": "Israel Liga Leumit",
+            "date": "02.01",
+            "time": "13:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.902073"
+        },
+        {
+            "home": "Al Kuwait",
+            "away": "Al Tadhamon",
+            "league": "Kuwait Premier League",
+            "date": "02.01",
+            "time": "13:10",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.946280"
+        },
+        {
+            "home": "Al Nasr",
+            "away": "Sohar",
+            "league": "Oman Sultan Cup",
+            "date": "02.01",
+            "time": "13:20",
+            "markets": {
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:56.987279"
+        },
+        {
+            "home": "Sitra",
+            "away": "Al Shabab",
+            "league": "Bahrain Premier League",
+            "date": "02.01",
+            "time": "13:25",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.028779"
+        },
+        {
+            "home": "Al Najma",
+            "away": "Al Khaleej Saihat",
+            "league": "Saudi-Arabia Pro League",
+            "date": "02.01",
+            "time": "13:30",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.069454"
+        },
+        {
+            "home": "US Chaouia",
+            "away": "US Biskra",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.112461"
+        },
+        {
+            "home": "MSP Batna",
+            "away": "JS Jijel",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.155163"
+        },
+        {
+            "home": "Khroub",
+            "away": "Teleghma",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.196889"
+        },
+        {
+            "home": "HB Chelghoum Laïd",
+            "away": "MO Constantine",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.247555"
+        },
+        {
+            "home": "CR Béni Thour",
+            "away": "IB Khémis El Khechna",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.289590"
+        },
+        {
+            "home": "JS Bordj Ménaïel",
+            "away": "NC Magra",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.329007"
+        },
+        {
+            "home": "Nrb Beni Oulbene",
+            "away": "MO Bejaia",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.367817"
+        },
+        {
+            "home": "USM Annaba",
+            "away": "CA Batna",
+            "league": "Algeria Ligue 2",
+            "date": "02.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.409457"
+        },
+        {
+            "home": "Al Shabab",
+            "away": "Al Arabi",
+            "league": "Kuwait Premier League",
+            "date": "02.01",
+            "time": "15:40",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.450096"
+        },
+        {
+            "home": "Baniyas SC",
+            "away": "Al Nasr",
+            "league": "United-Arab-Emirates Pro League",
+            "date": "02.01",
+            "time": "15:45",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.496008"
+        },
+        {
+            "home": "Al Ain",
+            "away": "Sharjah FC",
+            "league": "United-Arab-Emirates Pro League",
+            "date": "02.01",
+            "time": "15:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.536718"
+        },
+        {
+            "home": "Al Seeb",
+            "away": "Saham",
+            "league": "Oman Sultan Cup",
+            "date": "02.01",
+            "time": "15:50",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.581077"
+        },
+        {
+            "home": "Muharraq",
+            "away": "Khalidiya",
+            "league": "Bahrain Premier League",
+            "date": "02.01",
+            "time": "16:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.622713"
+        },
+        {
+            "home": "Budaiya",
+            "away": "A'Ali",
+            "league": "Bahrain Premier League",
+            "date": "02.01",
+            "time": "16:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.698154"
+        },
+        {
+            "home": "Gicumbi",
+            "away": "Al Hilal Omdurman",
+            "league": "Rwanda National Soccer League",
+            "date": "02.01",
+            "time": "16:30",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.737478"
+        },
+        {
+            "home": "Omonia Aradippou",
+            "away": "Krasava Ypsonas",
+            "league": "Cyprus 1. Division",
+            "date": "02.01",
+            "time": "17:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.776543"
+        },
+        {
+            "home": "GIL Vicente",
+            "away": "Sporting CP",
+            "league": "Portugal Primeira Liga",
+            "date": "02.01",
+            "time": "18:45",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.815996"
+        },
+        {
+            "home": "Caerau (Ely)",
+            "away": "Cardiff Draconians",
+            "league": "Wales FAW Championship",
+            "date": "02.01",
+            "time": "19:00",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.853743"
+        },
+        {
+            "home": "Eibar",
+            "away": "Mirandes",
+            "league": "Spain Segunda División",
+            "date": "02.01",
+            "time": "19:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.893754"
+        },
+        {
+            "home": "Larne",
+            "away": "Coleraine FC",
+            "league": "Northern-Ireland Premiership",
+            "date": "02.01",
+            "time": "19:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:57.968119"
+        },
+        {
+            "home": "Toulouse",
+            "away": "Lens",
+            "league": "France Ligue 1",
+            "date": "02.01",
+            "time": "19:45",
+            "markets": {
+                "1X2": {
+                    "pred": "X2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.009332"
+        },
+        {
+            "home": "Cagliari",
+            "away": "AC Milan",
+            "league": "Italy Serie A",
+            "date": "02.01",
+            "time": "19:45",
+            "markets": {
+                "1X2": {
+                    "pred": "2"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.053609"
+        },
+        {
+            "home": "Aveley",
+            "away": "Canvey Island",
+            "league": "England Non League Premier - Isthmian",
+            "date": "02.01",
+            "time": "19:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.093648"
+        },
+        {
+            "home": "Rayo Vallecano",
+            "away": "Getafe",
+            "league": "Spain La Liga",
+            "date": "02.01",
+            "time": "20:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.130982"
+        },
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "league": "Portugal Primeira Liga",
+            "date": "02.01",
+            "time": "20:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.169607"
+        },
+        {
+            "home": "Brisbane Roar",
+            "away": "Wellington Phoenix",
+            "league": "Australia A-League",
+            "date": "02.01",
+            "time": "06:00",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.209252"
+        },
+        {
+            "home": "Persija",
+            "away": "Persijap",
+            "league": "Indonesia Liga 1",
+            "date": "02.01",
+            "time": "08:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.246686"
+        },
+        {
+            "home": "Pusamania Borneo",
+            "away": "PSM Makassar",
+            "league": "Indonesia Liga 1",
+            "date": "02.01",
+            "time": "08:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1X"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.284653"
+        },
+        {
+            "home": "Como",
+            "away": "Udinese",
+            "league": "Italy Serie A",
+            "date": "02.01",
+            "time": "11:30",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.323367"
+        },
+        {
+            "home": "Celtic",
+            "away": "Rangers",
+            "league": "Scotland Premiership",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "12"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.361415"
         },
         {
             "home": "Aston Villa",
             "away": "Nottingham Forest",
-            "prediction": "1",
-            "timestamp": "2026-01-02T05:07:42.668506"
+            "league": "England Premier League",
+            "date": "02.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.399053"
+        },
+        {
+            "home": "Aldershot Town",
+            "away": "Solihull Moors",
+            "league": "England National League",
+            "date": "02.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1"
+                }
+            },
+            "timestamp": "2026-01-02T22:06:58.436854"
+        }
+    ],
+    "prosoccer": [
+        {
+            "home": "MELBOURNE VICTORY",
+            "away": "PERTH GLORY",
+            "timestamp": "2026-01-02T22:07:12.074228",
+            "markets": {
+                "1X2": {
+                    "pred": "1X",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                }
+            },
+            "date": "02.01",
+            "time": "08:35"
+        },
+        {
+            "home": "GIL VICENTE",
+            "away": "SPORTING LISBON",
+            "timestamp": "2026-01-02T22:07:12.104789",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                }
+            },
+            "date": "02.01",
+            "time": "18:45"
+        },
+        {
+            "home": "EIBAR",
+            "away": "MIRANDES",
+            "timestamp": "2026-01-02T22:07:12.132481",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                }
+            },
+            "date": "02.01",
+            "time": "19:30"
+        },
+        {
+            "home": "TOULOUSE",
+            "away": "LENS",
+            "timestamp": "2026-01-02T22:07:12.161396",
+            "markets": {
+                "1X2": {
+                    "pred": "12",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                }
+            },
+            "date": "02.01",
+            "time": "19:45"
+        },
+        {
+            "home": "CAGLIARI",
+            "away": "AC MILAN",
+            "timestamp": "2026-01-02T22:07:12.188292",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                }
+            },
+            "date": "02.01",
+            "time": "19:45"
+        },
+        {
+            "home": "RAYO VALLECANO",
+            "away": "GETAFE",
+            "timestamp": "2026-01-02T22:07:12.213529",
+            "markets": {
+                "1X2": {
+                    "pred": "1X",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "UNDER"
+                }
+            },
+            "date": "02.01",
+            "time": "20:00"
+        },
+        {
+            "home": "GUIMARAES",
+            "away": "MADEIRA",
+            "timestamp": "2026-01-02T22:07:12.240687",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "0"
+                },
+                "OU25": {
+                    "pred": "OVER"
+                }
+            },
+            "date": "02.01",
+            "time": "20:45"
+        }
+    ],
+    "olbg": [
+        {
+            "home": "Aston Villa",
+            "away": "Nottm Forest",
+            "league": "England Premier League",
+            "date": "03.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "84",
+                    "tip_count": "53/63"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.649877"
+        },
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "league": "Portugal Primeira Liga",
+            "date": "02.01",
+            "time": "20:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "72",
+                    "tip_count": "33/46"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.720315"
+        },
+        {
+            "home": "Brighton",
+            "away": "Burnley",
+            "league": "England Premier League",
+            "date": "03.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "65",
+                    "tip_count": "22/34"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.789748"
+        },
+        {
+            "home": "Bournemouth",
+            "away": "Arsenal",
+            "league": "England Premier League",
+            "date": "03.01",
+            "time": "17:30",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "65",
+                    "tip_count": "22/34"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.852625"
+        },
+        {
+            "home": "Wolverhampton",
+            "away": "West Ham",
+            "league": "England Premier League",
+            "date": "03.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X",
+                    "prob": "40",
+                    "tip_count": "14/35"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.910358"
+        },
+        {
+            "home": "Como",
+            "away": "Udinese",
+            "league": "Italy Serie A",
+            "date": "03.01",
+            "time": "11:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "81",
+                    "tip_count": "13/16"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:40.965213"
+        },
+        {
+            "home": "Juventus",
+            "away": "Lecce",
+            "league": "Italy Serie A",
+            "date": "03.01",
+            "time": "17:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "93",
+                    "tip_count": "13/14"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.028963"
+        },
+        {
+            "home": "Man City",
+            "away": "Chelsea",
+            "league": "England Premier League",
+            "date": "04.01",
+            "time": "17:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "79",
+                    "tip_count": "11/14"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.084070"
+        },
+        {
+            "home": "Brisbane Roar",
+            "away": "Wellington Phoenix",
+            "league": "Australia A League",
+            "date": "03.01",
+            "time": "06:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "67",
+                    "tip_count": "10/15"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.139927"
+        },
+        {
+            "home": "Leeds",
+            "away": "Man Utd",
+            "league": "England Premier League",
+            "date": "04.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "50",
+                    "tip_count": "10/20"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.196799"
+        },
+        {
+            "home": "Newcastle",
+            "away": "Crystal Palace",
+            "league": "England Premier League",
+            "date": "04.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "63",
+                    "tip_count": "10/16"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.252385"
+        },
+        {
+            "home": "Hearts",
+            "away": "Livingston",
+            "league": "Scotland Premiership",
+            "date": "03.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "100",
+                    "tip_count": "7/7"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.309208"
+        },
+        {
+            "home": "PSG",
+            "away": "Paris FC",
+            "league": "France Ligue 1",
+            "date": "04.01",
+            "time": "19:45",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "100",
+                    "tip_count": "7/7"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.365637"
+        },
+        {
+            "home": "Melbourne City",
+            "away": "Sydney FC",
+            "league": "Australia A League",
+            "date": "03.01",
+            "time": "08:35",
+            "markets": {
+                "1X2": {
+                    "pred": "X",
+                    "prob": "67",
+                    "tip_count": "6/9"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.421095"
+        },
+        {
+            "home": "Celtic",
+            "away": "Rangers",
+            "league": "Scotland Premiership",
+            "date": "03.01",
+            "time": "12:30",
+            "markets": {
+                "1X2": {
+                    "pred": "2",
+                    "prob": "43",
+                    "tip_count": "6/14"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.480594"
+        },
+        {
+            "home": "Real Madrid",
+            "away": "Real Betis",
+            "league": "Spain Primera Liga",
+            "date": "04.01",
+            "time": "15:15",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "86",
+                    "tip_count": "6/7"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.539397"
+        },
+        {
+            "home": "Senegal",
+            "away": "Sudan",
+            "league": "African Nations Cup",
+            "date": "03.01",
+            "time": "16:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "83",
+                    "tip_count": "5/6"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.599362"
+        },
+        {
+            "home": "Nice",
+            "away": "Strasbourg",
+            "league": "France Ligue 1",
+            "date": "03.01",
+            "time": "18:00",
+            "markets": {
+                "1X2": {
+                    "pred": "X",
+                    "prob": "100",
+                    "tip_count": "5/5"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.660562"
+        },
+        {
+            "home": "Marseille",
+            "away": "Nantes",
+            "league": "France Ligue 1",
+            "date": "04.01",
+            "time": "14:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "83",
+                    "tip_count": "5/6"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.718853"
+        },
+        {
+            "home": "Everton",
+            "away": "Brentford",
+            "league": "England Premier League",
+            "date": "04.01",
+            "time": "15:00",
+            "markets": {
+                "1X2": {
+                    "pred": "1",
+                    "prob": "45",
+                    "tip_count": "5/11"
+                }
+            },
+            "timestamp": "2026-01-02T21:45:41.776840"
         }
     ]
 }

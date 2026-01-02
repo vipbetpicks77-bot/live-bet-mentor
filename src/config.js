@@ -99,6 +99,24 @@ export const CONFIG = {
         TIER_2_MOMENTUM_WINDOW: 15, // More aggressive (15m instead of 10m)
         TIER_2_DEAD_MATCH_MIN: 70, // Earlier dead-match check (70' instead of 75')
       }
+    },
+    // Phase 15: Advanced Analysis Modules
+    ADVANCED_ANALYSIS: {
+      VALUE_DETECTION: {
+        ENABLED: true,
+        MIN_CONSENSUS_PROB: 70, // %70 prediction agreement
+        MAX_ODDS: 2.50, // Max odds to consider
+        MIN_EDGE: 10 // %10 difference between prediction and odds
+      },
+      DIVERGENCE_RADAR: {
+        ENABLED: true,
+        THRESHOLD: 50 // %50 division among sources
+      },
+      REVERSE_SIGNAL: {
+        ENABLED: true,
+        DQS_THRESHOLD: 0.70, // High DQS for counter-play
+        MOMENTUM_DIFF: 5 // Significant momentum difference
+      }
     }
   }
 };
