@@ -35,7 +35,7 @@ export const CONFIG = {
   // Data & Latency
   DATA: {
     LATENCY_THRESHOLD_MS: 30000, // 30 seconds
-    POLLING_INTERVAL_MS: 15000, // 15 seconds for API safety
+    POLLING_INTERVAL_MS: 8000, // 8 seconds for faster updates
     RELIABILITY_SCORE_MIN: 0.8, // Minimum reliability score to avoid NO-BET
     USE_MOCK_DATA: import.meta.env.VITE_USE_MOCK_DATA === 'true',
     DATA_SOURCE: import.meta.env.VITE_DATA_SOURCE || 'SOFASCORE',

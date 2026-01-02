@@ -34,6 +34,16 @@ export default defineConfig({
           'Origin': 'https://redscores.com',
           'Accept-Language': 'en-US,en;q=0.9'
         }
+      },
+      '/api/consensus': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+        secure: false
+      },
+      '/api/sofascore': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+        secure: false
       }
     }
   }

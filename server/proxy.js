@@ -69,10 +69,11 @@ app.get('/api/sofascore/event/:id/statistics', (req, res) => {
         const ageInSeconds = (Date.now() - stats.mtimeMs) / 1000;
 
         // TTL: 60 seconds for live statistics
+        // Even if it's an error/empty file, we cache it for 60s to avoid spamming the scraper
         if (ageInSeconds < 60) {
             const data = fs.readFileSync(filePath, 'utf8');
             const json = JSON.parse(data);
-            if (!json.error) return res.json(json);
+            return res.json(json);
         }
     }
 
@@ -107,7 +108,36 @@ function startScraper() {
     });
 }
 
+// --- CONSENSUS API ---
+app.get('/api/consensus', (req, res) => {
+    const filePath = path.join(__dirname, 'consensus_data.json');
+    if (fs.existsSync(filePath)) {
+        try {
+            console.log('[PROXY] Consensus request received');
+            const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            res.json(data);
+        } catch (e) {
+            res.status(500).json({ error: "Consensus parse error" });
+        }
+    } else {
+        res.json({}); // Return empty if scraper hasn't run yet
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`[PROXY SERVER] Running on http://localhost:${PORT}`);
     startScraper();
+    startConsensusScraper();
 });
+
+function startConsensusScraper() {
+    console.log('[PROXY] Initializing Consensus Scraper...');
+    const spawnScraper = () => {
+        const pythonProcess = spawn('python', [path.join(__dirname, 'consensus_scraper.py')]);
+        pythonProcess.stdout.on('data', (data) => console.log(`[CONSENSUS_STDOUT] ${data}`));
+        pythonProcess.stderr.on('data', (data) => console.error(`[CONSENSUS_STDERR] ${data}`));
+    };
+
+    spawnScraper(); // Run once at start
+    setInterval(spawnScraper, 4 * 60 * 60 * 1000); // Re-run every 4 hours
+}

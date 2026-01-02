@@ -191,6 +191,34 @@ export const translations = {
         live_feed_connected: "Canlı Veri Bağlantısı Aktif",
         close_intelligence: "Raporu Kapat",
         no_live_metrics: "Canlı metrik bulunamadı",
+        minute_label: "DK",
+        halftime_short: "İY",
+        ai_expert_summary: "🤖 AI UZMAN ÖZETİ (Gemini)",
+        global_consensus_report: "🌍 GLOBAL KONSENSUS (6 Kaynak)",
+        consensus_agreement: "Ortak Akıl Skoru:",
+        daily_radar: "GÜNLÜK RADAR (PRE-MATCH)",
+        status_wait: "BEKLENİYOR",
+
+        // Expert Upgrades
+        pressure_label: "BASKI GÜCÜ (0-100)",
+        velocity_label: "İVME / TREND",
+        velocity_hot: "🔴 PATLAMA NOKTASI (Vites 5)",
+        velocity_warming: "🟠 Hızlanıyor (Vites 3-4)",
+        velocity_stable: "⚪ Stabil Tempo",
+        velocity_cooling: "🔵 Tempo Düşüyor",
+        daily_target_reached: "HEDEF TAMAM: Günlük Kar %5+",
+        daily_stoploss_reached: "STOP AKTİF: Günlük Zarar %3",
+
+        // Expert FAQ
+        faq_q13_title: "13. Baskı Gücü (Pressure Index) Nedir?",
+        faq_q13_desc: "Baskı Gücü, maçın saha içindeki 'yoğunluğunu' ölçer. Sadece şutu değil; kornerleri ve rakip ceza sahasına yapılan tehlikeli girişleri harmanlar.",
+        faq_q13_example: "Örnek: Skor 0-0 olabilir, ama bir takımın baskı gücü 85 ise golün 'ayak sesleri' geliyordur. 70 ve üzeri 'Analiz Gerektiren Baskı' olarak kabul edilir.",
+        faq_q14_title: "14. İvme (Velocity) Nedir?",
+        faq_q14_desc: "İvme, maçın son 10 dakikadaki 'enerji değişim hızı'dır. Maçın geneline değil, en taze 10 dakikadaki aksiyon artışına bakar.",
+        faq_q14_example: "Örnek: Bir takım ilk 40 dakika uyumuş olabilir (Stabil Tempo). Ancak son 10 dakikada üst üste şut ve kornerlerle 'vites arttırmışsa' İvme motoru bunu yakalar ve analiz puanını (EdgeScore) otomatik yükseltir.",
+        faq_q15_title: "15. Kar/Zarar Disiplin Kilidi (Daily Stop)",
+        faq_q15_desc: "Profesyonel bir bahisçi nerede duracağını bilen kişidir. Sistem, kasanızı duygularınızdan bağımsız olarak korur.",
+        faq_daily_discipline: "Disiplin Kuralları: Günlük kar %5'e ulaşırsa bakiye korumak için, günlük zarar %3'e inerse büyük kayıpları önlemek için sistem o günkü bahisleri otomatik kapatır (NO-BET).",
 
         // Bankroll FAQ
         faq_bankroll_q1_title: "Kasa Yönetim Sistemi Nedir?",
@@ -242,7 +270,15 @@ export const translations = {
         "Shots outside box": "Ceza Sahası Dışı",
         "Big chances missed": "Kaçan Büyük Şans",
         "Touches in penalty area": "C. Sahası Dokunuş",
-        "Final third entries": "3. Bölge Girişimleri"
+        "Final third entries": "3. Bölge Girişimleri",
+        "radar_filters": "RADAR FİLTRELERİ",
+        "source_selection": "KAYNAK SEÇİMİ",
+        "min_sources": "MİNİMUM KAYNAK",
+        "search_team": "Takım veya Lig ara...",
+        "all_sources": "Tüm Kaynaklar",
+        "clear_filters": "Filtreleri Temizle",
+        "search_label": "ARA",
+        "matches_found": "Maç Bulundu"
     },
     en: {
         title: "LIVE BET MENTOR",
@@ -440,6 +476,33 @@ export const translations = {
         live_feed_connected: "Live Feed Connected",
         close_intelligence: "Close Intelligence",
         no_live_metrics: "No live metrics available",
+        minute_label: "MIN",
+        halftime_short: "HT",
+        ai_expert_summary: "🤖 AI EXPERT SUMMARY (Gemini)",
+        global_consensus_report: "🌍 GLOBAL CONSENSUS (6 Sources)",
+        consensus_agreement: "Consensus Score:",
+        daily_radar: "DAILY RADAR (PRE-MATCH)",
+        status_wait: "WAITING",
+        // Expert Upgrades
+        pressure_label: "PRESSURE INDEX (0-100)",
+        velocity_label: "VELOCITY / TREND",
+        velocity_hot: "🔴 EXPLOSION POINT (Gear 5)",
+        velocity_warming: "🟠 Warming Up (Gear 3-4)",
+        velocity_stable: "⚪ Stable Tempo",
+        velocity_cooling: "🔵 Cooling Down",
+        daily_target_reached: "TARGET REACHED: Daily Profit %5+",
+        daily_stoploss_reached: "STOP ACTIVE: Daily Loss %3",
+
+        // Expert FAQ
+        faq_q13_title: "13. What is Pressure Index?",
+        faq_q13_desc: "Pressure Index measures the 'intensity' of the match. It blends shots, corners, and dangerous entries into the opponent's box.",
+        faq_q13_example: "Example: The score might be 0-0, but if a team's pressure is 85, a goal is 'imminent'. Values over 70 are considered 'High Pressure'.",
+        faq_q14_title: "14. What is Velocity?",
+        faq_q14_desc: "Velocity is the 'energy change rate' in the last 10 minutes. It looks at the action increase in the freshest 10-minute window.",
+        faq_q14_example: "Example: A team might have been passive for 40 minutes (Stable), but if they suddenly increase shots/corners in the last 10 minutes, the Velocity engine catches this and boosts the EdgeScore.",
+        faq_q15_title: "15. Daily Profit/Loss Discipline (Stop-Limit)",
+        faq_q15_desc: "A professional bettor knows when to stop. The system protects your bankroll independently of your emotions.",
+        faq_daily_discipline: "Discipline: If daily profit reaches 5%, the system locks to preserve gains. If daily loss hits 3%, it stops to prevent large drawdowns (NO-BET).",
 
         // Bankroll FAQ
         faq_bankroll_q1_title: "What is the Bankroll Management System?",
@@ -478,6 +541,14 @@ export const translations = {
         "Accurate passes": "Accurate passes",
         "Tackles": "Tackles",
         "Interceptions": "Interceptions",
-        "Clearances": "Clearances"
+        "Clearances": "Clearances",
+        "radar_filters": "RADAR FILTERS",
+        "source_selection": "SOURCE SELECTION",
+        "min_sources": "MINIMUM SOURCES",
+        "search_team": "Search team or league...",
+        "all_sources": "All Sources",
+        "clear_filters": "Clear Filters",
+        "search_label": "SEARCH",
+        "matches_found": "Matches Found"
     }
 };

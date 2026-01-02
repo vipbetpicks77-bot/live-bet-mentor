@@ -199,9 +199,15 @@ class BankrollManager {
         const prevMode = this.state.current_mode;
         let newMode = h.MODES.NORMAL;
 
+        // EXPERT DISCIPLINE: Stop-Loss & Target Profit
+        const dailyProfitPercent = (this.state.daily_pl / this.state.starting_balance);
+        const targetReached = dailyProfitPercent >= 0.05; // %5 Kar Hedefi
+        const stopLossReached = dailyProfitPercent <= -0.03; // %3 Zarar Durdur
+
         if (this.state.loss_streak >= h.THRESHOLDS.STOP_LOSS_STREAK ||
             this.state.daily_loss_count >= h.THRESHOLDS.DAILY_LOSS_LIMIT ||
-            this.state.daily_bet_count >= h.THRESHOLDS.DAILY_BET_LIMIT) {
+            this.state.daily_bet_count >= h.THRESHOLDS.DAILY_BET_LIMIT ||
+            targetReached || stopLossReached) {
             newMode = h.MODES.NO_BET;
         }
         else if (this.state.loss_streak >= h.THRESHOLDS.CAUTION_LOSS_STREAK) {
@@ -210,10 +216,14 @@ class BankrollManager {
 
         if (newMode !== prevMode) {
             this.state.current_mode = newMode;
+            let reasonKey = 'stop_rules_reason';
+            if (targetReached) reasonKey = 'SSS: Günlük %5 kar hedefine ulaşıldı. Kasa koruma modu aktif.';
+            else if (stopLossReached) reasonKey = 'SSS: Günlük %3 zarar limitine ulaşıldı. Disiplin molası.';
+
             this.addToLedger('MODE_CHANGE', {
                 from: prevMode,
                 to: newMode,
-                reason: newMode === h.MODES.NO_BET ? 'stop_rules_reason' : 'caution_rules_reason'
+                reason: reasonKey
             });
         }
     }

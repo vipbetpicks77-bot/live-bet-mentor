@@ -11,8 +11,7 @@ export const sofaScoreAdapter = {
      */
     async fetchScheduledEvents() {
         try {
-            console.log('[SOFASCORE_ADAPTER] Fetching from local proxy:', CONFIG.DATA.SOFASCORE_LOCAL_PROXY_URL);
-            const response = await fetch(CONFIG.DATA.SOFASCORE_LOCAL_PROXY_URL);
+            const response = await fetch('/api/sofascore/live');
             if (!response.ok) throw new Error('API fetch failed');
             const data = await response.json();
 
@@ -78,8 +77,7 @@ export const sofaScoreAdapter = {
      * Fetches full details for a specific event.
      */
     fetchEventDetails: async (eventId) => {
-        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-        const baseUrl = `${apiBase}/api/sofascore/event`;
+        const baseUrl = `/api/sofascore/event`;
         const detailUrl = `${baseUrl}/${eventId}`;
         const statsUrl = `${baseUrl}/${eventId}/statistics`;
 
@@ -112,7 +110,7 @@ export const sofaScoreAdapter = {
     /**
      * Normalizes SofaScore data to our internal schema.
      */
-    normalize: (detail, stats) => {
+    normalize(detail, stats) {
         const event = detail.event;
         let isPartial = false;
 
@@ -205,7 +203,7 @@ export const sofaScoreAdapter = {
             awayTeam: event.awayTeam.name,
             leagueName: event.tournament?.name || 'Unknown League',
             score: { home: event.homeScore.current, away: event.awayScore.current },
-            minute: this.calculateMinute(event),
+            minute: sofaScoreAdapter.calculateMinute(event),
             stats: normalizedStats,
             isPartial: isPartial,
             latency: 0,

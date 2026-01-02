@@ -12,6 +12,8 @@ import { analyzeMatch } from '../logic/matchAnalyzer';
 import { HealthMonitor } from './healthMonitor';
 import { leagueProfileModule } from '../logic/leagueProfileModule';
 import { bankrollManager } from '../logic/bankrollManager';
+import { consensusAdapter } from './consensusAdapter';
+import { aiAnalystService } from './aiAnalystService';
 
 class DataWorker {
     constructor() {
@@ -35,7 +37,24 @@ class DataWorker {
         this.healthMonitor = new HealthMonitor(); // Phase 11 Scenario 3
         this.lastFetchDuration = 0;
         this.tier3Performance = JSON.parse(localStorage.getItem('tier3_performance') || '{}');
+        this.selectedMatchId = null;
         this.dataSource = CONFIG.DATA.DATA_SOURCE;
+        this.consensusData = {};
+        this.consensusTimer = 0;
+    }
+
+    async setSelectedMatch(matchId) {
+        this.selectedMatchId = matchId;
+        console.log('[DATA_WORKER] Priority match updated:', matchId);
+
+        // Trigger AI Analysis for selected match
+        const match = this.fixtures.find(f => f.id.toString() === matchId?.toString());
+        if (match && !match.aiSummary) {
+            console.log('[DATA_WORKER] Requesting AI Expert Summary for:', matchId);
+            match.aiSummary = "AI Analiz yapıyor...";
+            const summary = await aiAnalystService.getExpertSummary(match, match.consensusReport);
+            match.aiSummary = summary;
+        }
     }
 
     setApiKey(key) {
@@ -49,7 +68,17 @@ class DataWorker {
         if (this.isRunning) return;
         this.isRunning = true;
         this.poll();
+        this.pollConsensus();
         this.startHealthMonitoring(); // Phase 11 Scenario 3
+    }
+
+    async pollConsensus() {
+        while (this.isRunning) {
+            console.log('[DATA_WORKER] Fetching global consensus data...');
+            const data = await consensusAdapter.fetchConsensus();
+            if (data) this.consensusData = data;
+            await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000)); // Every 2 mins
+        }
     }
 
     async poll() {
@@ -57,34 +86,46 @@ class DataWorker {
             try {
                 const startTime = Date.now();
 
+                let rawMatches = [];
                 // Mock Data Mode (for testing when external APIs are unavailable)
                 if (CONFIG.DATA.USE_MOCK_DATA) {
-                    this.matches = await mockDataService.fetchLiveMatches();
-                    console.log('[DATA_WORKER] Mock data mode active, fetched:', this.matches?.length || 0, 'matches');
+                    rawMatches = await mockDataService.fetchLiveMatches();
+                    console.log('[DATA_WORKER] Mock data mode active, fetched:', rawMatches?.length || 0, 'matches');
                 } else {
                     // Sole source: SofaScore (via local scraper)
-                    this.matches = await sofaScoreAdapter.fetchScheduledEvents();
+                    rawMatches = await sofaScoreAdapter.fetchScheduledEvents();
                 }
 
-                // Normalize and process the fetched matches
-                if (Array.isArray(this.matches)) {
-                    // Phase 11 Improv: Sequential detail fetching for active matches to improve DQS
+                if (rawMatches && Array.isArray(rawMatches)) {
+                    // Smart Polling: Decide which matches need full details
                     const detailedMatches = await Promise.all(
-                        this.matches.map(async (match) => {
-                            // If it's a normalized match object, it has an ID
+                        rawMatches.map(async (match) => {
                             const eventId = match.id;
                             if (!eventId) return match;
 
-                            // Fetch updated details from local proxy (CDP Cache)
-                            const fullDetail = await sofaScoreAdapter.fetchEventDetails(eventId);
-                            return fullDetail || match;
+                            const isSelected = eventId.toString() === this.selectedMatchId?.toString();
+                            const isHighTier = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1.includes(match.leagueName) ||
+                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2.includes(match.leagueName);
+
+                            // Logic:
+                            // 1. If selected -> Always fetch
+                            // 2. If Tier 1/2 -> Always fetch (to keep algorithm running)
+                            // 3. Others -> Only if they were already 'PARTIAL' or have high basic stats (optional next step)
+
+                            if (isSelected || isHighTier) {
+                                const fullDetail = await sofaScoreAdapter.fetchEventDetails(eventId);
+                                return fullDetail || match;
+                            }
+
+                            // For Tier 3, use the basic data from search/list
+                            return match;
                         })
                     );
 
                     this.fixtures = this.normalizeFixtures(detailedMatches.filter(r => r !== null));
                     console.log('[DATA_WORKER] Normalized fixtures with details:', this.fixtures?.length || 0);
                 } else {
-                    console.warn('[DATA_WORKER] Fetched matches is not an array:', this.matches);
+                    console.warn('[DATA_WORKER] Fetched matches is not an array:', rawMatches);
                     this.fixtures = [];
                 }
 
@@ -125,26 +166,34 @@ class DataWorker {
             if (dqs >= CONFIG.DECISION.DQS_THRESHOLD) dqsAbove++;
             else dqsBelow++;
 
+            // Global Consensus Report
+            const consensusReport = consensusAdapter.getConsensusSummary(this.consensusData, f);
+
             // Create Snapshot
             const snapshot = {
                 timestamp: Date.now(),
                 dqs,
                 minute: f.minute,
-                score: { ...f.score },
-                stats: { ...f.stats },
+                score: f.score,
+                stats: f.stats,
+                consensusReport,
                 latency: f.latency
             };
             history.unshift(snapshot);
             if (history.length > 10) history.pop();
 
             const leagueProfile = leagueProfileModule.getProfile(f.league || f.leagueName);
+            const analysis = analyzeMatch(f, this.odds[f.id] || {});
 
             return {
                 ...f,
                 dqs,
                 tier: leagueProfile.tier,
                 history,
-                dataQuality: dqs >= CONFIG.DECISION.DQS_THRESHOLD ? 'OK' : 'LOW'
+                dataQuality: dqs >= 0.8 ? 'TAM' : dqs >= 0.5 ? 'KISITLI' : 'BEKLENİYOR',
+                observations: analysis.observations,
+                signal: analysis,
+                consensusReport
             };
         });
 

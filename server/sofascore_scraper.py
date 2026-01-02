@@ -77,10 +77,13 @@ def capture_sofascore():
                             elif "/event/" in request_url and "/statistics" not in request_url:
                                 type_label = "DETAIL"
                                 match_id = request_url.split('/')[-1]
+                                if not match_id.isdigit():
+                                    continue
                                 target_path = os.path.join(STATS_DIR, f"{match_id}_detail.json")
                             else:
                                 continue
 
+                            current_match_id = match_id if 'match_id' in locals() else "N/A"
                             try:
                                 response_body = driver.execute_cdp_cmd('Network.getResponseBody', {'requestId': request_id})
                                 body = response_body.get('body', '')
@@ -89,9 +92,14 @@ def capture_sofascore():
                                     if "error" not in json_data:
                                         with open(target_path, 'w', encoding='utf-8') as f:
                                             json.dump(json_data, f)
-                                        logger.info(f"Captured {type_label} for {match_id} -> {target_path}")
+                                        if type_label == "LIVE_LIST":
+                                            logger.info(f"Captured LIVE_LIST -> {target_path}")
+                                        else:
+                                            logger.info(f"Captured {type_label} for {match_id} -> {target_path}")
                                     else:
-                                        logger.warning(f"API Error for {match_id} ({type_label}), skipping save.")
+                                        logger.warning(f"API Error for {current_match_id} ({type_label}), saving empty marker.")
+                                        with open(target_path, 'w', encoding='utf-8') as f:
+                                            json.dump({"error": "No data available", "items": []}, f)
                             except Exception as e:
                                 continue
 

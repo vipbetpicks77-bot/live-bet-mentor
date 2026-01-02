@@ -11,9 +11,13 @@ export class LeagueProfileModule {
     }
 
     getTier(leagueName) {
+        if (!leagueName) return 3;
         const tiers = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS;
-        if (tiers.TIER_1.some(l => leagueName?.includes(l))) return 1;
-        if (tiers.TIER_2.some(l => leagueName?.includes(l))) return 2;
+
+        // Exact match check for Tier 1 and Tier 2
+        if (tiers.TIER_1.some(l => leagueName === l || leagueName.startsWith(l + ','))) return 1;
+        if (tiers.TIER_2.some(l => leagueName === l || leagueName.startsWith(l + ','))) return 2;
+
         return 3; // Default to Discovery
     }
 

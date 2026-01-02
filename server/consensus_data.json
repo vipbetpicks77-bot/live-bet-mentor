@@ -1,0 +1,184 @@
+{
+    "forebet": [],
+    "predictz": [],
+    "windrawwin": [],
+    "statarea": [
+        {
+            "home": "Rayo Vallecano",
+            "away": "Getafe",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:40.900535"
+        },
+        {
+            "home": "Cagliari",
+            "away": "AC Milan",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:12:42.578890"
+        },
+        {
+            "home": "Toulouse",
+            "away": "Lens",
+            "prediction": "X",
+            "timestamp": "2026-01-02T05:12:44.425643"
+        },
+        {
+            "home": "Gil Vicente",
+            "away": "Sporting CP",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:12:44.926963"
+        },
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:45.305774"
+        },
+        {
+            "home": "JS Kabylie",
+            "away": "MC Alger",
+            "prediction": "X",
+            "timestamp": "2026-01-02T05:12:45.811438"
+        },
+        {
+            "home": "Melbourne Victory FC",
+            "away": "Perth Glory FC",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:46.273683"
+        },
+        {
+            "home": "Hapoel Kfar Saba",
+            "away": "Maccabi Petah Tikva",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:12:46.581837"
+        },
+        {
+            "home": "Hapoel Rishon LeZion",
+            "away": "Hapoel Afula",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:46.877874"
+        },
+        {
+            "home": "Hapoel Ramat Gan",
+            "away": "Maccabi Kabilio Jaffa",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:47.167124"
+        },
+        {
+            "home": "Maccabi Herzliya",
+            "away": "Hapoel Raanana",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:47.512425"
+        },
+        {
+            "home": "Eibar",
+            "away": "Mirandes",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:48.698406"
+        },
+        {
+            "home": "Omonia Aradippou",
+            "away": "Krasava Ypsonas FC",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:49.860262"
+        },
+        {
+            "home": "Al-Kuwait",
+            "away": "Al-Tadhamon",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:50.398890"
+        },
+        {
+            "home": "Al-Shabab Al Ahmadi",
+            "away": "Al-Arabi Kuwait City",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:12:50.743218"
+        },
+        {
+            "home": "Aveley",
+            "away": "Canvey Island",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:12:51.510859"
+        }
+    ],
+    "vitibet": [],
+    "zulubet": [
+        {
+            "home": "Melbourne Victory",
+            "away": "Perth Glory",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:23.821845"
+        },
+        {
+            "home": "Araba",
+            "away": "Maccabi K. Ata Bialik",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:07:28.724663"
+        },
+        {
+            "home": "Tersana",
+            "away": "El Entag EL Harby",
+            "prediction": "X",
+            "timestamp": "2026-01-02T05:07:31.703350"
+        },
+        {
+            "home": "El Mansura",
+            "away": "Tanta SC",
+            "prediction": "X",
+            "timestamp": "2026-01-02T05:07:34.144236"
+        },
+        {
+            "home": "Khorfakkan",
+            "away": "Al-Dhafra",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:34.700758"
+        },
+        {
+            "home": "Kelantan United",
+            "away": "Kuching FA",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:07:35.809230"
+        },
+        {
+            "home": "Al Kuwait",
+            "away": "Al Tadhamon",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:36.313530"
+        },
+        {
+            "home": "CR Béni Thour",
+            "away": "IB Khémis El Khechna",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:38.946008"
+        },
+        {
+            "home": "JS Kabylie",
+            "away": "MC Alger",
+            "prediction": "X",
+            "timestamp": "2026-01-02T05:07:40.290671"
+        },
+        {
+            "home": "GIL Vicente",
+            "away": "Sporting CP",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:07:40.662854"
+        },
+        {
+            "home": "Cagliari",
+            "away": "AC Milan",
+            "prediction": "2",
+            "timestamp": "2026-01-02T05:07:41.961196"
+        },
+        {
+            "home": "Guimaraes",
+            "away": "Nacional",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:42.341373"
+        },
+        {
+            "home": "Aston Villa",
+            "away": "Nottingham Forest",
+            "prediction": "1",
+            "timestamp": "2026-01-02T05:07:42.668506"
+        }
+    ]
+}

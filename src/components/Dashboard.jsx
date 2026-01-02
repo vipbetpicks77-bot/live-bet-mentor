@@ -5,7 +5,17 @@ import { bankrollManager } from '../logic/bankrollManager';
 import { FAQ } from './FAQ';
 import { translations } from '../locales/translations';
 import { AdminPanel } from './AdminPanel';
+import { consensusAdapter } from '../backend/consensusAdapter';
 import '../styles/global.css';
+
+const RADAR_SOURCES = [
+    { id: 'forebet', label: 'Forebet', color: '#34d399' },
+    { id: 'predictz', label: 'PredictZ', color: '#f87171' },
+    { id: 'windrawwin', label: 'WDW', color: '#60a5fa' },
+    { id: 'statarea', label: 'Statarea', color: '#fbbf24' },
+    { id: 'vitibet', label: 'Vitibet', color: '#a78bfa' },
+    { id: 'zulubet', label: 'Zulubet', color: '#f472b6' }
+];
 
 export const Dashboard = ({ user, onLogout }) => {
     const [matches, setMatches] = useState([]);
@@ -25,14 +35,57 @@ export const Dashboard = ({ user, onLogout }) => {
     const [advancedSettings, setAdvancedSettings] = useState({
         ...CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES
     });
-    const [view, setView] = useState('DASHBOARD'); // 'DASHBOARD' or 'ADMIN'
+    const [view, setView] = useState('DASHBOARD'); // 'DASHBOARD', 'ADMIN', 'RADAR'
+    const [consensusData, setConsensusData] = useState({});
+
+    // Radar Filters State
+    const [radarFilters, setRadarFilters] = useState({
+        sources: ['forebet', 'predictz', 'windrawwin', 'statarea', 'vitibet', 'zulubet'],
+        minSources: 1,
+        search: ''
+    });
+
+    const radarMatches = React.useMemo(() => {
+        return consensusAdapter.getAllConsensusSummary(consensusData);
+    }, [consensusData]);
+
+    const filteredRadarMatches = React.useMemo(() => {
+        return radarMatches.filter(m => {
+            const matchSourceIds = Object.keys(m.predictions);
+            const activeMatchSources = matchSourceIds.filter(s => radarFilters.sources.includes(s));
+
+            if (activeMatchSources.length === 0) return false;
+            if (activeMatchSources.length < radarFilters.minSources) return false;
+
+            if (radarFilters.search) {
+                const query = radarFilters.search.toLowerCase();
+                return m.home.toLowerCase().includes(query) || m.away.toLowerCase().includes(query);
+            }
+
+            return true;
+        });
+    }, [radarMatches, radarFilters]);
+
     const isAdmin = user?.email === 'karabulut.hamza@gmail.com';
 
     const t = translations[lang];
 
     useEffect(() => {
+        if (selectedMatch) {
+            dataWorker.setSelectedMatch(selectedMatch.id);
+        } else {
+            dataWorker.setSelectedMatch(null);
+        }
+    }, [selectedMatch]);
+
+    useEffect(() => {
         dataWorker.start();
         const interval = setInterval(() => {
+            // ALWAYS sync consensus data regardless of live matches
+            const freshConsensus = { ...dataWorker.consensusData };
+            console.log('[DASHBOARD] Syncing Consensus Data:', Object.entries(freshConsensus).map(([k, v]) => `${k}:${v?.length}`).join(', '));
+            setConsensusData(freshConsensus);
+
             const currentFixtures = dataWorker.fixtures;
             if (currentFixtures.length === 0) {
                 setMatches([]);
@@ -134,6 +187,20 @@ export const Dashboard = ({ user, onLogout }) => {
                                 }}
                             >📊</button>
                             <button
+                                onClick={() => setView('RADAR')}
+                                style={{
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.65rem',
+                                    cursor: 'pointer',
+                                    background: view === 'RADAR' ? 'var(--accent-color)' : 'transparent',
+                                    color: view === 'RADAR' ? '#000' : 'var(--text-secondary)',
+                                    border: 'none',
+                                    borderRadius: '7px',
+                                    fontWeight: 800,
+                                    transition: 'all 0.2s'
+                                }}
+                            >🎯</button>
+                            <button
                                 onClick={() => setView('ADMIN')}
                                 style={{
                                     padding: '0.4rem 0.8rem',
@@ -197,7 +264,244 @@ export const Dashboard = ({ user, onLogout }) => {
 
             {view === 'ADMIN' ? (
                 <AdminPanel lang={lang} />
+            ) : view === 'RADAR' ? (
+                <div className="radar-view" style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem', flexWrap: 'wrap', gap: '2rem' }}>
+                        <div>
+                            <h3 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-1px' }}>
+                                <span style={{ marginRight: '1rem' }}>🎯</span>
+                                {t.daily_radar || 'GÜNLÜK RADAR (PRE-MATCH)'}
+                            </h3>
+                            <div style={{ marginTop: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>
+                                {filteredRadarMatches.length} / {radarMatches.length} {t.matches_found || 'Maç Bulundu'}
+                            </div>
+                        </div>
+
+                        {/* Radar Filter Bar */}
+                        <div className="glass-panel" style={{
+                            padding: '1.2rem 2rem',
+                            background: 'rgba(255,255,255,0.02)',
+                            borderRadius: '16px',
+                            border: '1px solid var(--glass-border)',
+                            display: 'flex',
+                            gap: '2rem',
+                            alignItems: 'center',
+                            flexWrap: 'wrap'
+                        }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.source_selection}</span>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    {RADAR_SOURCES.map(source => {
+                                        const isActive = radarFilters.sources.includes(source.id);
+                                        return (
+                                            <button
+                                                key={source.id}
+                                                onClick={() => {
+                                                    setRadarFilters(prev => ({
+                                                        ...prev,
+                                                        sources: isActive
+                                                            ? prev.sources.filter(s => s !== source.id)
+                                                            : [...prev.sources, source.id]
+                                                    }));
+                                                }}
+                                                style={{
+                                                    background: isActive ? source.color + '22' : 'rgba(255,255,255,0.03)',
+                                                    color: isActive ? source.color : 'rgba(255,255,255,0.3)',
+                                                    border: `1px solid ${isActive ? source.color + '66' : 'rgba(255,255,255,0.1)'}`,
+                                                    borderRadius: '8px',
+                                                    padding: '0.4rem 0.8rem',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 800,
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                {source.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.1)' }}></div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.min_sources}</span>
+                                <select
+                                    value={radarFilters.minSources}
+                                    onChange={(e) => setRadarFilters(prev => ({ ...prev, minSources: parseInt(e.target.value) }))}
+                                    style={{
+                                        background: 'rgba(0,0,0,0.2)',
+                                        color: '#fff',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '8px',
+                                        padding: '0.4rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        outline: 'none'
+                                    }}
+                                >
+                                    {[1, 2, 3, 4, 5, 6].map(n => (
+                                        <option key={n} value={n}>{n}+ Source</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.search_label || 'ARA'}</span>
+                                <input
+                                    type="text"
+                                    placeholder={t.search_team}
+                                    value={radarFilters.search}
+                                    onChange={(e) => setRadarFilters(prev => ({ ...prev, search: e.target.value }))}
+                                    style={{
+                                        background: 'rgba(0,0,0,0.2)',
+                                        color: '#fff',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '8px',
+                                        padding: '0.4rem 1rem',
+                                        fontSize: '0.75rem',
+                                        width: '180px',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+
+                            <button
+                                onClick={() => setRadarFilters({
+                                    sources: RADAR_SOURCES.map(s => s.id),
+                                    minSources: 1,
+                                    search: ''
+                                })}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--accent-color)',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 800,
+                                    cursor: 'pointer',
+                                    marginTop: '1.2rem',
+                                    opacity: 0.7
+                                }}
+                            >
+                                {t.clear_filters}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="radar-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+                        gap: '2rem'
+                    }}>
+                        {filteredRadarMatches.length > 0 ? (
+                            filteredRadarMatches.map(s => {
+                                const maxAgreement = Math.max(...Object.values(s.agreement));
+                                const agreementPercent = (maxAgreement / s.totalSources) * 100;
+                                const consensusPred = Object.entries(s.agreement).find(([p, c]) => c === maxAgreement)?.[0];
+
+                                return (
+                                    <div
+                                        key={s.match}
+                                        className="radar-card glass-panel"
+                                        onClick={() => s.forebetUrl && window.open(s.forebetUrl, '_blank')}
+                                        style={{
+                                            padding: '2rem',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            transition: 'all 0.3s ease',
+                                            border: s.totalSources >= 4 ? '1px solid var(--success-color)' : '1px solid var(--glass-border)',
+                                            background: 'rgba(15, 23, 42, 0.4)',
+                                            cursor: s.forebetUrl ? 'pointer' : 'default',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (s.forebetUrl) {
+                                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(16, 185, 129, 0.1)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'none';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        {s.totalSources >= 4 && (
+                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.3rem 1rem', fontSize: '0.65rem', fontWeight: 900, borderBottomLeftRadius: '12px', letterSpacing: '1px' }}>HIGH CONSENSUS</div>
+                                        )}
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' }}>{t.match_overview || 'MAÇ ÖZETİ'}</div>
+                                            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                                                {s.home} <span style={{ opacity: 0.3, fontWeight: 400 }}>vs</span> {s.away}
+                                            </div>
+                                            {s.forebetUrl && (
+                                                <div style={{ fontSize: '0.6rem', color: 'var(--accent-color)', marginTop: '0.4rem', fontWeight: 700 }}>🔗 ANALİZ İÇİN TIKLA</div>
+                                            )}
+                                        </div>
+
+                                        <div style={{ marginBottom: '2rem' }}>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '1rem' }}>{t.global_consensus_report || 'DIŞ KAYNAK ANALİZLERİ'} ({s.totalSources} Kaynak)</div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                                                {Object.entries(s.predictions).map(([site, pred]) => {
+                                                    const colorMap = {
+                                                        forebet: '#34d399',
+                                                        predictz: '#f87171',
+                                                        windrawwin: '#60a5fa',
+                                                        statarea: '#fbbf24',
+                                                        vitibet: '#a78bfa',
+                                                        zulubet: '#f472b6'
+                                                    };
+                                                    const color = colorMap[site] || '#94a3b8';
+
+                                                    return (
+                                                        <div key={site} style={{
+                                                            padding: '0.8rem',
+                                                            background: 'rgba(255,255,255,0.02)',
+                                                            borderRadius: '10px',
+                                                            border: `1px solid ${color}33`,
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center'
+                                                        }}>
+                                                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: color, textTransform: 'uppercase' }}>{site}</span>
+                                                            <span style={{ fontWeight: 900, fontSize: '0.9rem' }}>{pred}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.2rem', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                                                <div style={{ fontSize: '0.7rem', fontWeight: 700, opacity: 0.6 }}>{t.consensus_agreement || 'ORTAK AKIL SKORU'}</div>
+                                                <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--success-color)' }}>%{agreementPercent.toFixed(0)}</div>
+                                            </div>
+                                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                                                <div style={{
+                                                    width: `${agreementPercent}%`,
+                                                    height: '100%',
+                                                    background: `linear-gradient(to right, ${agreementPercent > 60 ? 'var(--success-color)' : 'var(--warning-color)'}, #fff)`,
+                                                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
+                                                }}></div>
+                                            </div>
+                                            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                                                <span style={{ fontSize: '0.65rem', opacity: 0.5 }}>{t.consensus_verdict || 'AĞIRLIKLI TAHMİN'}:</span>
+                                                <span style={{ marginLeft: '0.5rem', fontWeight: 900, fontSize: '1.2rem', color: 'var(--accent-color)' }}>{consensusPred}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div style={{ gridColumn: '1 / -1', padding: '10rem 2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px dashed var(--glass-border)' }}>
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📡</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 700, opacity: 0.5 }}>{t.waiting_for_sources || 'Dış kaynak verileri senkronize ediliyor...'}</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             ) : (
+
                 <>
                     {/* Bankroll Strategy Panel (Phase 13) */}
                     <div className="bankroll-binding-panel bankroll-ledger-container">
@@ -235,6 +539,12 @@ export const Dashboard = ({ user, onLogout }) => {
                                     <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{t.active_mode}</span>
                                     <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '0.5rem' }}>
                                         {bankrollManager.getModeLabel(lang)}
+                                        {bankState.current_mode === CONFIG.BANKROLL.HIERARCHY.MODES.NO_BET && (
+                                            <div style={{ marginTop: '1rem', padding: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger-color)', borderRadius: '8px', fontSize: '0.7rem', color: 'var(--danger-color)', fontWeight: 800 }}>
+                                                {bankState.daily_pl / CONFIG.BANKROLL.HIERARCHY.INITIAL_BALANCE >= 0.05 ? t.daily_target_reached :
+                                                    bankState.daily_pl / CONFIG.BANKROLL.HIERARCHY.INITIAL_BALANCE <= -0.03 ? t.daily_stoploss_reached : t.bankroll_stop}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -617,127 +927,187 @@ export const Dashboard = ({ user, onLogout }) => {
                                     <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
                                         <button className="close-btn" onClick={() => setSelectedMatch(null)}>×</button>
 
-                                        <div className="modal-header">
-                                            <div className="header-top">
-                                                <span className="label-text">MAÇ İSTİHBARAT RAPORU</span>
-                                                <h2>{currentMatch.homeTeam} vs {currentMatch.awayTeam}</h2>
-                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.5rem' }}>
-                                                    <span className="tier-badge">TIER {currentMatch.tier}</span>
-                                                    <span className="minute-badge">{currentMatch.minute}'</span>
-                                                    <span className="score-badge">{currentMatch.score.home} - {currentMatch.score.away}</span>
+                                        <div className="intelligence-modal-content">
+                                            {/* AI & Consensus Layer (Fusion) */}
+                                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                                                {/* AI Expert Column */}
+                                                {currentMatch.aiSummary && (
+                                                    <div style={{ background: 'rgba(56, 189, 248, 0.08)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(56, 189, 248, 0.2)', boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)' }}>
+                                                        <h4 style={{ margin: 0, fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                                            {t.ai_expert_summary}
+                                                        </h4>
+                                                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', lineHeight: '1.6', color: '#fff', fontStyle: 'italic', opacity: 0.95 }}>
+                                                            {currentMatch.aiSummary || "Uzman AI sahayı analiz ediyor..."}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Global Consensus Column */}
+                                                {currentMatch.consensusReport?.totalSources > 0 && (
+                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                                        <h4 style={{ margin: 0, fontSize: '0.75rem', opacity: 0.6, fontWeight: 800, textTransform: 'uppercase' }}>
+                                                            {t.global_consensus_report}
+                                                        </h4>
+                                                        <div style={{ marginTop: '1rem' }}>
+                                                            {currentMatch.consensusReport?.totalSources > 0 ? (
+                                                                <>
+                                                                    <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--success-color)' }}>
+                                                                        {currentMatch.consensusReport.totalSources}/6 <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 400 }}>{t.active_badges}</span>
+                                                                    </div>
+                                                                    <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', opacity: 0.7 }}>
+                                                                        {Object.entries(currentMatch.consensusReport.agreement).map(([pred, count]) => (
+                                                                            <div key={pred} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                                                                                <span>{pred}:</span>
+                                                                                <span style={{ fontWeight: 800 }}>{count} Site</span>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>Dış kaynak verisi bekleniyor...</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="modal-header">
+                                                <div className="header-top">
+                                                    <span className="label-text">MAÇ İSTİHBARAT RAPORU</span>
+                                                    <h2>{currentMatch.homeTeam} vs {currentMatch.awayTeam}</h2>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.5rem' }}>
+                                                        <span className="tier-badge">TIER {currentMatch.tier}</span>
+                                                        <span className="minute-badge">{currentMatch.minute}'</span>
+                                                        <span className="score-badge">{currentMatch.score.home} - {currentMatch.score.away}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="modal-grid">
-                                            {/* Column 1: Engine Quality */}
-                                            <div className="grid-col">
-                                                <h3><span style={{ marginRight: '0.5rem' }}>⚡</span> DQS MOTORU</h3>
-                                                <div className="stats-card">
-                                                    <div className="dqs-display">
-                                                        <div className="dqs-label">
-                                                            <span>DQS Skoru:</span>
-                                                            <span style={{ color: 'var(--accent-color)', fontWeight: 800 }}>{currentMatch.dqs.toFixed(4)}</span>
+                                            <div className="modal-grid">
+                                                {/* Column 1: Engine Quality */}
+                                                <div className="grid-col">
+                                                    <h3><span style={{ marginRight: '0.5rem' }}>⚡</span> DQS MOTORU</h3>
+                                                    <div className="stats-card">
+                                                        <div className="dqs-display">
+                                                            <div className="dqs-label">
+                                                                <span>DQS Skoru:</span>
+                                                                <span style={{ color: 'var(--accent-color)', fontWeight: 800 }}>{currentMatch.dqs.toFixed(4)}</span>
+                                                            </div>
+                                                            <div className="dqs-bar-bg">
+                                                                <div className="dqs-bar-fill" style={{ width: `${currentMatch.dqs * 100}%` }}></div>
+                                                            </div>
                                                         </div>
-                                                        <div className="dqs-bar-bg">
-                                                            <div className="dqs-bar-fill" style={{ width: `${currentMatch.dqs * 100}%` }}></div>
+
+                                                        <div className="stat-row-pill" style={{ marginTop: '1.5rem' }}>
+                                                            <span style={{ opacity: 0.6 }}>LATANS:</span>
+                                                            <span style={{ fontWeight: 700 }}>{currentMatch.latency || 0}ms</span>
                                                         </div>
-                                                    </div>
 
-                                                    <div className="stat-row-pill" style={{ marginTop: '1.5rem' }}>
-                                                        <span style={{ opacity: 0.6 }}>LATANS:</span>
-                                                        <span style={{ fontWeight: 700 }}>{currentMatch.latency || 0}ms</span>
-                                                    </div>
-
-                                                    <div className="stat-row-pill" style={{ marginTop: '1rem' }}>
-                                                        <span style={{ opacity: 0.6 }}>{t.data_integrity}:</span>
-                                                        <span className={`status-pill ${currentMatch.dataQuality === 'OK' ? 'ok' : (currentMatch.dataQuality === 'LIMITED' ? 'warning' : 'fail')}`}>
-                                                            {currentMatch.dataQuality === 'PARTIAL' ? 'BEKLENİYOR' : (currentMatch.dataQuality === 'LIMITED' ? 'KISITLI' : 'TAM')}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Column 2: Risk Analysis */}
-                                            <div className="grid-col">
-                                                <h3><span style={{ marginRight: '0.5rem' }}>🛡️</span> {t.risk_guard}</h3>
-                                                <div className="stats-card">
-                                                    {Object.entries(dataWorker.checkRiskFilters(currentMatch)).map(([key, f]) => (
-                                                        <div key={key} className="stat-row-pill" style={{ marginBottom: '0.8rem' }}>
-                                                            <span style={{ opacity: 0.8 }}>{t[key] || key}</span>
-                                                            <span className={`status-pill ${f.status === 'OK' ? 'ok' : f.status === 'FAIL' ? 'fail' : 'warning'}`}>
-                                                                {f.status === 'OK' ? t.status_ok : t.status_fail}
+                                                        <div className="stat-row-pill" style={{ marginTop: '1rem' }}>
+                                                            <span style={{ opacity: 0.6 }}>{t.data_integrity}:</span>
+                                                            <span className={`status-pill ${currentMatch.dataQuality === 'OK' ? 'ok' : (currentMatch.dataQuality === 'LIMITED' ? 'warning' : 'fail')}`}>
+                                                                {currentMatch.dataQuality === 'PARTIAL' ? 'BEKLENİYOR' : (currentMatch.dataQuality === 'LIMITED' ? 'KISITLI' : 'TAM')}
                                                             </span>
                                                         </div>
-                                                    ))}
-                                                    <div style={{ marginTop: '1.5rem', padding: '0.8rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', border: '1px dotted var(--accent-color)', fontSize: '0.7rem', opacity: 0.8 }}>
-                                                        {t.analysis_protocol_active}
+                                                    </div>
+                                                </div>
+
+                                                {/* Column 2: Expert Analysis & Risk */}
+                                                <div className="grid-col">
+                                                    <h3><span style={{ marginRight: '0.5rem' }}>🛡️</span> {t.risk_guard}</h3>
+                                                    <div className="stats-card">
+                                                        {/* Expert Metrics Display */}
+                                                        <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.1)' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+                                                                <span>{t.pressure_label}</span>
+                                                                <span style={{ color: 'var(--warning-color)' }}>%{currentMatch.observations?.pressure?.total || 0}</span>
+                                                            </div>
+                                                            <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden', marginBottom: '1rem' }}>
+                                                                <div style={{ width: `${currentMatch.observations?.pressure?.total || 0}%`, height: '100%', background: 'var(--warning-color)', transition: 'width 1s ease' }}></div>
+                                                            </div>
+
+                                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, marginBottom: '0.5rem' }}>{t.velocity_label}</div>
+                                                            <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800, textAlign: 'center' }}>
+                                                                {currentMatch.observations?.velocity?.trend === 'HOT' ? t.velocity_hot :
+                                                                    currentMatch.observations?.velocity?.trend === 'WARMING' ? t.velocity_warming :
+                                                                        currentMatch.observations?.velocity?.trend === 'COOLING' ? t.velocity_cooling : t.velocity_stable}
+                                                            </div>
+                                                        </div>
+
+                                                        {Object.entries(dataWorker.checkRiskFilters(currentMatch)).map(([key, f]) => (
+                                                            <div key={key} className="stat-row-pill" style={{ marginBottom: '0.8rem' }}>
+                                                                <span style={{ opacity: 0.8 }}>{t[key] || key}</span>
+                                                                <span className={`status-pill ${f.status === 'OK' ? 'ok' : f.status === 'FAIL' ? 'fail' : 'warning'}`}>
+                                                                    {f.status === 'OK' ? t.status_ok : t.status_fail}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Column 3: Live Snapshot */}
+                                                <div className="grid-col">
+                                                    <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
+                                                    <div className="stats-card" style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                                        {currentMatch.stats?.groups && currentMatch.stats.groups.length > 0 ? (
+                                                            currentMatch.stats.groups.map(group => (
+                                                                <div key={group.groupName} style={{ marginBottom: '1.8rem' }}>
+                                                                    <h4 style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.8rem', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--accent-color)' }}>
+                                                                        {t[group.groupName] || group.groupName}
+                                                                    </h4>
+                                                                    {group.statisticsItems.map(item => {
+                                                                        const parseVal = (v) => {
+                                                                            if (typeof v === 'string') return parseFloat(v.replace('%', '')) || 0;
+                                                                            return parseFloat(v) || 0;
+                                                                        };
+                                                                        const homeVal = parseVal(item.home);
+                                                                        const awayVal = parseVal(item.away);
+                                                                        const total = homeVal + awayVal;
+                                                                        const homePct = total > 0 ? (homeVal / total) * 100 : 50;
+
+                                                                        const isXG = item.name.toLowerCase().includes('expected') || item.name.toLowerCase() === 'xg';
+
+                                                                        return (
+                                                                            <div key={item.name} className="stat-item" style={{ marginBottom: '1rem' }}>
+                                                                                <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.75rem' }}>
+                                                                                    <span style={{ opacity: 0.8, color: isXG ? 'var(--warning-color)' : 'inherit' }}>
+                                                                                        {t[item.name] || item.name}
+                                                                                    </span>
+                                                                                    <span style={{ fontWeight: 800 }}>
+                                                                                        {isXG ? `${homeVal.toFixed(2)} - ${awayVal.toFixed(2)}` : `${item.home} - ${item.away}`}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="stat-bar-bg" style={{ display: 'flex', height: '3px', borderRadius: '1.5px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                                                                    <div className="stat-bar-home" style={{ width: `${homePct}%`, background: isXG ? 'var(--warning-color)' : 'var(--accent-color)', height: '100%', transition: 'width 0.5s ease' }}></div>
+                                                                                    <div className="stat-bar-away" style={{ width: `${100 - homePct}%`, background: 'rgba(255,255,255,0.15)', height: '100%', transition: 'width 0.5s ease' }}></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
+                                                                {currentMatch.isPartial ? (t.loading_stats || 'Detaylar yükleniyor...') : (t.no_stats_available || 'İstatistik verisi bulunamadı')}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Column 3: Live Snapshot */}
-                                            <div className="grid-col">
-                                                <h3><span style={{ marginRight: '0.5rem' }}>📊</span> {t.stats_title}</h3>
-                                                <div className="stats-card" style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                                                    {currentMatch.stats?.groups && currentMatch.stats.groups.length > 0 ? (
-                                                        currentMatch.stats.groups.map(group => (
-                                                            <div key={group.groupName} style={{ marginBottom: '1.8rem' }}>
-                                                                <h4 style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.8rem', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--accent-color)' }}>
-                                                                    {t[group.groupName] || group.groupName}
-                                                                </h4>
-                                                                {group.statisticsItems.map(item => {
-                                                                    const parseVal = (v) => {
-                                                                        if (typeof v === 'string') return parseFloat(v.replace('%', '')) || 0;
-                                                                        return parseFloat(v) || 0;
-                                                                    };
-                                                                    const homeVal = parseVal(item.home);
-                                                                    const awayVal = parseVal(item.away);
-                                                                    const total = homeVal + awayVal;
-                                                                    const homePct = total > 0 ? (homeVal / total) * 100 : 50;
-
-                                                                    const isXG = item.name.toLowerCase().includes('expected') || item.name.toLowerCase() === 'xg';
-
-                                                                    return (
-                                                                        <div key={item.name} className="stat-item" style={{ marginBottom: '1rem' }}>
-                                                                            <div className="stat-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.75rem' }}>
-                                                                                <span style={{ opacity: 0.8, color: isXG ? 'var(--warning-color)' : 'inherit' }}>
-                                                                                    {t[item.name] || item.name}
-                                                                                </span>
-                                                                                <span style={{ fontWeight: 800 }}>
-                                                                                    {isXG ? `${homeVal.toFixed(2)} - ${awayVal.toFixed(2)}` : `${item.home} - ${item.away}`}
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="stat-bar-bg" style={{ display: 'flex', height: '3px', borderRadius: '1.5px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                                                                <div className="stat-bar-home" style={{ width: `${homePct}%`, background: isXG ? 'var(--warning-color)' : 'var(--accent-color)', height: '100%', transition: 'width 0.5s ease' }}></div>
-                                                                                <div className="stat-bar-away" style={{ width: `${100 - homePct}%`, background: 'rgba(255,255,255,0.15)', height: '100%', transition: 'width 0.5s ease' }}></div>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
-                                                            {currentMatch.isPartial ? (t.loading_stats || 'Detaylar yükleniyor...') : (t.no_stats_available || 'İstatistik verisi bulunamadı')}
-                                                        </div>
-                                                    )}
+                                            <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
+                                                <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', opacity: 0.5 }}>
+                                                    <span style={{ width: '8px', height: '8px', background: 'var(--success-color)', borderRadius: '50%' }}></span>
+                                                    {t.live_feed_connected}
                                                 </div>
+                                                <button
+                                                    onClick={() => setSelectedMatch(null)}
+                                                    className="btn btn-outline"
+                                                    style={{ padding: '0.8rem 2rem', borderRadius: '10px' }}
+                                                >
+                                                    {t.close_intelligence}
+                                                </button>
                                             </div>
-                                        </div>
-
-                                        <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
-                                            <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', opacity: 0.5 }}>
-                                                <span style={{ width: '8px', height: '8px', background: 'var(--success-color)', borderRadius: '50%' }}></span>
-                                                {t.live_feed_connected}
-                                            </div>
-                                            <button
-                                                onClick={() => setSelectedMatch(null)}
-                                                className="btn btn-outline"
-                                                style={{ padding: '0.8rem 2rem', borderRadius: '10px' }}
-                                            >
-                                                {t.close_intelligence}
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
