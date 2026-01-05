@@ -173338,3 +173338,20 @@ FileExistsError: [WinError 183] Halen varolan bir dosya oluþturulamaz: 'C:\\User
 2026-01-05 14:20:03,838 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619203)
 2026-01-05 14:20:04,261 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
 2026-01-05 14:20:04,268 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619204)
+2026-01-05 14:20:06,719 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:06,839 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:22,735 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619222)
+2026-01-05 14:20:22,862 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619222)
+2026-01-05 14:20:25,259 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:25,612 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:41,280 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619241)
+2026-01-05 14:20:41,629 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619241)
+2026-01-05 14:20:43,434 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:44,873 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:20:59,452 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619259)
+2026-01-05 14:21:00,889 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619260)
+2026-01-05 14:21:02,802 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:21:18,462 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619278)
+2026-01-05 14:21:18,818 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767619278)
+2026-01-05 14:21:20,558 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:21:20,915 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
