@@ -43,7 +43,14 @@ function App() {
 
   return (
     <div className="App">
-      <Dashboard user={{ email: 'test@livebetcode.com', id: 'test-user' }} onLogout={() => { }} />
+      {!session ? (
+        <Login onLoginSuccess={(sess) => setSession(sess)} />
+      ) : (
+        <Dashboard
+          user={session.user}
+          onLogout={() => supabase.auth.signOut()}
+        />
+      )}
     </div>
   );
 }

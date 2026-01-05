@@ -10,6 +10,7 @@ import { aiAnalystService } from '../backend/aiAnalystService';
 import { liveOpportunityScorer } from '../logic/liveOpportunityScorer';
 import { smartAlertService } from '../backend/smartAlertService';
 import { predictionTracker } from '../backend/predictionTracker';
+import { database, ref, get } from '../firebase/config';
 import '../styles/global.css';
 
 const RADAR_SOURCES = [
@@ -153,18 +154,16 @@ export const Dashboard = ({ user, onLogout }) => {
     useEffect(() => {
         const fetchLiveOdds = async () => {
             try {
-                const API_BASE = window.location.hostname === 'localhost'
-                    ? 'http://localhost:3001'
-                    : '';
-                const response = await fetch(`${API_BASE}/api/live-odds`);
-                if (response.ok) {
-                    const data = await response.json();
+                // Fetch from Firebase
+                const snapshot = await get(ref(database, 'live_odds'));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
                     setLiveOdds(data);
                     // Pass to opportunity scorer for value detection
                     liveOpportunityScorer.setLiveOdds(data);
                 }
             } catch (e) {
-                console.log('[ODDS] Live odds fetch failed:', e.message);
+                console.log('[ODDS] Firebase odds fetch failed:', e.message);
             }
         };
 

@@ -227,10 +227,13 @@ export const sofaScoreAdapter = {
 
         return {
             id: event.id,
-            homeTeam: event.homeTeam.name,
-            awayTeam: event.awayTeam.name,
+            homeTeam: event.homeTeam?.name || 'Home',
+            awayTeam: event.awayTeam?.name || 'Away',
             leagueName: event.tournament?.name || 'Unknown League',
-            score: { home: event.homeScore.current, away: event.awayScore.current },
+            score: {
+                home: event.homeScore?.current ?? 0,
+                away: event.awayScore?.current ?? 0
+            },
             minute: sofaScoreAdapter.calculateMinute(event),
             stats: normalizedStats,
             isPartial: isPartial,
