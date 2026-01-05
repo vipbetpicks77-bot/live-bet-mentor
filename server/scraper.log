@@ -173186,3 +173186,57 @@ FileExistsError: [WinError 183] Halen varolan bir dosya oluþturulamaz: 'C:\\User
 2026-01-05 14:03:56,322 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
 2026-01-05 14:04:12,340 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618252)
 2026-01-05 14:04:13,360 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:04:29,381 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618269)
+2026-01-05 14:04:30,402 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:04:46,421 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618286)
+2026-01-05 14:04:47,440 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:05:03,457 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618303)
+2026-01-05 14:05:04,479 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:05:20,510 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618320)
+2026-01-05 14:05:21,529 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:05:37,545 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618337)
+2026-01-05 14:05:38,566 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:05:54,583 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618354)
+2026-01-05 14:05:55,602 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:06:11,619 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618371)
+2026-01-05 14:06:12,639 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:06:28,663 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618388)
+2026-01-05 14:06:29,682 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:06:45,701 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618405)
+2026-01-05 14:06:46,721 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:07:02,741 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618422)
+2026-01-05 14:07:03,762 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:07:19,784 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618439)
+2026-01-05 14:07:20,804 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:07:36,820 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618456)
+2026-01-05 14:07:37,841 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:07:53,861 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618473)
+2026-01-05 14:07:54,882 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:08:10,898 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618490)
+2026-01-05 14:08:11,918 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:08:27,939 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618507)
+2026-01-05 14:08:28,960 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:08:44,976 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618524)
+2026-01-05 14:08:45,998 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:09:02,017 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618542)
+2026-01-05 14:09:03,037 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:09:19,058 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618559)
+2026-01-05 14:09:20,077 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:09:36,095 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618576)
+2026-01-05 14:09:37,115 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:09:53,134 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618593)
+2026-01-05 14:09:54,155 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:10:10,174 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618610)
+2026-01-05 14:10:11,194 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:10:27,215 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618627)
+2026-01-05 14:10:28,234 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:10:28,234 [INFO] Safety net: Refreshing page...
+2026-01-05 14:10:42,114 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-05 14:10:42,118 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-05 14:10:42,121 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-05 14:10:42,123 [INFO] Captured DETAIL for 15301216 -> server/stats\15301216_detail.json
+2026-01-05 14:10:42,127 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-05 14:10:44,132 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618644)
+2026-01-05 14:10:45,154 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-05 14:11:01,176 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767618661)
+2026-01-05 14:11:02,195 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
