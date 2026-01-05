@@ -291,7 +291,7 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
                                 })}
 
                                 {/* IQ Guide Quick-view */}
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', gridColumn: 'span 2' }}>
+                                <div className="glass-panel iq-guide-quickview" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
                                     <h3 style={{ fontSize: '1.2rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '1.5rem' }}>🎯 IQ & ANALİZ KILAVUZU</h3>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
                                         <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>

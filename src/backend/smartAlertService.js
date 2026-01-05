@@ -1,9 +1,5 @@
-/**
- * SMART ALERT SERVICE
- * Monitors matches and triggers alerts when high-value opportunities are detected.
- */
-
 import { CONFIG } from '../config';
+import { aiUsageLimiter } from './aiUsageLimiter';
 
 class SmartAlertService {
     constructor() {
@@ -12,6 +8,13 @@ class SmartAlertService {
         this.subscribers = [];
         this.lastCheckTime = {};
         this.cooldownMinutes = 5; // Don't re-alert same match within 5 mins
+        this.currentUserId = null;
+        this.currentTier = 'trial';
+    }
+
+    setUserContext(userId, tier) {
+        this.currentUserId = userId;
+        this.currentTier = tier;
     }
 
     /**
@@ -183,6 +186,15 @@ class SmartAlertService {
             const evaluation = this.evaluateMatch(match, signal);
 
             if (evaluation.shouldAlert) {
+                // Check Usage Limit
+                const limitCheck = aiUsageLimiter.canReceiveSmartAlert(this.currentUserId, this.currentTier);
+                if (!limitCheck.allowed) {
+                    // Limit reached, silently skip (or log)
+                    // console.log('[ALERT] Limit reached for ' + this.currentUserId);
+                    this.lastCheckTime[matchId] = now; // Mark as checked to prevent retry spamming
+                    return;
+                }
+
                 const recommendation = this.generateRecommendation(match, evaluation);
 
                 const alert = {
@@ -209,6 +221,9 @@ class SmartAlertService {
                 this.alertHistory.unshift(alert);
                 if (this.alertHistory.length > 100) this.alertHistory.pop();
                 localStorage.setItem('alert_history', JSON.stringify(this.alertHistory));
+
+                // Record usage
+                aiUsageLimiter.recordAIUsage(this.currentUserId, 'smartAlert');
 
                 // Notify subscribers
                 this.notify(alert);

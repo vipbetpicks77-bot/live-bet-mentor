@@ -23,6 +23,8 @@ DATA_FILE = 'server/sofascore_live.json'
 NETWORK_LOG_FILE = 'server/network_log.txt'
 STATS_DIR = 'server/stats'
 LIVE_FETCH_INTERVAL = 15  # Fetch live list every 15 seconds for fresher data
+STATS_FETCH_INTERVAL = 30  # Auto-fetch stats for all live matches every 30 seconds
+BATCH_SIZE = 5  # Number of matches to fetch stats for in each batch (to avoid rate limiting)
 
 # Configure performance logging
 caps = DesiredCapabilities.CHROME
@@ -80,6 +82,8 @@ def capture_sofascore():
         time.sleep(15)
         last_live_fetch = 0
         last_page_refresh = time.time()
+        last_stats_fetch = 0
+        stats_batch_index = 0  # Track which batch of matches we're processing
 
         while True:
             # Check for generic event fetch requests or specific detail requests
@@ -200,6 +204,50 @@ def capture_sofascore():
                 driver.refresh()
                 time.sleep(10)
                 last_page_refresh = time.time()
+
+            # AUTO-FETCH STATS: Automatically fetch stats for all live matches in batches
+            if time.time() - last_stats_fetch > STATS_FETCH_INTERVAL:
+                try:
+                    if os.path.exists(DATA_FILE):
+                        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                            live_data = json.load(f)
+                        
+                        events = live_data.get('events', [])
+                        if events:
+                            # Get all match IDs
+                            all_ids = [str(e.get('id')) for e in events if e.get('id')]
+                            
+                            # Calculate batch to process
+                            total_batches = (len(all_ids) + BATCH_SIZE - 1) // BATCH_SIZE
+                            if total_batches > 0:
+                                stats_batch_index = stats_batch_index % total_batches
+                                start_idx = stats_batch_index * BATCH_SIZE
+                                end_idx = min(start_idx + BATCH_SIZE, len(all_ids))
+                                batch_ids = all_ids[start_idx:end_idx]
+                                
+                                logger.info(f"[AUTO-STATS] Processing batch {stats_batch_index + 1}/{total_batches} ({len(batch_ids)} matches)")
+                                
+                                for match_id in batch_ids:
+                                    # Check if stats file exists and is fresh (< 60 seconds old)
+                                    stats_file = os.path.join(STATS_DIR, f"{match_id}_stats.json")
+                                    should_fetch = True
+                                    
+                                    if os.path.exists(stats_file):
+                                        age = time.time() - os.path.getmtime(stats_file)
+                                        if age < 60:  # Skip if fetched within last 60 seconds
+                                            should_fetch = False
+                                    
+                                    if should_fetch:
+                                        driver.execute_script(f"fetch('https://www.sofascore.com/api/v1/event/{match_id}');")
+                                        time.sleep(0.3)
+                                        driver.execute_script(f"fetch('https://www.sofascore.com/api/v1/event/{match_id}/statistics');")
+                                        time.sleep(0.5)
+                                
+                                stats_batch_index += 1
+                except Exception as e:
+                    logger.error(f"[AUTO-STATS] Error: {e}")
+                
+                last_stats_fetch = time.time()
 
             request_queue = 'server/stats_request.json'
             if os.path.exists(request_queue):

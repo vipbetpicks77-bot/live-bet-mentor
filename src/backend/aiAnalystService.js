@@ -1,8 +1,10 @@
 /**
  * AI ANALYST SERVICE
  * Connects to Google Gemini API to provide expert summaries.
+ * Integrated with aiUsageLimiter for tier-based rate limiting.
  */
 import { CONFIG } from '../config';
+import { aiUsageLimiter } from './aiUsageLimiter';
 
 const RADAR_SOURCES = [
     { id: 'forebet', label: 'Forebet' },
@@ -27,6 +29,23 @@ const RADAR_BASE_URLS = {
 };
 
 export const aiAnalystService = {
+    // Current user context (set from Dashboard)
+    currentUserId: null,
+    currentTier: 'trial',
+
+    async setUserContext(userId, tier = 'trial') {
+        this.currentUserId = userId;
+        this.currentTier = tier;
+        console.log('[AI_SERVICE] User context set:', userId, tier);
+
+        // Preload usage data from DB
+        await aiUsageLimiter.loadUserUsage(userId);
+    },
+
+    getUsageStats() {
+        return aiUsageLimiter.getUsageStats(this.currentUserId || 'anonymous', this.currentTier);
+    },
+
     generateExpertPrompt(fixture, consensusReport) {
         const { homeTeam, awayTeam, minute, score, stats, observations } = fixture;
 
@@ -106,6 +125,25 @@ export const aiAnalystService = {
             consensusReport: consensusReport ? 'exists' : 'null'
         });
 
+        const userId = this.currentUserId || 'anonymous';
+        const tier = this.currentTier || 'trial';
+
+        // Check rate limit
+        const limitCheck = aiUsageLimiter.canMakeAIRequest(userId, tier);
+        if (!limitCheck.allowed) {
+            console.warn('[AI_SERVICE] Rate limit reached:', limitCheck);
+            return `⚠️ Günlük AI raporu limitinize ulaştınız (${limitCheck.current}/${limitCheck.limit}). Yarın sıfırlanacak. Limit artırmak için üyelik planınızı yükseltin.`;
+        }
+
+        // Check cache
+        const matchId = fixture?.matchId || `${fixture?.homeTeam}_${fixture?.awayTeam}`;
+        const cacheKey = `expert_${matchId}_${fixture?.minute || 0}`;
+        const cached = aiUsageLimiter.getCachedResponse(cacheKey, tier);
+        if (cached) {
+            console.log('[AI_SERVICE] Returning cached response');
+            return cached + '\n\n📋 (Önbellekten - maliyet yok)';
+        }
+
         const modelName = 'gemini-2.0-flash';
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -147,7 +185,17 @@ export const aiAnalystService = {
             console.log('[AI_SERVICE] Data received, has candidates:', !!data.candidates);
             const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
             console.log('[AI_SERVICE] Result length:', result?.length || 0);
-            return result || this.getLocalExpertLogic(fixture, consensusReport);
+
+            if (result) {
+                // Record usage and cache response
+                aiUsageLimiter.recordAIUsage(userId, 'aiReport');
+                aiUsageLimiter.cacheResponse(cacheKey, result);
+
+                const stats = aiUsageLimiter.getUsageStats(userId, tier);
+                return result + `\n\n📊 AI Kullanım: ${stats.aiReports.used}/${stats.aiReports.limit} (Bugün)`;
+            }
+
+            return this.getLocalExpertLogic(fixture, consensusReport);
         } catch (error) {
             console.error('[AI_SERVICE] Deep Analysis failed:', error.name, error.message);
             return this.getLocalExpertLogic(fixture, consensusReport);
@@ -195,6 +243,15 @@ export const aiAnalystService = {
     },
 
     async getGlobalIntelligenceReport(matches, type = 'LIVE') {
+        const userId = this.currentUserId || 'anonymous';
+        const tier = this.currentTier || 'trial';
+
+        // Check rate limit
+        const limitCheck = aiUsageLimiter.canMakeAIRequest(userId, tier);
+        if (!limitCheck.allowed) {
+            return `⚠️ Günlük AI raporu limitinize ulaştınız (${limitCheck.current}/${limitCheck.limit}).`;
+        }
+
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
         // Enhanced match summaries with more data
@@ -338,7 +395,14 @@ JSON FORMATI:
 
             const data = await response.json();
             console.log('[AI_GLOBAL] Report generated successfully');
-            return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Rapor boş döndü.";
+
+            const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            if (result) {
+                aiUsageLimiter.recordAIUsage(userId, 'aiReport');
+                return result;
+            }
+
+            return "Rapor boş döndü.";
         } catch (error) {
             console.error('[AI_GLOBAL] Error:', error.name === 'AbortError' ? 'Timeout' : error);
             return "Hata: Rapor oluşturma sırasında teknik bir problem (veya zaman aşımı) oluştu.";

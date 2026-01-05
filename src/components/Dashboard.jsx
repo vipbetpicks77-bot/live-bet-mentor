@@ -39,7 +39,7 @@ const RADAR_BASE_URLS = {
     superbet: 'https://superbetpredictions.com'
 };
 
-export const Dashboard = ({ user, onLogout }) => {
+export const Dashboard = ({ user, userProfile, onLogout }) => {
     const [matches, setMatches] = useState([]);
     const [signals, setSignals] = useState({});
     const [bankState, setBankState] = useState(bankrollManager.getState());
@@ -60,6 +60,23 @@ export const Dashboard = ({ user, onLogout }) => {
     });
     const [view, setView] = useState('DASHBOARD'); // 'DASHBOARD', 'ADMIN', 'RADAR'
     const [consensusData, setConsensusData] = useState({});
+
+    useEffect(() => {
+        if (user && userProfile) {
+            aiAnalystService.setUserContext(user.id, userProfile.plan || 'trial');
+            smartAlertService.setUserContext(user.id, userProfile.plan || 'trial');
+            predictionTracker.init(user.id).then(() => {
+                setTrackingStats(predictionTracker.getStats());
+            });
+        }
+    }, [user, userProfile]);
+
+    const PLAN_COLORS = {
+        trial: '#10b981',
+        pro: '#38bdf8',
+        premium: '#a78bfa',
+        admin: '#f59e0b'
+    };
 
     // Radar Filters State
     const [radarFilters, setRadarFilters] = useState({
@@ -219,8 +236,16 @@ export const Dashboard = ({ user, onLogout }) => {
             setActiveAlerts([...smartAlertService.getActiveAlerts()]);
         });
 
+        // Auto-check for result processing (Every 60s)
+        const resultCheckInterval = setInterval(() => {
+            predictionTracker.checkPendingPredictions().then(() => {
+                setTrackingStats(predictionTracker.getStats());
+            });
+        }, 60000);
+
         return () => {
             clearInterval(interval);
+            clearInterval(resultCheckInterval);
             unsubscribe();
             dataWorker.stop();
         };
@@ -1691,6 +1716,26 @@ export const Dashboard = ({ user, onLogout }) => {
                                                         if (bankrollManager.approveBet(match, signal, stake)) {
                                                             alert(t.bet_approved_alert);
                                                             setBankState(bankrollManager.getState());
+
+                                                            // Record in Prediction Tracker
+                                                            predictionTracker.recordPrediction({
+                                                                matchId: match.id,
+                                                                match: `${match.homeTeam} vs ${match.awayTeam}`,
+                                                                homeTeam: match.homeTeam,
+                                                                awayTeam: match.awayTeam,
+                                                                minute: match.minute,
+                                                                score: match.score,
+                                                                market: signal.market || 'Match Result',
+                                                                prediction: signal.prediction,
+                                                                confidence: signal.confidence || 75,
+                                                                source: 'LIVE_SYSTEM',
+                                                                dqs: match.dqs,
+                                                                xgHome: match.stats?.xg?.home || 0,
+                                                                xgAway: match.stats?.xg?.away || 0,
+                                                                consensusCount: match.consensusReport?.totalSources || 0
+                                                            }).then(() => {
+                                                                setTrackingStats(predictionTracker.getStats());
+                                                            });
                                                         }
                                                     }}
                                                     style={{ background: 'var(--accent-color)', color: '#000', border: 'none', borderRadius: '10px', fontWeight: 900, fontSize: '0.75rem', cursor: 'pointer' }}
@@ -2451,7 +2496,10 @@ export const Dashboard = ({ user, onLogout }) => {
                                         }}>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{pred.match}</div>
-                                                <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{pred.market} • %{pred.confidence} güven</div>
+                                                <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
+                                                    {pred.market} • %{pred.confidence} güven
+                                                    {pred.minute && <span style={{ marginLeft: '0.5rem', color: 'var(--text-primary)', opacity: 0.8 }}>@{pred.minute}' ({typeof pred.scoreAtPrediction === 'object' ? `${pred.scoreAtPrediction.home}-${pred.scoreAtPrediction.away}` : pred.scoreAtPrediction})</span>}
+                                                </div>
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                                 {pred.status === 'PENDING' ? (

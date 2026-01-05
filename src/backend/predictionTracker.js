@@ -1,86 +1,244 @@
 /**
  * PREDICTION TRACKER SERVICE
  * Tracks all predictions/bets and calculates accuracy statistics.
+ * Uses Supabase for persistent storage.
  */
+
+import { supabase } from './supabaseClient';
+import { CONFIG } from '../config';
 
 class PredictionTracker {
     constructor() {
-        this.predictions = JSON.parse(localStorage.getItem('prediction_history') || '[]');
+        this.predictions = [];
+        this.userId = null;
+    }
+
+    /**
+     * Initialize tracker for specific user
+     */
+    async init(userId) {
+        this.userId = userId;
+        this.predictions = [];
+
+        if (!userId) return;
+
+        try {
+            const { data, error } = await supabase
+                .from('predictions')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(200);
+
+            if (error) {
+                console.error('[TRACKER] Fetch error:', error);
+                return;
+            }
+
+            if (data) {
+                this.predictions = data.map(item => this.mapDbToModel(item));
+                console.log('[TRACKER] Loaded', this.predictions.length, 'predictions from DB');
+            }
+        } catch (e) {
+            console.error('[TRACKER] Init error:', e);
+        }
+    }
+
+    /**
+     * Map DB row to Model object
+     */
+    mapDbToModel(dbItem) {
+        if (!dbItem) return null;
+
+        // Parse final score
+        let finalScoreObj = null;
+        if (dbItem.final_score && dbItem.final_score.includes('-')) {
+            const parts = dbItem.final_score.split('-');
+            finalScoreObj = { home: parseInt(parts[0]), away: parseInt(parts[1]) };
+        }
+
+        // Parse score at prediction
+        let scoreAtPredictionObj = { home: 0, away: 0 };
+        if (dbItem.score_at_prediction && dbItem.score_at_prediction.includes('-')) {
+            const parts = dbItem.score_at_prediction.split('-');
+            scoreAtPredictionObj = { home: parseInt(parts[0]), away: parseInt(parts[1]) };
+        }
+
+        return {
+            id: dbItem.id,
+            timestamp: new Date(dbItem.created_at).getTime(),
+            matchId: dbItem.match_id,
+            match: dbItem.match_name,
+            homeTeam: dbItem.home_team,
+            awayTeam: dbItem.away_team,
+            minute: dbItem.minute,
+            scoreAtPrediction: scoreAtPredictionObj,
+            market: dbItem.market,
+            prediction: dbItem.prediction,
+            confidence: dbItem.confidence,
+            source: dbItem.source,
+            dqs: dbItem.dqs ? parseFloat(dbItem.dqs) : 0,
+            xgHome: dbItem.xg_home ? parseFloat(dbItem.xg_home) : 0,
+            xgAway: dbItem.xg_away ? parseFloat(dbItem.xg_away) : 0,
+            consensusCount: dbItem.consensus_count,
+            status: dbItem.status,
+            finalScore: finalScoreObj,
+            resolvedAt: dbItem.resolved_at ? new Date(dbItem.resolved_at).getTime() : null,
+            profit: dbItem.profit
+        };
     }
 
     /**
      * Record a new prediction
      */
-    recordPrediction(data) {
-        const prediction = {
-            id: `pred_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now(),
-            matchId: data.matchId,
-            match: data.match,
-            homeTeam: data.homeTeam,
-            awayTeam: data.awayTeam,
+    async recordPrediction(data) {
+        if (!this.userId) {
+            console.warn('[TRACKER] No user ID, cannot save prediction');
+            return null;
+        }
+
+        const scoreStr = data.score ? `${data.score.home}-${data.score.away}` : '0-0';
+
+        const dbItem = {
+            user_id: this.userId,
+            match_id: data.matchId ? data.matchId.toString() : null,
+            match_name: data.match,
+            home_team: data.homeTeam,
+            away_team: data.awayTeam,
             minute: data.minute,
-            scoreAtPrediction: data.score,
-            market: data.market, // e.g., "Over 1.5", "Home Win", "Next Goal Home"
-            prediction: data.prediction, // The actual prediction value
-            confidence: data.confidence, // 0-100
-            source: data.source, // 'AI', 'CONSENSUS', 'ALERT', 'MANUAL'
+            score_at_prediction: scoreStr,
+            market: data.market,
+            prediction: data.prediction,
+            confidence: data.confidence,
+            source: data.source,
             dqs: data.dqs,
-            xgHome: data.xgHome,
-            xgAway: data.xgAway,
-            consensusCount: data.consensusCount,
-            status: 'PENDING', // PENDING, WON, LOST, PUSH, VOID
-            finalScore: null,
-            resolvedAt: null,
-            profit: null // For Kelly criterion calculations later
+            xg_home: data.xgHome,
+            xg_away: data.xgAway,
+            consensus_count: data.consensusCount,
+            status: 'PENDING',
+            created_at: new Date().toISOString()
         };
 
-        this.predictions.unshift(prediction);
+        // Optimistic update
+        const tempModel = {
+            ...this.mapDbToModel(dbItem),
+            id: `temp_${Date.now()}`, // Temporary ID until DB returns real one
+            timestamp: Date.now(),
+            scoreAtPrediction: data.score
+        };
+        this.predictions.unshift(tempModel);
 
-        // Keep last 200 predictions
         if (this.predictions.length > 200) {
             this.predictions = this.predictions.slice(0, 200);
         }
 
-        this.save();
-        console.log('[TRACKER] Recorded prediction:', prediction.match, prediction.market);
+        try {
+            const { data: inserted, error } = await supabase
+                .from('predictions')
+                .insert([dbItem])
+                .select()
+                .single();
 
-        return prediction;
+            if (error) throw error;
+
+            if (inserted) {
+                // Replace temp model with real one
+                const realModel = this.mapDbToModel(inserted);
+                const index = this.predictions.findIndex(p => p.id === tempModel.id);
+                if (index !== -1) {
+                    this.predictions[index] = realModel;
+                }
+                console.log('[TRACKER] Saved prediction:', inserted.id);
+                return realModel;
+            }
+        } catch (e) {
+            console.error('[TRACKER] Save error:', e);
+            // Optionally remove temp item or mark as error
+        }
+
+        return tempModel;
     }
 
     /**
      * Update prediction result
      */
-    updateResult(predictionId, result, finalScore) {
+    async updateResult(predictionId, result, finalScore) {
         const pred = this.predictions.find(p => p.id === predictionId);
         if (pred) {
-            pred.status = result; // 'WON', 'LOST', 'PUSH', 'VOID'
+            const finalScoreStr = finalScore ? `${finalScore.home}-${finalScore.away}` : null;
+
+            // Optimistic update
+            pred.status = result;
             pred.finalScore = finalScore;
             pred.resolvedAt = Date.now();
-            this.save();
-            console.log('[TRACKER] Updated result:', pred.match, result);
+
+            try {
+                const { error } = await supabase
+                    .from('predictions')
+                    .update({
+                        status: result,
+                        final_score: finalScoreStr,
+                        resolved_at: new Date().toISOString()
+                    })
+                    .eq('id', predictionId);
+
+                if (error) throw error;
+                console.log('[TRACKER] Updated result:', result);
+            } catch (e) {
+                console.error('[TRACKER] Update error:', e);
+            }
         }
     }
 
     /**
      * Bulk update by match ID (when match ends)
      */
-    updateByMatchId(matchId, finalScore) {
+    async updateByMatchId(matchId, finalScore) {
         const pending = this.predictions.filter(p =>
-            p.matchId === matchId && p.status === 'PENDING'
+            p.matchId === matchId.toString() && p.status === 'PENDING'
         );
 
-        pending.forEach(pred => {
+        if (pending.length === 0) return;
+
+        const finalScoreStr = finalScore ? `${finalScore.home}-${finalScore.away}` : null;
+        const now = new Date().toISOString();
+
+        // Prepare updates
+        const updates = pending.map(pred => {
             const result = this.evaluateResult(pred, finalScore);
+
+            // Optimistic update
             pred.status = result;
             pred.finalScore = finalScore;
             pred.resolvedAt = Date.now();
+
+            return {
+                id: pred.id,
+                status: result,
+                final_score: finalScoreStr,
+                resolved_at: now
+            };
         });
 
-        if (pending.length > 0) {
-            this.save();
-            console.log('[TRACKER] Auto-updated', pending.length, 'predictions for match', matchId);
+        // Supabase doesn't support bulk update with different values easily in one query depending on ID
+        // So we loop (or use upsert if we had all fields, but we only want to update status)
+        // For simplicity with small numbers, we loop.
+        for (const update of updates) {
+            try {
+                await supabase
+                    .from('predictions')
+                    .update({
+                        status: update.status,
+                        final_score: update.final_score,
+                        resolved_at: update.resolved_at
+                    })
+                    .eq('id', update.id);
+            } catch (e) {
+                console.error('[TRACKER] Bulk update error for', update.id, e);
+            }
         }
+
+        console.log('[TRACKER] Auto-updated', pending.length, 'predictions for match', matchId);
     }
 
     /**
@@ -117,11 +275,6 @@ class PredictionTracker {
             return homeGoals === awayGoals ? 'WON' : 'LOST';
         }
 
-        // Next Goal Home (can't auto-evaluate, needs manual)
-        if (market.includes('Sıradaki Gol')) {
-            return 'PENDING'; // Needs manual resolution
-        }
-
         // BTTS (Both Teams To Score)
         if (market.includes('KG Var') || market.includes('BTTS Yes')) {
             return homeGoals > 0 && awayGoals > 0 ? 'WON' : 'LOST';
@@ -131,13 +284,14 @@ class PredictionTracker {
             return homeGoals === 0 || awayGoals === 0 ? 'WON' : 'LOST';
         }
 
-        return 'PENDING'; // Unknown market type
+        return 'PENDING';
     }
 
     /**
      * Get comprehensive statistics
      */
     getStats() {
+        // Use local predictions array which is kept in sync
         const resolved = this.predictions.filter(p =>
             p.status === 'WON' || p.status === 'LOST'
         );
@@ -244,38 +398,58 @@ class PredictionTracker {
     }
 
     /**
-     * Save to localStorage
+     * Check pending predictions against live/finished data via Proxy
      */
-    save() {
-        localStorage.setItem('prediction_history', JSON.stringify(this.predictions));
+    async checkPendingPredictions() {
+        const pending = this.getPending();
+        if (pending.length === 0) return;
+
+        console.log('[TRACKER] Checking', pending.length, 'pending predictions...');
+        const uniqueMatchIds = [...new Set(pending.map(p => p.matchId))];
+
+        // Use the proxy URL from config
+        // "http://localhost:3001/api/sofascore/live" -> "http://localhost:3001/api/sofascore/event"
+        const baseUrl = CONFIG.DATA.SOFASCORE_LOCAL_PROXY_URL.replace('/live', '/event');
+
+        for (const matchId of uniqueMatchIds) {
+            if (!matchId) continue;
+
+            try {
+                const res = await fetch(`${baseUrl}/${matchId}`);
+
+                if (res.status === 200) {
+                    const data = await res.json();
+                    // Check if we have valid event data
+                    if (data && data.event) {
+                        const status = data.event.status?.type; // 'finished', 'inprogress', 'notstarted'
+
+                        // Consider 'finished' or 'ended' 
+                        if (status === 'finished') {
+                            const finalScore = {
+                                home: data.event.homeScore?.current ?? 0,
+                                away: data.event.awayScore?.current ?? 0
+                            };
+
+                            console.log(`[TRACKER] Match ${matchId} finished. Score: ${finalScore.home}-${finalScore.away}`);
+                            await this.updateByMatchId(matchId, finalScore);
+                        }
+                    }
+                } else if (res.status === 202) {
+                    // Queued for fetching, wait for next cycle
+                    // console.log(`[TRACKER] Match ${matchId} queued for details...`);
+                }
+            } catch (e) {
+                console.error('[TRACKER] Error checking match', matchId, e);
+            }
+        }
     }
 
     /**
-     * Clear all data
+     * Clear all data (For logout/debug)
      */
     clearAll() {
         this.predictions = [];
-        localStorage.removeItem('prediction_history');
-    }
-
-    /**
-     * Export data for analysis
-     */
-    exportCSV() {
-        const headers = ['Date', 'Match', 'Market', 'Confidence', 'Source', 'DQS', 'Status', 'Score At Pred', 'Final Score'];
-        const rows = this.predictions.map(p => [
-            new Date(p.timestamp).toLocaleDateString(),
-            p.match,
-            p.market,
-            p.confidence,
-            p.source,
-            p.dqs?.toFixed(2) || '',
-            p.status,
-            p.scoreAtPrediction,
-            p.finalScore ? `${p.finalScore.home}-${p.finalScore.away}` : ''
-        ]);
-
-        return [headers, ...rows].map(r => r.join(',')).join('\n');
+        this.userId = null;
     }
 }
 
