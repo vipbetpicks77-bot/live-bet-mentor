@@ -47,16 +47,22 @@ app.get('/api/sofascore/event/:id', (req, res) => {
         const stats = fs.statSync(filePath);
         const ageInSeconds = (Date.now() - stats.mtimeMs) / 1000;
 
-        // TTL: 60 seconds for live details
-        if (ageInSeconds < 60) {
-            const data = fs.readFileSync(filePath, 'utf8');
+        // Still queue if older than 60s, but return the current data
+        if (ageInSeconds >= 60) {
+            queueRequest(id);
+        }
+
+        const data = fs.readFileSync(filePath, 'utf8');
+        try {
             const json = JSON.parse(data);
             if (!json.error) return res.json(json);
+        } catch (e) {
+            console.error(`Error parsing ${filePath}:`, e);
         }
     }
 
     queueRequest(id);
-    res.status(202).json({ status: 'queued', message: 'Detail stale or missing' });
+    res.status(202).json({ status: 'queued', message: 'Detail missing' });
 });
 
 // 3. Match Statistics (with freshness check)
@@ -68,17 +74,22 @@ app.get('/api/sofascore/event/:id/statistics', (req, res) => {
         const stats = fs.statSync(filePath);
         const ageInSeconds = (Date.now() - stats.mtimeMs) / 1000;
 
-        // TTL: 60 seconds for live statistics
-        // Even if it's an error/empty file, we cache it for 60s to avoid spamming the scraper
-        if (ageInSeconds < 60) {
+        // Still queue if older than 60s, but return current data
+        if (ageInSeconds >= 60) {
+            queueRequest(id);
+        }
+
+        try {
             const data = fs.readFileSync(filePath, 'utf8');
             const json = JSON.parse(data);
             return res.json(json);
+        } catch (e) {
+            console.error(`Error parsing ${filePath}:`, e);
         }
     }
 
     queueRequest(id);
-    res.status(202).json({ status: 'queued', message: 'Stats stale or missing' });
+    res.status(202).json({ status: 'queued', message: 'Stats missing' });
 });
 
 function queueRequest(id) {
@@ -124,10 +135,28 @@ app.get('/api/consensus', (req, res) => {
     }
 });
 
+// --- LIVE ODDS API ---
+const ODDS_FILE = path.join(__dirname, 'live_odds.json');
+
+app.get('/api/odds/live', (req, res) => {
+    if (fs.existsSync(ODDS_FILE)) {
+        try {
+            console.log('[PROXY] Odds request received');
+            const data = JSON.parse(fs.readFileSync(ODDS_FILE, 'utf8'));
+            res.json(data);
+        } catch (e) {
+            res.status(500).json({ error: "Odds parse error" });
+        }
+    } else {
+        res.json({ matches: [], timestamp: 0, message: 'Odds scraper not running yet' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`[PROXY SERVER] Running on http://localhost:${PORT}`);
     startScraper();
     startConsensusScraper();
+    startOddsScraper(); // Live odds from OddsPortal
 });
 
 function startConsensusScraper() {
@@ -140,4 +169,17 @@ function startConsensusScraper() {
 
     spawnScraper(); // Run once at start
     setInterval(spawnScraper, 4 * 60 * 60 * 1000); // Re-run every 4 hours
+}
+
+// Odds Scraper (OddsPortal) - disabled by default, enable when needed
+function startOddsScraper() {
+    console.log('[PROXY] Initializing Odds Scraper...');
+    const pythonProcess = spawn('python', [path.join(__dirname, 'odds_scraper.py')], {
+        stdio: 'inherit'
+    });
+
+    pythonProcess.on('close', (code) => {
+        console.log(`[PROXY] Odds scraper exited with code ${code}. Restarting in 30s...`);
+        setTimeout(startOddsScraper, 30000);
+    });
 }

@@ -44,17 +44,62 @@ class DataWorker {
     }
 
     async setSelectedMatch(matchId) {
-        this.selectedMatchId = matchId;
-        console.log('[DATA_WORKER] Priority match updated:', matchId);
-
-        // Trigger AI Analysis for selected match
-        const match = this.fixtures.find(f => f.id.toString() === matchId?.toString());
-        if (match && !match.aiSummary) {
-            console.log('[DATA_WORKER] Requesting AI Expert Summary for:', matchId);
-            match.aiSummary = "AI Analiz yapıyor...";
-            const summary = await aiAnalystService.getExpertSummary(match, match.consensusReport);
-            match.aiSummary = summary;
+        if (!matchId) {
+            this.selectedMatchId = null;
+            return;
         }
+
+        this.selectedMatchId = matchId.toString();
+        // Automatic AI trigger removed to save tokens, now handled by manual button in UI
+        console.log('[DATA_WORKER] Match selected:', matchId);
+    }
+
+    async triggerDeepAnalysis(matchId) {
+        const match = this.fixtures.find(f => f.id.toString() === matchId.toString());
+        if (!match) return;
+
+        console.log('[DATA_WORKER] Manual Deep Analysis triggered for:', matchId);
+        match.aiSummary = "AI Analiz yapıyor...";
+
+        const summary = await aiAnalystService.getExpertSummary(match, match.consensusReport);
+        match.aiSummary = summary;
+
+        return summary;
+    }
+
+    async generateGlobalIntelligence(type = 'LIVE') {
+        let candidates = [];
+        if (type === 'LIVE') {
+            // Live: DQS > 0.50, Signal = BET, and Minute < 80 (Professional Action Window)
+            candidates = this.fixtures.filter(f => {
+                const signal = this.getSignalForMatch(f.id);
+                return f.dqs > 0.50 && signal?.verdict === 'BET' && f.minute < 80;
+            });
+
+            // Handle low volume: If fewer than 3 candidates, pull in next best potentials (also under 80m)
+            if (candidates.length < 3) {
+                const extra = this.fixtures
+                    .filter(f => !candidates.find(c => c.id === f.id) && f.dqs > 0.35 && f.minute < 80)
+                    .sort((a, b) => b.dqs - a.dqs)
+                    .slice(0, 5 - candidates.length);
+                candidates = [...candidates, ...extra];
+            }
+        } else {
+            // Radar: High consensus or Value
+            // radarMatches are calculated in Dashboard, but we can access consensusData here
+            // For simplicity, let's let the Dashboard pass the matches for PRE-MATCH
+            // But we can implement a basic filter here as well if needed.
+        }
+
+        if (candidates.length === 0 && type === 'LIVE') return "Şu an kriterlere uygun canlı 'Altın Seçim' bulunamadı.";
+
+        // Enhance candidates with signals for the AI to see our internal verdict
+        const enhancedCandidates = candidates.map(c => ({
+            ...c,
+            signal: this.getSignalForMatch(c.id)
+        }));
+
+        return await aiAnalystService.getGlobalIntelligenceReport(enhancedCandidates, type);
     }
 
     setApiKey(key) {
@@ -97,33 +142,34 @@ class DataWorker {
                 }
 
                 if (rawMatches && Array.isArray(rawMatches)) {
-                    // Smart Polling: Decide which matches need full details
+                    // Fetch full details for ALL discovered matches to ensure stats availability
                     const detailedMatches = await Promise.all(
                         rawMatches.map(async (match) => {
                             const eventId = match.id;
                             if (!eventId) return match;
 
-                            const isSelected = eventId.toString() === this.selectedMatchId?.toString();
-                            const isHighTier = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1.includes(match.leagueName) ||
-                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2.includes(match.leagueName);
+                            // Fetch full details to get stats, xG, etc.
+                            const fullDetail = await sofaScoreAdapter.fetchEventDetails(eventId);
+                            if (fullDetail) return fullDetail;
 
-                            // Logic:
-                            // 1. If selected -> Always fetch
-                            // 2. If Tier 1/2 -> Always fetch (to keep algorithm running)
-                            // 3. Others -> Only if they were already 'PARTIAL' or have high basic stats (optional next step)
-
-                            if (isSelected || isHighTier) {
-                                const fullDetail = await sofaScoreAdapter.fetchEventDetails(eventId);
-                                return fullDetail || match;
+                            // FALLBACK: If detail fetch returns null (queued), 
+                            // check if we already have this match in this.fixtures with stats.
+                            const existing = this.fixtures.find(f => f.id === eventId);
+                            if (existing && !existing.isPartial) {
+                                // Update basic info (score, minute) but keep existing detailed stats
+                                return {
+                                    ...existing,
+                                    score: match.score,
+                                    minute: match.minute
+                                };
                             }
 
-                            // For Tier 3, use the basic data from search/list
-                            return match;
+                            return match; // Final fallback to basic 0-0 match
                         })
                     );
 
                     this.fixtures = this.normalizeFixtures(detailedMatches.filter(r => r !== null));
-                    console.log('[DATA_WORKER] Normalized fixtures with details:', this.fixtures?.length || 0);
+                    console.log('[DATA_WORKER] Normalized fixtures with full details:', this.fixtures?.length || 0);
                 } else {
                     console.warn('[DATA_WORKER] Fetched matches is not an array:', rawMatches);
                     this.fixtures = [];
@@ -185,6 +231,7 @@ class DataWorker {
             const leagueProfile = leagueProfileModule.getProfile(f.league || f.leagueName);
             const analysis = analyzeMatch(f, this.odds[f.id] || {}, consensusReport);
 
+
             return {
                 ...f,
                 dqs,
@@ -193,7 +240,8 @@ class DataWorker {
                 dataQuality: dqs >= 0.8 ? 'TAM' : dqs >= 0.5 ? 'KISITLI' : 'BEKLENİYOR',
                 observations: analysis.observations,
                 signal: analysis,
-                consensusReport
+                consensusReport,
+                aiSummary: existing?.aiSummary || f.aiSummary // Preserve AI analysis during refresh
             };
         });
 
@@ -257,7 +305,6 @@ class DataWorker {
                 reasonKey: 'dead_match_reason'
             };
         }
-
         // B. Momentum Guard
         const history = fixture.history || [];
         const momentumWindow = fixture.tier === 2 ?
@@ -310,6 +357,7 @@ class DataWorker {
         const dqs = fixture.dqs;
         const riskFilters = this.checkRiskFilters(fixture);
         const hasRiskFail = Object.values(riskFilters).some(f => f.status === 'FAIL');
+        const matchAnalysis = fixture.signal; // Already calculated in normalizeFixtures
 
         let verdict = 'PASS';
         let mainReason = '';
@@ -337,7 +385,24 @@ class DataWorker {
                 verdict = 'BET';
                 mainReason = isVipFastTrack ? 'VIP Fast-Track (DQS Esnetildi)' : 'DQS Onaylandı';
                 reasonKey = isVipFastTrack ? 'vip_fasttrack' : 'dqs_approved';
+            } else if (this.decisionMode === CONFIG.DECISION.MODES.FULL_STACK) {
+                // FULL STACK: Both Basic Risk Filters AND Advanced Expert Analysis must be OK
+                if (hasRiskFail) {
+                    verdict = 'PASS';
+                    const failed = Object.values(riskFilters).find(f => f.status === 'FAIL');
+                    mainReason = failed.reason;
+                    reasonKey = failed.reasonKey;
+                } else if (matchAnalysis.verdict === 'PASS') {
+                    verdict = 'PASS';
+                    mainReason = matchAnalysis.reason;
+                    reasonKey = 'analysis_rejected'; // For translations or fallback
+                } else {
+                    verdict = 'BET';
+                    mainReason = matchAnalysis.reason;
+                    reasonKey = 'full_stack_ok';
+                }
             } else {
+                // DQS_RISK (STANDART): Basic Risk Filters only
                 if (hasRiskFail) {
                     verdict = 'PASS';
                     const failed = Object.values(riskFilters).find(f => f.status === 'FAIL');
@@ -357,13 +422,11 @@ class DataWorker {
             reasonKey,
             dqs,
             riskFilters,
+            observations: matchAnalysis.observations || {},
+            edgeScore: matchAnalysis.edgeScore,
+            counterArgs: matchAnalysis.counterArgs,
             timestamp: Date.now()
         };
-
-        // Phase 11: Modular Observations
-        const matchAnalysis = analyzeMatch(fixture, fixture.odds || {});
-        signal.observations = matchAnalysis.observations || {};
-
 
         this.decisionLogs.push({ matchId, ...signal });
         if (this.decisionLogs.length > 100) this.decisionLogs.shift();

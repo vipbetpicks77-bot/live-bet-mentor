@@ -3,13 +3,15 @@
  * Normalizes external predictions and applies fuzzy logic for team matching.
  */
 import { CONFIG } from '../config';
+import { database, ref, get } from '../firebase/config';
 
 export const consensusAdapter = {
     async fetchConsensus() {
         try {
-            const response = await fetch('http://localhost:3001/api/consensus');
-            if (!response.ok) throw new Error('Consensus data unreachable');
-            return await response.json();
+            // Fetch from Firebase
+            const snapshot = await get(ref(database, 'consensus'));
+            if (!snapshot.exists()) return null;
+            return snapshot.val();
         } catch (error) {
             console.error('[CONSENSUS_ADAPTER] Error:', error);
             return null;
@@ -23,16 +25,31 @@ export const consensusAdapter = {
             .replace(/\bmilano\b/g, 'milan')
             .replace(/\blisboa\b/g, 'lisbon')
             .replace(/\bpraha\b/g, 'prague')
-            .replace(/\bmadeira\b/g, 'nacional') // Specific alias for CD Nacional
+            .replace(/\bmadeira\b/g, 'nacional')
+            .replace(/\bnottm\b/g, 'nottingham')
+            .replace(/\bspurs\b/g, 'tottenham')
+            .replace(/\bhove albion\b/g, '') // Brighton & Hove Albion -> Brighton
             .replace(/\s+vs\s+/g, ' ')
             .replace(/\s+v\s+/g, ' ')
             .replace(/\s+-\s+/g, ' ')
             // Detailed Noise words & Common suffixes
-            .replace(/\b(ac|fc|sc|cf|cd|ud|sd|rc|cp|fk|as|ssc|lfc|afc|rsc|youth|u20|u19|u23|b|reserve|reserves|lisbon|lisboa|madrid|london|praha|prague|calcio|vitoria|funchal|de|of)\b/g, '')
+            .replace(/\b(ac|fc|sc|cf|cd|ud|sd|rc|cp|fk|as|ssc|lfc|afc|rsc|youth|u20|u19|u23|b|reserve|reserves|lisbon|lisboa|madrid|london|praha|prague|calcio|vitoria|funchal|de|of|city|united|utd|st|saint|real|athletic|sporting|club|deportivo)\b/g, '')
             .replace(/\b(manchester)\b/g, 'man')
-            .replace(/\b(united)\b/g, 'utd')
-            .replace(/\b(saint)\b/g, 'st')
             .replace(/[^a-z0-9]/g, '');
+    },
+
+    _isFuzzyMatch(home1, away1, home2, away2) {
+        if (!home1 || !away1 || !home2 || !away2) return false;
+
+        const h1 = this._clean(home1);
+        const a1 = this._clean(away1);
+        const h2 = this._clean(home2);
+        const a2 = this._clean(away2);
+
+        const homeMatch = h1 === h2 || h1.includes(h2) || h2.includes(h1);
+        const awayMatch = a1 === a2 || a1.includes(a2) || a2.includes(a1);
+
+        return homeMatch && awayMatch;
     },
 
     /**
@@ -52,6 +69,33 @@ export const consensusAdapter = {
         });
     },
 
+    _getStandings(globalData, leagueName, teamName) {
+        if (!globalData.standings) return { rank: '-', points: '-' };
+
+        // Find the matching league using fuzzy matching
+        const leagueClean = this._clean(leagueName);
+        const leagueEntry = Object.entries(globalData.standings).find(([lName, table]) => {
+            return this._clean(lName) === leagueClean ||
+                this._clean(lName).includes(leagueClean) ||
+                leagueClean.includes(this._clean(lName));
+        });
+
+        if (!leagueEntry) return { rank: '-', points: '-' };
+        const leagueTable = leagueEntry[1];
+
+        // Try exact match for team
+        if (leagueTable[teamName]) return leagueTable[teamName];
+
+        // Try fuzzy match for team
+        const teamClean = this._clean(teamName);
+        const match = Object.entries(leagueTable).find(([tName, data]) => {
+            const tClean = this._clean(tName);
+            return tClean === teamClean || tClean.includes(teamClean) || teamClean.includes(tClean);
+        });
+
+        return match ? match[1] : { rank: '-', points: '-' };
+    },
+
     getConsensusSummary(globalData, fixture, market = '1X2') {
         const report = {
             totalSources: 0,
@@ -60,6 +104,7 @@ export const consensusAdapter = {
         };
 
         Object.entries(globalData).forEach(([site, matches]) => {
+            if (!Array.isArray(matches)) return;
             const match = this.findMatchInConsensus(matches, `${fixture.homeTeam} ${fixture.awayTeam}`);
             if (match && match.markets && match.markets[market]) {
                 const mData = match.markets[market];
@@ -67,7 +112,9 @@ export const consensusAdapter = {
                 report.signals.push({
                     site,
                     prediction: mData.pred,
-                    prob: mData.prob
+                    prob: mData.prob,
+                    score_pred: match.score_pred, // Pass score if available
+                    form: match.form // Pass form if available
                 });
 
                 // Track consensus agreement
@@ -101,9 +148,16 @@ export const consensusAdapter = {
                 const away = m.away.trim();
                 const homeClean = this._clean(home);
                 const awayClean = this._clean(away);
-                const key = `${homeClean}_${awayClean}`;
 
-                if (!matchMap[key]) {
+                // Find existing match by fuzzy matching
+                let key = Object.keys(matchMap).find(k => {
+                    const [exHome, exAway] = k.split('_S_'); // Using a unique separator
+                    return (homeClean === exHome || homeClean.includes(exHome) || exHome.includes(homeClean)) &&
+                        (awayClean === exAway || awayClean.includes(exAway) || exAway.includes(awayClean));
+                });
+
+                if (!key) {
+                    key = `${homeClean}_S_${awayClean}`;
                     let cleanLeague = m.league || 'Others';
                     if (cleanLeague.includes('adsbygoogle') || cleanLeague.includes('<script')) cleanLeague = 'Others';
 
@@ -116,33 +170,68 @@ export const consensusAdapter = {
                         agreement: {},
                         probabilities: {},
                         tipCounts: {},
+                        scorePredictions: {},
+                        odds: {}, // New: Store odds
+                        ranks: { home: '-', away: '-' }, // New: Store Rank
+                        points: { home: '-', away: '-' }, // New: Store Points
                         totalSources: 0,
                         divergence: 0,
                         isValue: false,
                         market: selectedMarket,
                         date: m.date || null,
-                        time: m.time || null
+                        time: m.time || null,
+                        form: m.form || null // Store Home/Away form
                     };
+
+                    // Enrich with Standings immediately
+                    const hStandings = this._getStandings(globalData, cleanLeague, home);
+                    const aStandings = this._getStandings(globalData, cleanLeague, away);
+                    matchMap[key].ranks = { home: hStandings.rank, away: aStandings.rank };
+                    matchMap[key].points = { home: hStandings.points, away: aStandings.points };
                 } else {
                     // Update missing date/time if this source has it
                     if (!matchMap[key].date && m.date) matchMap[key].date = m.date;
                     if (!matchMap[key].time && m.time) matchMap[key].time = m.time;
 
                     // Prefer cleaner league name if current one is messy
-                    if (m.league && (matchMap[key].league === 'Others' || matchMap[key].league.includes('adsbygoogle'))) {
+                    const isNewLeagueBetter = m.league &&
+                        (matchMap[key].league === 'Others' ||
+                            matchMap[key].league.includes('adsbygoogle') ||
+                            matchMap[key].league.toLowerCase().includes('maç özeti') ||
+                            matchMap[key].league.toLowerCase().includes('summary') ||
+                            (site === 'soccervista' && matchMap[key].league !== m.league));
+
+                    if (isNewLeagueBetter) {
                         matchMap[key].league = m.league;
+                        // Re-enrich standings if league changed
+                        const hStandings = this._getStandings(globalData, m.league, home);
+                        const aStandings = this._getStandings(globalData, m.league, away);
+                        matchMap[key].ranks = { home: hStandings.rank, away: aStandings.rank };
+                        matchMap[key].points = { home: hStandings.points, away: aStandings.points };
                     }
+
+                    // Prefer form from a source that has it (like SoccerVista)
+                    if (!matchMap[key].form && m.form) {
+                        matchMap[key].form = m.form;
+                    }
+                }
+
+                // Capture Odds if available (Forebet)
+                if (mData.odds) {
+                    matchMap[key].odds[site] = mData.odds;
                 }
 
                 // Normalization
                 let normalizedPred = mData.pred;
                 if (selectedMarket === 'BTTS') {
-                    if (normalizedPred.toLowerCase().includes('yes') || normalizedPred === '1') normalizedPred = 'KG Var';
-                    if (normalizedPred.toLowerCase().includes('no') || normalizedPred === '0') normalizedPred = 'KG Yok';
+                    const p = normalizedPred.toLowerCase();
+                    if (p.includes('yes') || p === '1' || p === 'kg var' || p === 'y') normalizedPred = 'KG Var';
+                    if (p.includes('no') || p === '0' || p === 'kg yok' || p === 'n') normalizedPred = 'KG Yok';
                 }
                 if (selectedMarket === 'OU25') {
-                    if (normalizedPred.toLowerCase().includes('over') || normalizedPred === 'O') normalizedPred = 'Üst';
-                    if (normalizedPred.toLowerCase().includes('under') || normalizedPred === 'U') normalizedPred = 'Alt';
+                    const p = normalizedPred.toLowerCase();
+                    if (p.includes('over') || p === 'o' || p === 'üst' || p === 'üst 2.5') normalizedPred = 'Üst';
+                    if (p.includes('under') || p === 'u' || p === 'alt' || p === 'alt 2.5') normalizedPred = 'Alt';
                 }
 
                 matchMap[key].predictions[site] = normalizedPred;
@@ -152,6 +241,10 @@ export const consensusAdapter = {
 
                 if (mData.tip_count) {
                     matchMap[key].tipCounts[site] = mData.tip_count;
+                }
+
+                if (m.score_pred && m.score_pred !== "N/A") {
+                    matchMap[key].scorePredictions[site] = m.score_pred;
                 }
 
                 matchMap[key].agreement[normalizedPred] = (matchMap[key].agreement[normalizedPred] || 0) + 1;

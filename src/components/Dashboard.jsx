@@ -6,17 +6,23 @@ import { FAQ } from './FAQ';
 import { translations } from '../locales/translations';
 import { AdminPanel } from './AdminPanel';
 import { consensusAdapter } from '../backend/consensusAdapter';
+import { aiAnalystService } from '../backend/aiAnalystService';
+import { liveOpportunityScorer } from '../logic/liveOpportunityScorer';
+import { smartAlertService } from '../backend/smartAlertService';
+import { predictionTracker } from '../backend/predictionTracker';
 import '../styles/global.css';
 
 const RADAR_SOURCES = [
-    { id: 'forebet', label: 'Forebet', color: '#34d399' },
-    { id: 'prosoccer', label: 'ProSoccer', color: '#38bdf8' },
-    { id: 'predictz', label: 'PredictZ', color: '#f87171' },
-    { id: 'windrawwin', label: 'WDW', color: '#60a5fa' },
-    { id: 'statarea', label: 'Statarea', color: '#fbbf24' },
-    { id: 'vitibet', label: 'Vitibet', color: '#a78bfa' },
-    { id: 'zulubet', label: 'Zulubet', color: '#f472b6' },
-    { id: 'olbg', label: 'OLBG', color: '#00f2fe' }
+    { id: 'forebet', label: 'Forebet', color: '#34d399', iq: 'iq_forebet' },
+    { id: 'prosoccer', label: 'ProSoccer', color: '#38bdf8', iq: 'iq_prosoccer' },
+    { id: 'predictz', label: 'PredictZ', color: '#f87171', iq: 'iq_predictz' },
+    { id: 'windrawwin', label: 'WDW', color: '#60a5fa', iq: 'iq_windrawwin' },
+    { id: 'statarea', label: 'Statarea', color: '#fbbf24', iq: 'iq_statarea' },
+    { id: 'vitibet', label: 'Vitibet', color: '#a78bfa', iq: 'iq_vitibet' },
+    { id: 'zulubet', label: 'Zulubet', color: '#f472b6', iq: 'iq_zulubet' },
+    { id: 'olbg', label: 'OLBG', color: '#00f2fe', iq: 'iq_olbg' },
+    { id: 'soccervista', label: 'SoccerVista', color: '#fb923c', iq: 'iq_soccervista' },
+    { id: 'superbet', label: 'SuperBet', color: '#facc15', iq: 'iq_superbet' }
 ];
 
 const RADAR_BASE_URLS = {
@@ -27,7 +33,9 @@ const RADAR_BASE_URLS = {
     vitibet: 'https://www.vitibet.com',
     zulubet: 'https://www.zulubet.com',
     prosoccer: 'https://www.prosoccer.eu',
-    olbg: 'https://www.olbg.com/betting-tips/Football/1'
+    olbg: 'https://www.olbg.com/betting-tips/Football/1',
+    soccervista: 'https://www.soccervista.com',
+    superbet: 'https://superbetpredictions.com'
 };
 
 export const Dashboard = ({ user, onLogout }) => {
@@ -54,14 +62,28 @@ export const Dashboard = ({ user, onLogout }) => {
 
     // Radar Filters State
     const [radarFilters, setRadarFilters] = useState({
-        sources: ['forebet', 'predictz', 'windrawwin', 'statarea', 'vitibet', 'zulubet', 'prosoccer', 'olbg'],
+        sources: ['forebet', 'predictz', 'windrawwin', 'statarea', 'vitibet', 'zulubet', 'prosoccer', 'olbg', 'soccervista', 'superbet'],
         minSources: 1,
         search: '',
         valueOnly: false,
         hideDivergent: false,
-        todayOnly: true
+        todayOnly: true,
+        sortBy: 'CONSENSUS' // 'CONSENSUS' or 'TIME'
     });
     const [selectedMarket, setSelectedMarket] = useState('1X2');
+    const [expandedLeagues, setExpandedLeagues] = useState({});
+
+    // Global AI Report State
+    const [globalReport, setGlobalReport] = useState({ content: '', type: null, loading: false });
+
+    // Live Odds State for Opportunity Scoring
+    const [liveOdds, setLiveOdds] = useState(null);
+
+    // Alert & Tracking System State
+    const [activeAlerts, setActiveAlerts] = useState([]);
+    const [showAlertPopup, setShowAlertPopup] = useState(null);
+    const [trackingStats, setTrackingStats] = useState(predictionTracker.getStats());
+    const [showTrackingPanel, setShowTrackingPanel] = useState(false);
 
     const radarMatches = React.useMemo(() => {
         return consensusAdapter.getAllConsensusSummary(consensusData, selectedMarket);
@@ -92,6 +114,26 @@ export const Dashboard = ({ user, onLogout }) => {
             }
 
             return true;
+        }).sort((a, b) => {
+            if (radarFilters.sortBy === 'TIME') {
+                const timeA = a.time || '23:59';
+                const timeB = b.time || '23:59';
+                if (timeA !== timeB) return timeA.localeCompare(timeB);
+            }
+
+            // Priority 1: Full Consensus (8/8)
+            const aIsFull = a.totalSources === 8 && Math.max(...Object.values(a.agreement)) === 8;
+            const bIsFull = b.totalSources === 8 && Math.max(...Object.values(b.agreement)) === 8;
+            if (aIsFull && !bIsFull) return -1;
+            if (!aIsFull && bIsFull) return 1;
+
+            // Priority 2: Agreement Percentage
+            const aPercent = (Math.max(...Object.values(a.agreement)) / a.totalSources);
+            const bPercent = (Math.max(...Object.values(b.agreement)) / b.totalSources);
+            if (aPercent !== bPercent) return bPercent - aPercent;
+
+            // Priority 3: Total Sources count
+            return b.totalSources - a.totalSources;
         });
     }, [radarMatches, radarFilters]);
 
@@ -106,6 +148,30 @@ export const Dashboard = ({ user, onLogout }) => {
             dataWorker.setSelectedMatch(null);
         }
     }, [selectedMatch]);
+
+    // Live Odds Fetching for Opportunity Scoring
+    useEffect(() => {
+        const fetchLiveOdds = async () => {
+            try {
+                const API_BASE = window.location.hostname === 'localhost'
+                    ? 'http://localhost:3001'
+                    : '';
+                const response = await fetch(`${API_BASE}/api/live-odds`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setLiveOdds(data);
+                    // Pass to opportunity scorer for value detection
+                    liveOpportunityScorer.setLiveOdds(data);
+                }
+            } catch (e) {
+                console.log('[ODDS] Live odds fetch failed:', e.message);
+            }
+        };
+
+        fetchLiveOdds();
+        const interval = setInterval(fetchLiveOdds, 30000); // Every 30 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         dataWorker.start();
@@ -122,7 +188,7 @@ export const Dashboard = ({ user, onLogout }) => {
                 return;
             }
 
-            setMatches(currentFixtures);
+            setMatches([...currentFixtures]); // Use spread to force new reference for React
 
             const updatedSignals = {};
             currentFixtures.forEach(m => {
@@ -135,13 +201,28 @@ export const Dashboard = ({ user, onLogout }) => {
             setSignals(updatedSignals);
             setBankState(bankrollManager.getState());
 
+            // Check for smart alerts
+            const newAlerts = smartAlertService.checkMatches(currentFixtures, updatedSignals);
+            if (newAlerts.length > 0) {
+                setActiveAlerts([...smartAlertService.getActiveAlerts()]);
+                // Show popup for the first new alert
+                setShowAlertPopup(newAlerts[0]);
+                setTrackingStats(predictionTracker.getStats());
+            }
+
             if (dataWorker.healthStats.lastFetch) {
                 setLastFetchSeconds(Math.floor((Date.now() - dataWorker.healthStats.lastFetch) / 1000));
             }
         }, CONFIG.DATA.POLLING_INTERVAL_MS);
 
+        // Subscribe to alerts
+        const unsubscribe = smartAlertService.subscribe((alert) => {
+            setActiveAlerts([...smartAlertService.getActiveAlerts()]);
+        });
+
         return () => {
             clearInterval(interval);
+            unsubscribe();
             dataWorker.stop();
         };
     }, []);
@@ -153,6 +234,291 @@ export const Dashboard = ({ user, onLogout }) => {
         .sort((a, b) => (b.dqs || 0) - (a.dqs || 0));
 
     const filterByTier = (m) => activeTierFilter === 'ALL' || m.tier === activeTierFilter;
+
+    const handleGenerateGlobalReport = async (type) => {
+        setGlobalReport({ content: '', type, loading: true });
+
+        try {
+            let report = "";
+            if (type === 'LIVE') {
+                report = await dataWorker.generateGlobalIntelligence('LIVE');
+            } else {
+                // Pre-match logic: Selective mix for the AI "Judge"
+                const highConsensus = filteredRadarMatches.filter(m =>
+                    m.agreement && (Math.max(...Object.values(m.agreement)) / m.totalSources) >= 0.80 && m.totalSources >= 4
+                ).slice(0, 4);
+
+                const highDivergence = filteredRadarMatches.filter(m =>
+                    m.divergence > 30 && m.totalSources >= 3 && !highConsensus.find(hc => hc.match === m.match)
+                ).sort((a, b) => b.divergence - a.divergence).slice(0, 4);
+
+                const candidates = [...highConsensus, ...highDivergence];
+
+                if (candidates.length === 0) {
+                    report = "Şu an kriterlere uygun 'Altın Seçim' veya 'Tartışmalı Maç' bulunamadı.";
+                } else {
+                    report = await aiAnalystService.getGlobalIntelligenceReport(candidates, 'PRE-MATCH');
+                }
+            }
+            setGlobalReport({ content: report, type, loading: false });
+        } catch (error) {
+            console.error('[AI_REPORT] Generation Error:', error);
+            setGlobalReport({
+                content: "Bu rapor şu an teknik bir sorun nedeniyle hazırlanamıyor. Lütfen tekrar deneyin.",
+                type,
+                loading: false
+            });
+        }
+    };
+
+    const renderGlobalAISection = (type) => {
+        const isLoading = globalReport.loading && globalReport.type === type;
+        const hasContent = globalReport.content && globalReport.type === type;
+
+        return (
+            <div className="global-ai-container glass-panel" style={{
+                marginBottom: '2.5rem',
+                padding: '2rem',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(15, 23, 42, 0.4) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.2)',
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: '16px'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '0.6rem', letterSpacing: '0.5px' }}>
+                            <span style={{ fontSize: '1.2rem' }}>💎</span>
+                            {lang === 'tr' ? 'PRO AI KÜRESEL İSTİHBARAT' : 'PRO AI GLOBAL INTELLIGENCE'}
+                        </h4>
+                        <span style={{
+                            background: 'var(--accent-color)',
+                            color: '#000',
+                            fontSize: '0.6rem',
+                            fontWeight: 900,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            letterSpacing: '1px'
+                        }}>PRO</span>
+                    </div>
+
+                    <button
+                        onClick={() => handleGenerateGlobalReport(type)}
+                        disabled={isLoading}
+                        style={{
+                            background: isLoading ? 'rgba(255,255,255,0.05)' : 'var(--accent-color)',
+                            color: '#000',
+                            border: 'none',
+                            padding: '0.6rem 1.2rem',
+                            borderRadius: '12px',
+                            fontSize: '0.75rem',
+                            fontWeight: 900,
+                            cursor: isLoading ? 'default' : 'pointer',
+                            transition: 'all 0.3s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            boxShadow: isLoading ? 'none' : '0 4px 15px rgba(56, 189, 248, 0.3)'
+                        }}
+                    >
+                        {isLoading ? (
+                            <>
+                                <span style={{ animation: 'spin 2s linear infinite', display: 'inline-block' }}>🌀</span>
+                                {lang === 'tr' ? 'ANALİZ EDİLİYOR...' : 'ANALYZING...'}
+                            </>
+                        ) : (
+                            <>
+                                <span>🚀</span>
+                                {lang === 'tr' ? 'RAPOR OLUŞTUR' : 'GENERATE REPORT'}
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {isLoading ? (
+                    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                        <div className="skeleton-loader" style={{ height: '0.8rem', width: '95%', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
+                        <div className="skeleton-loader" style={{ height: '0.8rem', width: '85%', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
+                        <div className="skeleton-loader" style={{ height: '0.8rem', width: '90%', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    </div>
+                ) : hasContent ? (
+                    <div className="ai-report-content" style={{ padding: '0.5rem' }}>
+                        {(() => {
+                            let data = null;
+                            try {
+                                const clean = globalReport.content.replace(/```json|```/g, '').trim();
+                                data = JSON.parse(clean);
+                            } catch (e) {
+                                return (
+                                    <p style={{ fontSize: '0.85rem', color: '#e2e8f0', whiteSpace: 'pre-line' }}>
+                                        {globalReport.content}
+                                    </p>
+                                );
+                            }
+
+                            return (
+                                <>
+                                    {data.report_summary && (
+                                        <div style={{
+                                            padding: '1rem',
+                                            background: 'rgba(56, 189, 248, 0.1)',
+                                            borderRadius: '8px',
+                                            marginBottom: '1.5rem',
+                                            fontSize: '0.8rem',
+                                            color: 'var(--accent-color)',
+                                            borderLeft: '4px solid var(--accent-color)',
+                                            lineHeight: '1.5'
+                                        }}>
+                                            {data.report_summary}
+                                        </div>
+                                    )}
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.2rem' }}>
+                                        {data.golden_picks?.map((pick, i) => (
+                                            <div key={i} className="glass-panel" style={{
+                                                padding: '1.5rem',
+                                                background: 'rgba(255,255,255,0.02)',
+                                                border: '1px solid rgba(255,255,255,0.05)',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '0.8rem',
+                                                position: 'relative',
+                                                transition: 'transform 0.3s'
+                                            }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 900, color: '#fff' }}>{pick.match || 'Maç Bilgisi'}</h5>
+                                                        {(pick.market || pick.time_info) && (
+                                                            <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{pick.market || pick.time_info}</span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{
+                                                        background: pick.verdict === 'BET' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                                        color: pick.verdict === 'BET' ? 'var(--success-color)' : 'var(--danger-color)',
+                                                        padding: '4px 10px',
+                                                        borderRadius: '6px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 900
+                                                    }}>
+                                                        {pick.verdict || pick.risk || 'N/A'}
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                                                    {pick.probability && (
+                                                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem' }}>
+                                                            <span style={{ opacity: 0.6 }}>Olasılık:</span> <b style={{ color: 'var(--accent-color)' }}>%{pick.probability}</b>
+                                                        </div>
+                                                    )}
+                                                    {pick.edge && (
+                                                        <div style={{ background: 'rgba(250, 204, 21, 0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem' }}>
+                                                            <span style={{ opacity: 0.6 }}>Edge:</span> <b style={{ color: '#facc15' }}>%{pick.edge}</b>
+                                                        </div>
+                                                    )}
+                                                    {pick.risk && (
+                                                        <div style={{ background: pick.risk === 'DÜŞÜK' ? 'rgba(16, 185, 129, 0.1)' : pick.risk === 'YÜKSEK' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(250, 204, 21, 0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem' }}>
+                                                            <span style={{ opacity: 0.6 }}>Risk:</span> <b style={{ color: pick.risk === 'DÜŞÜK' ? 'var(--success-color)' : pick.risk === 'YÜKSEK' ? 'var(--danger-color)' : '#facc15' }}>{pick.risk}</b>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {pick.reason && (
+                                                    <div style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                                                        <b>Neden:</b> {pick.reason}
+                                                    </div>
+                                                )}
+
+                                                {pick.hidden_insight && (
+                                                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(0,0,0,0.2)', padding: '0.8rem', borderRadius: '8px', marginTop: 'auto' }}>
+                                                        <span style={{ color: 'var(--accent-color)', fontWeight: 800 }}>💡 Insight:</span> {pick.hidden_insight}
+                                                    </div>
+                                                )}
+
+                                                {pick.trap_alert && (
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--danger-color)', opacity: 0.8, marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                        <span>⚠️</span> {pick.trap_alert}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {data.strategic_combo && (
+                                        <div style={{
+                                            marginTop: '1.5rem',
+                                            padding: '1.2rem',
+                                            background: 'rgba(167, 139, 250, 0.05)',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(167, 139, 250, 0.2)'
+                                        }}>
+                                            <h6 style={{ margin: '0 0 0.5rem 0', color: '#a78bfa', fontSize: '0.8rem', fontWeight: 900 }}>🎯 STRATEJİK KOMBİNASYON</h6>
+                                            {typeof data.strategic_combo === 'string' ? (
+                                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#e2e8f0' }}>{data.strategic_combo}</p>
+                                            ) : (
+                                                <div style={{ fontSize: '0.8rem', color: '#e2e8f0' }}>
+                                                    {data.strategic_combo.type && <p style={{ margin: '0 0 0.3rem 0', fontWeight: 700 }}>{data.strategic_combo.type}</p>}
+                                                    {data.strategic_combo.matches && (
+                                                        <ul style={{ margin: '0.3rem 0', paddingLeft: '1.2rem' }}>
+                                                            {data.strategic_combo.matches.map((m, idx) => <li key={idx}>{m}</li>)}
+                                                        </ul>
+                                                    )}
+                                                    {data.strategic_combo.combined_probability && (
+                                                        <p style={{ margin: '0.3rem 0 0 0', opacity: 0.7 }}>Kombine Olasılık: %{data.strategic_combo.combined_probability}</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Avoid List */}
+                                    {data.avoid_list && data.avoid_list.length > 0 && (
+                                        <div style={{
+                                            marginTop: '1.5rem',
+                                            padding: '1rem',
+                                            background: 'rgba(239, 68, 68, 0.05)',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(239, 68, 68, 0.2)'
+                                        }}>
+                                            <h6 style={{ margin: '0 0 0.5rem 0', color: 'var(--danger-color)', fontSize: '0.75rem', fontWeight: 900 }}>⚠️ KAÇINILMASI GEREKENLER</h6>
+                                            <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.75rem', color: '#e2e8f0' }}>
+                                                {data.avoid_list.map((item, idx) => <li key={idx} style={{ marginBottom: '0.3rem' }}>{item}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Value Picks */}
+                                    {data.value_picks && data.value_picks.length > 0 && (
+                                        <div style={{
+                                            marginTop: '1.5rem',
+                                            padding: '1rem',
+                                            background: 'rgba(16, 185, 129, 0.05)',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(16, 185, 129, 0.2)'
+                                        }}>
+                                            <h6 style={{ margin: '0 0 0.5rem 0', color: 'var(--success-color)', fontSize: '0.75rem', fontWeight: 900 }}>💎 DEĞER MAÇLARI</h6>
+                                            {data.value_picks.map((pick, idx) => (
+                                                <div key={idx} style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: '#e2e8f0' }}>
+                                                    <b>{pick.match}</b>
+                                                    {pick.market && <span style={{ opacity: 0.7 }}> - {pick.market}</span>}
+                                                    {pick.reason && <p style={{ margin: '0.2rem 0 0 0', opacity: 0.8, fontSize: '0.7rem' }}>{pick.reason}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            );
+                        })()}
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '1rem', opacity: 0.5, fontSize: '0.8rem', fontStyle: 'italic' }}>
+                        {lang === 'tr'
+                            ? "Şu anki maç verilerini toplu analiz etmek ve 'Altın Seçimleri' görmek için butona tıklayın."
+                            : "Click the button to analyze current match data and see 'Golden Picks'."}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
         <div className="dashboard-container" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', minHeight: '100vh', background: 'radial-gradient(circle at top right, #1e293b, #030712)' }}>
@@ -199,36 +565,41 @@ export const Dashboard = ({ user, onLogout }) => {
                         </button>
                     </div>
 
+                    {/* View Toggle - Available to all users */}
+                    <div className="view-toggle-wrapper" style={{ display: 'flex', gap: '0.3rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.2rem', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+                        <button
+                            onClick={() => setView('DASHBOARD')}
+                            style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.65rem',
+                                cursor: 'pointer',
+                                background: view === 'DASHBOARD' ? 'var(--accent-color)' : 'transparent',
+                                color: view === 'DASHBOARD' ? '#000' : 'var(--text-secondary)',
+                                border: 'none',
+                                borderRadius: '7px',
+                                fontWeight: 800,
+                                transition: 'all 0.2s'
+                            }}
+                        >📊 {lang === 'tr' ? 'CANLI' : 'LIVE'}</button>
+                        <button
+                            onClick={() => setView('RADAR')}
+                            style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.65rem',
+                                cursor: 'pointer',
+                                background: view === 'RADAR' ? 'var(--accent-color)' : 'transparent',
+                                color: view === 'RADAR' ? '#000' : 'var(--text-secondary)',
+                                border: 'none',
+                                borderRadius: '7px',
+                                fontWeight: 800,
+                                transition: 'all 0.2s'
+                            }}
+                        >🎯 RADAR</button>
+                    </div>
+
+                    {/* Admin-only toggle */}
                     {isAdmin && (
-                        <div className="admin-toggle-wrapper" style={{ display: 'flex', gap: '0.3rem', background: 'rgba(15, 23, 42, 0.8)', padding: '0.2rem', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
-                            <button
-                                onClick={() => setView('DASHBOARD')}
-                                style={{
-                                    padding: '0.4rem 0.8rem',
-                                    fontSize: '0.65rem',
-                                    cursor: 'pointer',
-                                    background: view === 'DASHBOARD' ? 'var(--accent-color)' : 'transparent',
-                                    color: view === 'DASHBOARD' ? '#000' : 'var(--text-secondary)',
-                                    border: 'none',
-                                    borderRadius: '7px',
-                                    fontWeight: 800,
-                                    transition: 'all 0.2s'
-                                }}
-                            >📊</button>
-                            <button
-                                onClick={() => setView('RADAR')}
-                                style={{
-                                    padding: '0.4rem 0.8rem',
-                                    fontSize: '0.65rem',
-                                    cursor: 'pointer',
-                                    background: view === 'RADAR' ? 'var(--accent-color)' : 'transparent',
-                                    color: view === 'RADAR' ? '#000' : 'var(--text-secondary)',
-                                    border: 'none',
-                                    borderRadius: '7px',
-                                    fontWeight: 800,
-                                    transition: 'all 0.2s'
-                                }}
-                            >🎯</button>
+                        <div className="admin-toggle-wrapper" style={{ display: 'flex', gap: '0.3rem', background: 'rgba(251, 191, 36, 0.1)', padding: '0.2rem', borderRadius: '10px', border: '1px solid rgba(251, 191, 36, 0.3)' }}>
                             <button
                                 onClick={() => setView('ADMIN')}
                                 style={{
@@ -242,7 +613,7 @@ export const Dashboard = ({ user, onLogout }) => {
                                     fontWeight: 800,
                                     transition: 'all 0.2s'
                                 }}
-                            >🛡️</button>
+                            >🛡️ ADMIN</button>
                         </div>
                     )}
 
@@ -409,7 +780,20 @@ export const Dashboard = ({ user, onLogout }) => {
                                                     transition: 'all 0.2s'
                                                 }}
                                             >
-                                                {source.label}
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '2px' }}>{source.label}</span>
+                                                    <span style={{
+                                                        fontSize: '0.5rem',
+                                                        fontWeight: 700,
+                                                        background: 'rgba(255,255,255,0.1)',
+                                                        padding: '1px 5px',
+                                                        borderRadius: '3px',
+                                                        textTransform: 'uppercase',
+                                                        opacity: 0.8
+                                                    }}>
+                                                        {t[source.iq]}
+                                                    </span>
+                                                </div>
                                             </button>
                                         );
                                     })}
@@ -461,6 +845,18 @@ export const Dashboard = ({ user, onLogout }) => {
                             </div>
 
                             <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+                                <button
+                                    onClick={() => setRadarFilters(prev => ({ ...prev, sortBy: prev.sortBy === 'CONSENSUS' ? 'TIME' : 'CONSENSUS' }))}
+                                    style={{
+                                        background: radarFilters.sortBy === 'TIME' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.03)',
+                                        color: radarFilters.sortBy === 'TIME' ? 'var(--accent-color)' : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${radarFilters.sortBy === 'TIME' ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'}`,
+                                        borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '0.5rem'
+                                    }}
+                                >
+                                    {radarFilters.sortBy === 'TIME' ? '🕒 SAATE GÖRE' : '🎯 UYUMA GÖRE'}
+                                </button>
                                 <button
                                     onClick={() => setRadarFilters(prev => ({ ...prev, valueOnly: !prev.valueOnly }))}
                                     style={{
@@ -515,6 +911,8 @@ export const Dashboard = ({ user, onLogout }) => {
                         </div>
                     </div>
 
+                    {renderGlobalAISection('PRE-MATCH')}
+
                     <div className="radar-grid" style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
@@ -554,9 +952,27 @@ export const Dashboard = ({ user, onLogout }) => {
                                             e.currentTarget.style.boxShadow = 'none';
                                         }}
                                     >
-                                        {s.totalSources >= 4 && (
-                                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--success-color)', color: '#000', padding: '0.3rem 1rem', fontSize: '0.65rem', fontWeight: 900, borderBottomLeftRadius: '12px', letterSpacing: '1px', zIndex: 10 }}>HIGH CONSENSUS</div>
-                                        )}
+                                        {/* Consensus Badges */}
+                                        {s.totalSources === 8 && Math.max(...Object.values(s.agreement)) === 8 ? (
+                                            <div style={{
+                                                position: 'absolute', top: 0, right: 0,
+                                                background: 'var(--accent-color)', color: '#000',
+                                                padding: '0.4rem 1.2rem', fontSize: '0.7rem', fontWeight: 900,
+                                                borderBottomLeftRadius: '12px', letterSpacing: '1px', zIndex: 10,
+                                                boxShadow: '0 0 15px var(--accent-color)'
+                                            }}>
+                                                🔥 {t.full_consensus_label || '8/8 FULL CONSENSUS'}
+                                            </div>
+                                        ) : s.totalSources >= 4 && agreementPercent >= 75 ? (
+                                            <div style={{
+                                                position: 'absolute', top: 0, right: 0,
+                                                background: 'var(--success-color)', color: '#000',
+                                                padding: '0.3rem 1rem', fontSize: '0.65rem', fontWeight: 900,
+                                                borderBottomLeftRadius: '12px', letterSpacing: '1px', zIndex: 10
+                                            }}>
+                                                {t.high_consensus_label || 'HIGH AGREEMENT'}
+                                            </div>
+                                        ) : null}
 
                                         <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
                                             {s.isValue && (
@@ -569,7 +985,23 @@ export const Dashboard = ({ user, onLogout }) => {
 
                                         <div style={{ marginBottom: '1.5rem' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                                <div style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-color)', fontWeight: 800 }}>
+                                                <div
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setExpandedLeagues(prev => ({ ...prev, [s.match]: !prev[s.match] }));
+                                                    }}
+                                                    style={{
+                                                        fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase',
+                                                        letterSpacing: '1px', color: 'var(--accent-color)', fontWeight: 800,
+                                                        cursor: s.league?.length > 60 ? 'pointer' : 'default',
+                                                        overflow: 'hidden',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: expandedLeagues[s.match] ? 'unset' : 3,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        lineHeight: '1.2'
+                                                    }}
+                                                    title={s.league?.length > 60 ? 'Tamamını görmek için tıkla' : ''}
+                                                >
                                                     {s.league && s.league !== 'Others' && s.league !== 'Unknown' ? s.league : (t.match_overview || 'MAÇ ÖZETİ')}
                                                 </div>
                                                 {s.date && (
@@ -588,7 +1020,15 @@ export const Dashboard = ({ user, onLogout }) => {
                                         </div>
 
                                         <div style={{ marginBottom: '2rem' }}>
-                                            <div style={{ fontSize: '0.75rem', opacity: 0.5, marginBottom: '1rem' }}>{t.global_consensus_report} ({s.totalSources}/{RADAR_SOURCES.length} {t.active_badges || 'Kaynak'})</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>{t.global_consensus_report} ({s.totalSources}/{RADAR_SOURCES.length} {t.active_badges || 'Kaynak'})</div>
+                                                {agreementPercent < 60 && s.totalSources >= 2 && (
+                                                    <div style={{ fontSize: '0.6rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 800, border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                                                        ⚠️ {t.divergence_flag || 'DIVERGENCE'}
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                                                 {Object.entries(s.predictions).map(([site, pred]) => {
                                                     const sourceConfig = RADAR_SOURCES.find(rs => rs.id === site);
@@ -619,17 +1059,76 @@ export const Dashboard = ({ user, onLogout }) => {
                                                                 {url && <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>🔗</span>}
                                                                 <span style={{ fontSize: '0.65rem', fontWeight: 800, color: color, textTransform: 'uppercase' }}>{site}</span>
                                                             </div>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                                                <span style={{ fontWeight: 900, fontSize: '0.9rem' }}>{pred}</span>
-                                                                {s.probabilities[site] && (
-                                                                    <span style={{ fontSize: '0.65rem', color: color, opacity: 0.8, fontWeight: 700 }}>
-                                                                        (%{s.probabilities[site]}{s.tipCounts[site] ? ` - ${s.tipCounts[site]}` : ''})
-                                                                    </span>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                                    <span style={{ fontWeight: 900, fontSize: '0.9rem' }}>{pred}</span>
+                                                                    {s.odds?.[site] && (
+                                                                        <span style={{ fontSize: '0.7rem', color: '#fff', background: 'rgba(255,255,255,0.1)', padding: '1px 4px', borderRadius: '4px', fontWeight: 900 }}>
+                                                                            @{s.odds[site]}
+                                                                        </span>
+                                                                    )}
+                                                                    {s.probabilities?.[site] && (
+                                                                        <span style={{ fontSize: '0.65rem', color: color, opacity: 0.8, fontWeight: 700 }}>
+                                                                            (%{s.probabilities[site]})
+                                                                        </span>
+                                                                    )}
+                                                                    {s.tipCounts?.[site] && (
+                                                                        <span style={{ fontSize: '0.6rem', color: color, opacity: 0.6, fontWeight: 800 }}>
+                                                                            ({s.tipCounts[site]})
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                {s.scorePredictions?.[site] && (
+                                                                    <div style={{ fontSize: '0.6rem', fontWeight: 800, opacity: 0.7, color: 'var(--accent-color)' }}>
+                                                                        {s.scorePredictions[site]}
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     );
                                                 })}
+                                            </div>
+
+                                            {/* Dual Team Form */}
+                                            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', marginBottom: '5px' }}>EV FORMU</div>
+                                                    <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
+                                                        {s.form?.home?.length > 0 ? (
+                                                            <>
+                                                                {s.form.home.slice(0, 5).map((f, i) => (
+                                                                    <span key={i} style={{
+                                                                        width: '14px', height: '14px', borderRadius: '3px',
+                                                                        background: f === 'W' ? 'var(--success-color)' : f === 'D' ? 'var(--warning-color)' : 'var(--danger-color)',
+                                                                        fontSize: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 900
+                                                                    }}>{f}</span>
+                                                                ))}
+                                                            </>
+                                                        ) : <span style={{ fontSize: '0.55rem', opacity: 0.2 }}>Veri Yok</span>}
+                                                    </div>
+                                                    <div style={{ marginTop: '5px', fontSize: '0.55rem', opacity: 0.3, fontWeight: 700 }}>
+                                                        SIRA: {s.ranks?.home || '-'} | PUAN: {s.points?.home || '-'}
+                                                    </div>
+                                                </div>
+                                                <div style={{ flex: 1, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                    <div style={{ fontSize: '0.6rem', opacity: 0.4, textTransform: 'uppercase', marginBottom: '5px' }}>DEP FORMU</div>
+                                                    <div style={{ display: 'flex', gap: '3px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                        {s.form?.away?.length > 0 ? (
+                                                            <>
+                                                                {s.form.away.slice(0, 5).map((f, i) => (
+                                                                    <span key={i} style={{
+                                                                        width: '14px', height: '14px', borderRadius: '3px',
+                                                                        background: f === 'W' ? 'var(--success-color)' : f === 'D' ? 'var(--warning-color)' : 'var(--danger-color)',
+                                                                        fontSize: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 900
+                                                                    }}>{f}</span>
+                                                                ))}
+                                                            </>
+                                                        ) : <span style={{ fontSize: '0.55rem', opacity: 0.2 }}>Veri Yok</span>}
+                                                    </div>
+                                                    <div style={{ marginTop: '5px', fontSize: '0.55rem', opacity: 0.3, fontWeight: 700 }}>
+                                                        SIRA: {s.ranks?.away || '-'} | PUAN: {s.points?.away || '-'}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -827,6 +1326,272 @@ export const Dashboard = ({ user, onLogout }) => {
                         ))}
                     </div>
 
+                    {renderGlobalAISection('LIVE')}
+
+                    {/* Live Opportunities Panel */}
+                    {(() => {
+                        const opportunities = liveOpportunityScorer.getOpportunities(matches, signals);
+                        const topOpportunities = opportunities.slice(0, 5);
+
+                        const heatColors = {
+                            ALEV: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: '#ef4444', icon: '🔥' },
+                            SICAK: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.4)', text: '#fbbf24', icon: '⚡' },
+                            SOGUK: { bg: 'rgba(56, 189, 248, 0.1)', border: 'rgba(56, 189, 248, 0.3)', text: '#38bdf8', icon: '❄️' }
+                        };
+
+                        return (
+                            <section className="live-opportunities-section" style={{ marginBottom: '4rem' }}>
+                                <div className="glass-panel" style={{
+                                    padding: '2rem',
+                                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(15, 23, 42, 0.4) 100%)',
+                                    border: '1px solid rgba(239, 68, 68, 0.15)',
+                                    borderRadius: '20px'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <h3 style={{
+                                                fontSize: '1.3rem',
+                                                fontWeight: 900,
+                                                letterSpacing: '-0.5px',
+                                                background: 'linear-gradient(to right, #ef4444, #fbbf24)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.8rem'
+                                            }}>
+                                                🔥 {lang === 'tr' ? 'CANLI FIRSATLAR' : 'LIVE OPPORTUNITIES'}
+                                            </h3>
+                                            <span style={{
+                                                background: 'rgba(239, 68, 68, 0.2)',
+                                                padding: '0.3rem 0.8rem',
+                                                borderRadius: '20px',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 800,
+                                                color: '#ef4444',
+                                                border: '1px solid rgba(239, 68, 68, 0.3)'
+                                            }}>
+                                                TOP {topOpportunities.length}
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            {opportunities.length} {lang === 'tr' ? 'fırsat' : 'opportunities'}
+                                        </div>
+                                    </div>
+
+                                    {topOpportunities.length > 0 ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                            {topOpportunities.map((opp, idx) => {
+                                                const match = matches.find(m => m.id === opp.matchId);
+                                                if (!match) return null;
+                                                const heatStyle = heatColors[opp.heatLevel] || heatColors.SOGUK;
+                                                const isTop = idx === 0 && opp.heatLevel === 'ALEV';
+
+                                                return (
+                                                    <div
+                                                        key={opp.matchId}
+                                                        onClick={() => setSelectedMatch(match)}
+                                                        style={{
+                                                            padding: '1.2rem',
+                                                            background: heatStyle.bg,
+                                                            border: `1px solid ${heatStyle.border}`,
+                                                            borderRadius: '16px',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease',
+                                                            position: 'relative',
+                                                            overflow: 'hidden',
+                                                            animation: isTop ? 'pulse 2s infinite' : 'none'
+                                                        }}
+                                                    >
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <div style={{ flex: 1 }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.5rem' }}>
+                                                                    <span style={{ fontSize: '1.5rem' }}>{heatStyle.icon}</span>
+                                                                    <span style={{ fontWeight: 800, fontSize: '1rem', color: heatStyle.text }}>
+                                                                        {match.homeTeam} vs {match.awayTeam}
+                                                                    </span>
+                                                                    {opp.trend === 'UP' && <span style={{ color: '#10b981' }}>↑</span>}
+                                                                    {opp.trend === 'DOWN' && <span style={{ color: '#ef4444' }}>↓</span>}
+                                                                    {opp.valueDetected && (
+                                                                        <span style={{
+                                                                            background: 'linear-gradient(135deg, #10b981, #34d399)',
+                                                                            padding: '0.15rem 0.5rem',
+                                                                            borderRadius: '6px',
+                                                                            fontSize: '0.55rem',
+                                                                            fontWeight: 900,
+                                                                            color: '#000',
+                                                                            letterSpacing: '0.5px'
+                                                                        }}>💰 VALUE</span>
+                                                                    )}
+                                                                </div>
+                                                                <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
+                                                                    {match.minute}' • <span style={{ fontWeight: 800, color: 'var(--accent-color)' }}>{match.score?.home ?? 0} - {match.score?.away ?? 0}</span> • {opp.suggestedMarket?.market || opp.suggestedMarket || '-'}
+                                                                    {opp.suggestedMarket?.confidence && (
+                                                                        <span style={{
+                                                                            marginLeft: '0.5rem',
+                                                                            padding: '0.1rem 0.4rem',
+                                                                            background: opp.suggestedMarket.confidence === 'VALUE' ? 'rgba(16, 185, 129, 0.2)' :
+                                                                                opp.suggestedMarket.confidence === 'HIGH' ? 'rgba(251, 191, 36, 0.2)' :
+                                                                                    'rgba(148, 163, 184, 0.15)',
+                                                                            color: opp.suggestedMarket.confidence === 'VALUE' ? '#10b981' :
+                                                                                opp.suggestedMarket.confidence === 'HIGH' ? '#fbbf24' :
+                                                                                    '#94a3b8',
+                                                                            borderRadius: '4px',
+                                                                            fontSize: '0.55rem',
+                                                                            fontWeight: 700
+                                                                        }}>{opp.suggestedMarket.confidence}</span>
+                                                                    )}
+                                                                </div>
+                                                                <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
+                                                                    {opp.reason}
+                                                                </div>
+
+                                                                {/* Consensus Preview - Show if available */}
+                                                                {match.consensusReport?.totalSources > 0 && (
+                                                                    <div style={{
+                                                                        marginTop: '0.8rem',
+                                                                        padding: '0.6rem 0.8rem',
+                                                                        background: 'rgba(56, 189, 248, 0.08)',
+                                                                        borderRadius: '10px',
+                                                                        border: '1px solid rgba(56, 189, 248, 0.15)'
+                                                                    }}>
+                                                                        <div style={{
+                                                                            fontSize: '0.6rem',
+                                                                            fontWeight: 800,
+                                                                            color: 'var(--accent-color)',
+                                                                            marginBottom: '0.5rem',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'space-between'
+                                                                        }}>
+                                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                                                🎯 {lang === 'tr' ? 'RADAR TAHMİNLERİ' : 'RADAR PREDICTIONS'}
+                                                                            </span>
+                                                                            <span style={{ opacity: 0.5, fontWeight: 600 }}>
+                                                                                {match.consensusReport.totalSources} {lang === 'tr' ? 'kaynak' : 'sources'}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        {/* Source List with Predictions */}
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.5rem' }}>
+                                                                            {(match.consensusReport.signals || [])
+                                                                                .filter(signal => signal.prediction && signal.prediction !== 'N/A')
+                                                                                .slice(0, 4).map((signal, idx) => {
+                                                                                    const sourceName = RADAR_SOURCES.find(rs => rs.id === signal.site)?.label || signal.site;
+                                                                                    return (
+                                                                                        <div key={idx} style={{
+                                                                                            display: 'flex',
+                                                                                            alignItems: 'center',
+                                                                                            justifyContent: 'space-between',
+                                                                                            fontSize: '0.6rem',
+                                                                                            padding: '0.25rem 0.4rem',
+                                                                                            background: 'rgba(255,255,255,0.03)',
+                                                                                            borderRadius: '4px'
+                                                                                        }}>
+                                                                                            <span style={{ opacity: 0.7, fontWeight: 600 }}>{sourceName}</span>
+                                                                                            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                                                                                {signal.prediction && (
+                                                                                                    <span style={{
+                                                                                                        fontWeight: 800,
+                                                                                                        color: signal.prediction === '1' ? '#10b981' :
+                                                                                                            signal.prediction === '2' ? '#ef4444' : '#fbbf24',
+                                                                                                        background: signal.prediction === '1' ? 'rgba(16, 185, 129, 0.15)' :
+                                                                                                            signal.prediction === '2' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(251, 191, 36, 0.15)',
+                                                                                                        padding: '0.1rem 0.35rem',
+                                                                                                        borderRadius: '4px'
+                                                                                                    }}>
+                                                                                                        {signal.prediction}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                {signal.score_prediction && (
+                                                                                                    <span style={{
+                                                                                                        fontWeight: 700,
+                                                                                                        color: '#fbbf24',
+                                                                                                        fontSize: '0.55rem'
+                                                                                                    }}>
+                                                                                                        📊 {signal.score_prediction}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                {signal.btts && (
+                                                                                                    <span style={{
+                                                                                                        fontWeight: 600,
+                                                                                                        color: signal.btts === 'Yes' ? '#10b981' : '#94a3b8',
+                                                                                                        fontSize: '0.5rem'
+                                                                                                    }}>
+                                                                                                        KG:{signal.btts === 'Yes' ? '✓' : '✗'}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                {signal.over_under && (
+                                                                                                    <span style={{
+                                                                                                        fontWeight: 600,
+                                                                                                        color: '#38bdf8',
+                                                                                                        fontSize: '0.5rem'
+                                                                                                    }}>
+                                                                                                        {signal.over_under}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            {(match.consensusReport.signals || []).filter(s => s.prediction && s.prediction !== 'N/A').length > 4 && (
+                                                                                <div style={{ fontSize: '0.5rem', opacity: 0.4, textAlign: 'center' }}>
+                                                                                    +{match.consensusReport.signals.filter(s => s.prediction && s.prediction !== 'N/A').length - 4} {lang === 'tr' ? 'daha' : 'more'}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* Consensus Summary */}
+                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                                                                            {Object.entries(match.consensusReport.agreement || {}).map(([pred, count]) => {
+                                                                                const isMainPred = count >= 2;
+                                                                                return (
+                                                                                    <span key={pred} style={{
+                                                                                        fontSize: '0.6rem',
+                                                                                        fontWeight: isMainPred ? 800 : 600,
+                                                                                        padding: '0.15rem 0.4rem',
+                                                                                        borderRadius: '4px',
+                                                                                        background: isMainPred ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
+                                                                                        color: isMainPred ? '#10b981' : 'rgba(255,255,255,0.6)',
+                                                                                        border: isMainPred ? '1px solid rgba(16, 185, 129, 0.4)' : 'none'
+                                                                                    }}>
+                                                                                        {pred}: {count}
+                                                                                    </span>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div style={{ textAlign: 'right' }}>
+                                                                <div style={{
+                                                                    fontSize: '1.8rem',
+                                                                    fontWeight: 900,
+                                                                    color: heatStyle.text
+                                                                }}>
+                                                                    {opp.score}
+                                                                </div>
+                                                                <div style={{ fontSize: '0.6rem', opacity: 0.5, textTransform: 'uppercase' }}>
+                                                                    {opp.heatLevel}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>
+                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📡</div>
+                                            {t.no_opportunities || 'Şu an aktif fırsat bulunmuyor...'}
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        );
+                    })()}
+
+
                     {/* Analysis Candidates */}
                     <section className="dashboard-section" style={{ marginBottom: '5rem' }}>
                         <div className="section-header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
@@ -985,29 +1750,125 @@ export const Dashboard = ({ user, onLogout }) => {
                             ))}
                         </div>
 
-                        {/* Tier 3 Performance Monitor */}
-                        {Object.keys(dataWorker.tier3Performance).length > 0 && (
-                            <div className="glass-panel" style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(56, 189, 248, 0.03)', border: '1px solid rgba(56, 189, 248, 0.1)' }}>
-                                <h4 style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--accent-color)' }}>{t.tier3_monitor_title}</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                                    {Object.entries(dataWorker.tier3Performance).map(([league, stats]) => {
-                                        const winRate = stats.totalObserved > 0 ? (stats.potentialWins / stats.totalObserved * 100).toFixed(0) : 0;
-                                        return (
-                                            <div key={league} style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '10px', fontSize: '0.75rem' }}>
-                                                <div style={{ fontWeight: 800, marginBottom: '0.3rem' }}>{league}</div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <span style={{ opacity: 0.6 }}>{t.est_success}</span>
-                                                    <span style={{ color: winRate > 70 ? 'var(--success-color)' : 'inherit', fontWeight: 800 }}>%{winRate}</span>
-                                                </div>
-                                                {winRate > 75 && (
-                                                    <div style={{ marginTop: '0.5rem', fontSize: '0.6rem', color: 'var(--warning-color)', fontWeight: 800 }}>↑ {t.promotion_candidate}</div>
+                        {/* Tier 3 Performance Monitor - Improved */}
+                        {(() => {
+                            // Filter leagues with actual data (min 3 observations and >0% win rate)
+                            const performanceData = Object.entries(dataWorker.tier3Performance || {})
+                                .map(([league, stats]) => ({
+                                    league,
+                                    winRate: stats.totalObserved > 0 ? Math.round((stats.potentialWins / stats.totalObserved) * 100) : 0,
+                                    total: stats.totalObserved || 0,
+                                    wins: stats.potentialWins || 0
+                                }))
+                                .filter(item => item.total >= 3) // Only show leagues with min 3 games tracked
+                                .sort((a, b) => b.winRate - a.winRate); // Sort by win rate descending
+
+                            const promotionCandidates = performanceData.filter(item => item.winRate >= 70);
+                            const regularLeagues = performanceData.filter(item => item.winRate < 70 && item.winRate > 0);
+
+                            if (performanceData.length === 0) return null;
+
+                            return (
+                                <div className="glass-panel" style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(56, 189, 248, 0.03)', border: '1px solid rgba(56, 189, 248, 0.1)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                                        <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--accent-color)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            🔬 {t.tier3_monitor_title}
+                                        </h4>
+                                        <span style={{ fontSize: '0.65rem', opacity: 0.5, background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>
+                                            {performanceData.length} {lang === 'tr' ? 'lig takipte' : 'leagues tracked'}
+                                        </span>
+                                    </div>
+
+                                    {/* Promotion Candidates - High Success */}
+                                    {promotionCandidates.length > 0 && (
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--success-color)', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                🏆 {lang === 'tr' ? 'YÜKSELTME ADAYLARI' : 'PROMOTION CANDIDATES'} ({promotionCandidates.length})
+                                            </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.8rem' }}>
+                                                {promotionCandidates.slice(0, 6).map(item => (
+                                                    <div key={item.league} style={{
+                                                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
+                                                        padding: '1rem',
+                                                        borderRadius: '12px',
+                                                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                        position: 'relative',
+                                                        overflow: 'hidden'
+                                                    }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.6rem' }}>
+                                                            <div style={{ fontWeight: 800, fontSize: '0.75rem', flex: 1, paddingRight: '0.5rem' }}>{item.league}</div>
+                                                            <div style={{
+                                                                fontSize: '1.1rem',
+                                                                fontWeight: 900,
+                                                                color: 'var(--success-color)',
+                                                                background: 'rgba(16, 185, 129, 0.15)',
+                                                                padding: '0.2rem 0.5rem',
+                                                                borderRadius: '6px',
+                                                                minWidth: '45px',
+                                                                textAlign: 'center'
+                                                            }}>
+                                                                %{item.winRate}
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden', marginBottom: '0.4rem' }}>
+                                                            <div style={{ width: `${item.winRate}%`, height: '100%', background: 'var(--success-color)', transition: 'width 0.5s ease' }}></div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', opacity: 0.6 }}>
+                                                            <span>{item.wins}/{item.total} {lang === 'tr' ? 'başarılı' : 'wins'}</span>
+                                                            <span style={{ color: 'var(--warning-color)', fontWeight: 700 }}>↑ TIER 2</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Regular Tracked Leagues */}
+                                    {regularLeagues.length > 0 && (
+                                        <div>
+                                            <div style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.6, marginBottom: '0.8rem' }}>
+                                                📊 {lang === 'tr' ? 'TAKİPTEKİ DİĞER LİGLER' : 'OTHER TRACKED LEAGUES'}
+                                            </div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                                {regularLeagues.slice(0, 12).map(item => (
+                                                    <div key={item.league} style={{
+                                                        background: 'rgba(255,255,255,0.03)',
+                                                        padding: '0.5rem 0.8rem',
+                                                        borderRadius: '8px',
+                                                        fontSize: '0.7rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.5rem',
+                                                        border: '1px solid rgba(255,255,255,0.05)'
+                                                    }}>
+                                                        <span style={{ fontWeight: 700, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.league}</span>
+                                                        <span style={{
+                                                            fontWeight: 800,
+                                                            color: item.winRate >= 50 ? 'var(--warning-color)' : item.winRate >= 30 ? 'var(--text-secondary)' : 'var(--danger-color)',
+                                                            fontSize: '0.65rem'
+                                                        }}>
+                                                            %{item.winRate}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                                {regularLeagues.length > 12 && (
+                                                    <div style={{ fontSize: '0.65rem', opacity: 0.4, padding: '0.5rem', alignSelf: 'center' }}>
+                                                        +{regularLeagues.length - 12} {lang === 'tr' ? 'daha' : 'more'}
+                                                    </div>
                                                 )}
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+                                    )}
+
+                                    {/* Empty State Info */}
+                                    {performanceData.length > 0 && promotionCandidates.length === 0 && (
+                                        <div style={{ marginTop: '1rem', fontSize: '0.65rem', opacity: 0.4, fontStyle: 'italic', textAlign: 'center' }}>
+                                            💡 {lang === 'tr' ? '%70+ başarı oranına ulaşan ligler Tier 2\'ye yükseltme adayı olur' : 'Leagues reaching 70%+ success rate become Tier 2 promotion candidates'}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
                     </section>
 
                     {/* Raw Data Explorer */}
@@ -1065,7 +1926,7 @@ export const Dashboard = ({ user, onLogout }) => {
                     {/* Match Details Modal */}
                     {selectedMatch && (
                         (() => {
-                            const currentMatch = matches.find(m => m.id === selectedMatch?.id) || selectedMatch;
+                            const currentMatch = matches.find(m => String(m.id) === String(selectedMatch?.id)) || selectedMatch;
                             if (!currentMatch) return null;
 
                             return (
@@ -1075,46 +1936,143 @@ export const Dashboard = ({ user, onLogout }) => {
 
                                         <div className="intelligence-modal-content">
                                             {/* AI & Consensus Layer (Fusion) */}
-                                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
                                                 {/* AI Expert Column */}
-                                                {currentMatch.aiSummary && (
-                                                    <div style={{ background: 'rgba(56, 189, 248, 0.08)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(56, 189, 248, 0.2)', boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)' }}>
-                                                        <h4 style={{ margin: 0, fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                                            {t.ai_expert_summary}
+                                                <div style={{ background: 'rgba(56, 189, 248, 0.08)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(56, 189, 248, 0.2)', boxShadow: '0 0 30px rgba(56, 189, 248, 0.1)', position: 'relative', overflow: 'hidden' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                        <h4 style={{ margin: 0, fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <span style={{ fontSize: '1rem' }}>🤖</span> {t.ai_expert_summary}
                                                         </h4>
-                                                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', lineHeight: '1.6', color: '#fff', fontStyle: 'italic', opacity: 0.95 }}>
-                                                            {currentMatch.aiSummary || "Uzman AI sahayı analiz ediyor..."}
-                                                        </p>
+
+                                                        {(!currentMatch.aiSummary || currentMatch.aiSummary.includes('bekleniyor')) && (
+                                                            currentMatch.dqs < 0.40 ? (
+                                                                <div style={{
+                                                                    background: 'rgba(239, 68, 68, 0.1)',
+                                                                    color: '#ef4444',
+                                                                    padding: '0.4rem 0.8rem',
+                                                                    borderRadius: '6px',
+                                                                    fontSize: '0.7rem',
+                                                                    fontWeight: 800,
+                                                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.4rem'
+                                                                }}>
+                                                                    <span>⚠️</span> {t.insufficient_data}
+                                                                </div>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        // First set loading state immediately
+                                                                        const matchIdx = dataWorker.fixtures.findIndex(f => String(f.id) === String(currentMatch.id));
+                                                                        if (matchIdx !== -1) {
+                                                                            dataWorker.fixtures[matchIdx].aiSummary = "AI Analiz yapıyor...";
+                                                                            setMatches([...dataWorker.fixtures]);
+                                                                        }
+
+                                                                        // Then trigger the actual analysis
+                                                                        const summary = await dataWorker.triggerDeepAnalysis(currentMatch.id);
+
+                                                                        // Update state with the result
+                                                                        if (matchIdx !== -1 && summary) {
+                                                                            dataWorker.fixtures[matchIdx].aiSummary = summary;
+                                                                        }
+                                                                        setMatches([...dataWorker.fixtures]);
+                                                                    }}
+                                                                    className="pulse"
+                                                                    style={{
+                                                                        background: 'var(--accent-color)',
+                                                                        color: '#000',
+                                                                        border: 'none',
+                                                                        padding: '0.4rem 0.8rem',
+                                                                        borderRadius: '6px',
+                                                                        fontSize: '0.7rem',
+                                                                        fontWeight: 800,
+                                                                        cursor: 'pointer',
+                                                                        textTransform: 'uppercase'
+                                                                    }}
+                                                                >
+                                                                    {t.deep_analysis || 'DERİN ANALİZ'}
+                                                                </button>
+                                                            )
+                                                        )}
                                                     </div>
-                                                )}
+
+                                                    {currentMatch.aiSummary === "AI Analiz yapıyor..." ? (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                                            <div className="skeleton-loader" style={{ height: '0.8rem', width: '90%', borderRadius: '4px' }}></div>
+                                                            <div className="skeleton-loader" style={{ height: '0.8rem', width: '70%', borderRadius: '4px' }}></div>
+                                                            <div className="skeleton-loader" style={{ height: '0.8rem', width: '85%', borderRadius: '4px' }}></div>
+                                                            <span style={{ fontSize: '0.7rem', opacity: 0.5, fontStyle: 'italic', marginTop: '0.5rem' }}>{t.ai_processing || 'Gelişmiş veri setleri taranıyor...'}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div style={{ whiteSpace: 'pre-line' }}>
+                                                            <p style={{ fontSize: '0.85rem', lineHeight: '1.6', color: '#fff', opacity: 0.95 }}>
+                                                                {currentMatch.aiSummary || (t.ai_standby || "Analiz raporu için butona basın...")}
+                                                            </p>
+
+                                                            {/* Probabilistic Markets Mini-Display */}
+                                                            {currentMatch.aiSummary && currentMatch.aiSummary.includes('%') && (
+                                                                <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                                                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <div style={{ fontSize: '0.6rem', opacity: 0.5, textTransform: 'uppercase' }}>Tahmini Güven</div>
+                                                                        <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--success-color)' }}>
+                                                                            %{currentMatch.aiSummary.match(/%(\d+)/)?.[1] || '??'}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                        <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent-color)' }}>{t.quant_badge || 'KUANT ANALİZ'}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
 
                                                 {/* Global Consensus Column */}
-                                                {currentMatch.consensusReport?.totalSources > 0 && (
-                                                    <div style={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                                        <h4 style={{ margin: 0, fontSize: '0.75rem', opacity: 0.6, fontWeight: 800, textTransform: 'uppercase' }}>
-                                                            {t.global_consensus_report}
-                                                        </h4>
-                                                        <div style={{ marginTop: '1rem' }}>
-                                                            {currentMatch.consensusReport?.totalSources > 0 ? (
-                                                                <>
-                                                                    <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--success-color)' }}>
-                                                                        {currentMatch.consensusReport.totalSources}/{RADAR_SOURCES.length} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 400 }}>{t.active_badges}</span>
+                                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: '15px', padding: '1.5rem', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                                    <h4 style={{ margin: 0, fontSize: '0.75rem', opacity: 0.6, fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontSize: '1rem' }}>🌐</span> {t.global_consensus_report}
+                                                    </h4>
+                                                    <div style={{ marginTop: '1.2rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '1rem' }}>
+                                                            <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--success-color)' }}>
+                                                                {currentMatch.consensusReport?.totalSources || 0}
+                                                            </span>
+                                                            <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600 }}>/ {RADAR_SOURCES.length} {t.active_badges}</span>
+                                                        </div>
+
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                                            {Object.entries(currentMatch.consensusReport?.agreement || {}).map(([pred, count]) => {
+                                                                const sources = currentMatch.consensusReport.signals
+                                                                    .filter(s => s.prediction === pred)
+                                                                    .map(s => RADAR_SOURCES.find(rs => rs.id === s.site)?.label || s.site);
+
+                                                                return (
+                                                                    <div key={pred} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.8rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                                                                            <span style={{ fontWeight: 800, color: 'var(--accent-color)', fontSize: '0.85rem' }}>{pred}</span>
+                                                                            <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{count} Kaynak</span>
+                                                                        </div>
+                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                                                            {sources.map(src => (
+                                                                                <span key={src} style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.5rem', borderRadius: '4px', opacity: 0.8 }}>
+                                                                                    {src}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
-                                                                    <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', opacity: 0.7 }}>
-                                                                        {Object.entries(currentMatch.consensusReport.agreement).map(([pred, count]) => (
-                                                                            <div key={pred} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                                                                                <span>{pred}:</span>
-                                                                                <span style={{ fontWeight: 800 }}>{count} Site</span>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                </>
-                                                            ) : (
-                                                                <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>Dış kaynak verisi bekleniyor...</div>
+                                                                );
+                                                            })}
+
+                                                            {!currentMatch.consensusReport?.totalSources && (
+                                                                <div style={{ fontSize: '0.7rem', opacity: 0.4, fontStyle: 'italic', textAlign: 'center', padding: '1rem' }}>
+                                                                    Henüz dış kaynak verisi eşleşmedi.
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
 
                                             <div className="modal-header">
@@ -1262,60 +2220,305 @@ export const Dashboard = ({ user, onLogout }) => {
                     )}
                     {/* Match Details Modal end */}
                 </>
-            )}
+            )
+            }
 
             {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} mode={faqMode} />}
 
-            {showAdvanced && (
-                <div className="modal-overlay" onClick={() => setShowAdvanced(false)}>
-                    <div className="modal-content settings glass-panel" onClick={e => e.stopPropagation()}>
-                        <button className="close-btn" onClick={() => setShowAdvanced(false)}>×</button>
-                        <h2>{t.advanced_settings_title}</h2>
+            {
+                showAdvanced && (
+                    <div className="modal-overlay" onClick={() => setShowAdvanced(false)}>
+                        <div className="modal-content settings glass-panel" onClick={e => e.stopPropagation()}>
+                            <button className="close-btn" onClick={() => setShowAdvanced(false)}>×</button>
+                            <h2>{t.advanced_settings_title}</h2>
 
-                        <div className="settings-list">
-                            {[
-                                { id: 'XG_ANALYSIS', label: t.toggle_xg },
-                                { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
-                                { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
-                            ].map(setting => (
-                                <div key={setting.id} className="setting-item">
-                                    <span>{setting.label}</span>
-                                    <div
-                                        className={`toggle ${advancedSettings[setting.id] ? 'on' : ''}`}
-                                        onClick={() => {
-                                            const newVal = !advancedSettings[setting.id];
-                                            setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
-                                            CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
-                                        }}
-                                    ><div className="knob"></div></div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="league-management">
-                            <h4>{t.league_tier_management}</h4>
-                            {['tier1', 'tier2'].map(tierKey => (
-                                <div key={tierKey} className="tier-group">
-                                    <label>{tierKey === 'tier1' ? t.tier_1_label : t.tier_2_label}</label>
-                                    <div className="leagues">
-                                        {leagueTierMap[tierKey].map(league => (
-                                            <span key={league} className="league-chip" onClick={() => {
-                                                const otherTier = tierKey === 'tier1' ? 'tier2' : 'tier1';
-                                                const newMap = { ...leagueTierMap };
-                                                newMap[tierKey] = newMap[tierKey].filter(l => l !== league);
-                                                newMap[otherTier].push(league);
-                                                setLeagueTierMap(newMap);
-                                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1 = newMap.tier1;
-                                                CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2 = newMap.tier2;
-                                            }}>{league} ⇄</span>
-                                        ))}
+                            <div className="settings-list">
+                                {[
+                                    { id: 'XG_ANALYSIS', label: t.toggle_xg },
+                                    { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
+                                    { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
+                                ].map(setting => (
+                                    <div key={setting.id} className="setting-item">
+                                        <span>{setting.label}</span>
+                                        <div
+                                            className={`toggle ${advancedSettings[setting.id] ? 'on' : ''}`}
+                                            onClick={() => {
+                                                const newVal = !advancedSettings[setting.id];
+                                                setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
+                                                CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
+                                            }}
+                                        ><div className="knob"></div></div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+
+                            <div className="league-management">
+                                <h4>{t.league_tier_management}</h4>
+                                {['tier1', 'tier2'].map(tierKey => (
+                                    <div key={tierKey} className="tier-group">
+                                        <label>{tierKey === 'tier1' ? t.tier_1_label : t.tier_2_label}</label>
+                                        <div className="leagues">
+                                            {leagueTierMap[tierKey].map(league => (
+                                                <span key={league} className="league-chip" onClick={() => {
+                                                    const otherTier = tierKey === 'tier1' ? 'tier2' : 'tier1';
+                                                    const newMap = { ...leagueTierMap };
+                                                    newMap[tierKey] = newMap[tierKey].filter(l => l !== league);
+                                                    newMap[otherTier].push(league);
+                                                    setLeagueTierMap(newMap);
+                                                    CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1 = newMap.tier1;
+                                                    CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2 = newMap.tier2;
+                                                }}>{league} ⇄</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+
+            {/* SMART ALERT POPUP */}
+            {
+                showAlertPopup && (
+                    <div className="modal-overlay" style={{ zIndex: 9999 }} onClick={() => setShowAlertPopup(null)}>
+                        <div className="glass-panel" onClick={e => e.stopPropagation()} style={{
+                            maxWidth: '500px',
+                            padding: '2rem',
+                            background: showAlertPopup.level === 'ALEV'
+                                ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%)',
+                            border: `2px solid ${showAlertPopup.level === 'ALEV' ? 'rgba(239, 68, 68, 0.5)' : 'rgba(251, 191, 36, 0.5)'}`,
+                            animation: 'pulse 2s infinite'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                    <span style={{ fontSize: '2rem' }}>{showAlertPopup.level === 'ALEV' ? '🔥' : '⚡'}</span>
+                                    <div>
+                                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900, color: showAlertPopup.level === 'ALEV' ? '#ef4444' : '#fbbf24' }}>
+                                            {showAlertPopup.level} FIRSAT!
+                                        </h3>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{showAlertPopup.conditionsMet}/5 koşul sağlandı</span>
+                                    </div>
+                                </div>
+                                <button onClick={() => setShowAlertPopup(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                            </div>
+
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <h4 style={{ margin: '0 0 0.3rem 0', fontSize: '1.2rem', fontWeight: 800 }}>{showAlertPopup.match}</h4>
+                                <div style={{ fontSize: '0.85rem', opacity: 0.7 }}>{showAlertPopup.minute}' • Skor: {showAlertPopup.score}</div>
+                            </div>
+
+                            <div style={{
+                                background: 'rgba(56, 189, 248, 0.1)',
+                                padding: '1.2rem',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(56, 189, 248, 0.3)',
+                                marginBottom: '1.5rem'
+                            }}>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.5rem' }}>ÖNERİ</div>
+                                <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--accent-color)', marginBottom: '0.5rem' }}>
+                                    {showAlertPopup.recommendation?.market}
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.8rem' }}>
+                                    <span style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
+                                        %{showAlertPopup.recommendation?.confidence} Güven
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>{showAlertPopup.recommendation?.reasoning}</div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    onClick={() => {
+                                        // Record prediction when user accepts
+                                        const match = matches.find(m => m.id === showAlertPopup.matchId);
+                                        predictionTracker.recordPrediction({
+                                            matchId: showAlertPopup.matchId,
+                                            match: showAlertPopup.match,
+                                            homeTeam: showAlertPopup.homeTeam,
+                                            awayTeam: showAlertPopup.awayTeam,
+                                            minute: showAlertPopup.minute,
+                                            score: showAlertPopup.score,
+                                            market: showAlertPopup.recommendation?.market,
+                                            prediction: showAlertPopup.recommendation?.market,
+                                            confidence: showAlertPopup.recommendation?.confidence,
+                                            source: 'ALERT',
+                                            dqs: match?.dqs,
+                                            xgHome: match?.stats?.xg?.home,
+                                            xgAway: match?.stats?.xg?.away,
+                                            consensusCount: match?.consensusReport?.totalSources
+                                        });
+                                        setTrackingStats(predictionTracker.getStats());
+                                        setShowAlertPopup(null);
+                                        alert('✅ Tahmin kaydedildi! Maç bitince sonucu güncelleyebilirsin.');
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        background: 'var(--success-color)',
+                                        color: '#000',
+                                        border: 'none',
+                                        padding: '0.8rem',
+                                        borderRadius: '10px',
+                                        fontWeight: 900,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    ✓ OYNA & KAYDET
+                                </button>
+                                <button
+                                    onClick={() => setShowAlertPopup(null)}
+                                    style={{
+                                        flex: 1,
+                                        background: 'rgba(255,255,255,0.1)',
+                                        color: '#fff',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        padding: '0.8rem',
+                                        borderRadius: '10px',
+                                        fontWeight: 700,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    KAPAT
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* TRACKING PANEL */}
+            {
+                showTrackingPanel && (
+                    <div className="modal-overlay" onClick={() => setShowTrackingPanel(false)}>
+                        <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '700px', maxHeight: '80vh', overflow: 'auto' }}>
+                            <button className="close-btn" onClick={() => setShowTrackingPanel(false)}>×</button>
+
+                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                <span>📊</span> TAHMİN PERFORMANSI
+                            </h2>
+
+                            {/* Summary Stats */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                                <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '0.3rem' }}>TOPLAM</div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--accent-color)' }}>{trackingStats.total}</div>
+                                </div>
+                                <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '0.3rem' }}>KAZANAN</div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#10b981' }}>{trackingStats.won}</div>
+                                </div>
+                                <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '0.3rem' }}>KAYBEDEN</div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#ef4444' }}>{trackingStats.lost}</div>
+                                </div>
+                                <div style={{ background: 'rgba(251, 191, 36, 0.1)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '0.3rem' }}>İSABET</div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fbbf24' }}>%{trackingStats.accuracy}</div>
+                                </div>
+                            </div>
+
+                            {/* By Confidence */}
+                            <div style={{ marginBottom: '2rem' }}>
+                                <h4 style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: 0.8 }}>Güven Seviyesine Göre</h4>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    {Object.entries(trackingStats.byConfidence || {}).map(([level, stats]) => (
+                                        <div key={level} style={{ flex: 1, background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px' }}>
+                                            <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase' }}>
+                                                {level === 'high' ? 'Yüksek (75+)' : level === 'medium' ? 'Orta (60-74)' : 'Düşük (<60)'}
+                                            </div>
+                                            <div style={{ fontWeight: 800, marginTop: '0.3rem' }}>
+                                                {stats.total > 0 ? `${((stats.won / stats.total) * 100).toFixed(0)}%` : '-'}
+                                                <span style={{ fontSize: '0.7rem', opacity: 0.5, marginLeft: '0.3rem' }}>({stats.won}/{stats.total})</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Recent Predictions */}
+                            <div>
+                                <h4 style={{ fontSize: '0.85rem', marginBottom: '1rem', opacity: 0.8 }}>Son Tahminler</h4>
+                                <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+                                    {predictionTracker.getRecent(20).map((pred, idx) => (
+                                        <div key={pred.id} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            padding: '0.8rem',
+                                            background: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+                                            borderRadius: '8px',
+                                            marginBottom: '0.3rem'
+                                        }}>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{pred.match}</div>
+                                                <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{pred.market} • %{pred.confidence} güven</div>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                                {pred.status === 'PENDING' ? (
+                                                    <div style={{ display: 'flex', gap: '0.3rem' }}>
+                                                        <button onClick={() => {
+                                                            predictionTracker.updateResult(pred.id, 'WON', {});
+                                                            setTrackingStats(predictionTracker.getStats());
+                                                        }} style={{ background: '#10b981', color: '#000', border: 'none', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer' }}>✓</button>
+                                                        <button onClick={() => {
+                                                            predictionTracker.updateResult(pred.id, 'LOST', {});
+                                                            setTrackingStats(predictionTracker.getStats());
+                                                        }} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer' }}>✗</button>
+                                                    </div>
+                                                ) : (
+                                                    <span style={{
+                                                        padding: '0.3rem 0.6rem',
+                                                        borderRadius: '4px',
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: 800,
+                                                        background: pred.status === 'WON' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                                        color: pred.status === 'WON' ? '#10b981' : '#ef4444'
+                                                    }}>{pred.status === 'WON' ? 'KAZANDI' : 'KAYBETTİ'}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {predictionTracker.getRecent(20).length === 0 && (
+                                        <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>
+                                            Henüz kayıtlı tahmin yok
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Floating Tracking Button */}
+            <button
+                onClick={() => {
+                    setTrackingStats(predictionTracker.getStats());
+                    setShowTrackingPanel(true);
+                }}
+                style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    background: 'linear-gradient(135deg, #38bdf8, #818cf8)',
+                    color: '#fff',
+                    border: 'none',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(56, 189, 248, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}
+                title="Tahmin Performansı"
+            >
+                📊
+            </button>
+        </div >
     );
 };

@@ -116,6 +116,21 @@ export const CONFIG = {
         ENABLED: true,
         DQS_THRESHOLD: 0.70, // High DQS for counter-play
         MOMENTUM_DIFF: 5 // Significant momentum difference
+      },
+      // Phase 16: Live Opportunities (Canlı Fırsatlar)
+      LIVE_OPPORTUNITIES: {
+        ENABLED: true,
+        ALEV_THRESHOLD: 75, // 🔥 Hot opportunity
+        SICAK_THRESHOLD: 50, // ⚡ Warm opportunity
+        MAX_MINUTE: 80, // Exclude matches after this minute
+        MIN_DQS: 0.40, // Minimum data quality
+        WEIGHTS: {
+          DQS: 0.30,
+          MOMENTUM: 0.25,
+          PRESSURE: 0.20,
+          XG: 0.15,
+          RISK: 0.10
+        }
       }
     }
   }

@@ -16,17 +16,31 @@ import { velocityModule } from './velocityModule';
 export const analyzeMatch = (fixture, odds, consensusReport) => {
     const { stats, minute, score, history } = fixture;
 
-    // 1. Odds check (Requirement: No Odds = No Bet, except for Discovery)
+    // Expert Metrics Calculation (Always needed for UI/Logic regardless of odds)
+    const pressure = pressureIndex.calculate(stats);
+    const velocity = velocityModule.calculate(history || []);
+
+
+    const observations = {
+        xg: xGModule.calculate(fixture),
+        leagueProfile: leagueProfileModule.getProfile(fixture.leagueName),
+        pressure,
+        velocity,
+        bayesian: null,
+        reverseSignal: false // Default
+    };
+
+    // A. Odds Check (Only for verdict calculation)
     if (!odds || Object.keys(odds).length === 0) {
         const tier = leagueProfileModule.getTier(fixture.leagueName);
         if (tier !== 3) {
-            return { verdict: 'PASS', reason: 'Eksik Oran Verisi (Odds Required)' };
+            return {
+                verdict: 'PASS',
+                reason: 'Eksik Oran Verisi (Odds Required)',
+                observations
+            };
         }
     }
-
-    // Expert Metrics Calculation
-    const pressure = pressureIndex.calculate(stats);
-    const velocity = velocityModule.calculate(history || []);
 
     // Reverse Signal Implementation (Pre-match Consensus vs Live Reality)
     let reverseSignal = false;
@@ -44,22 +58,14 @@ export const analyzeMatch = (fixture, odds, consensusReport) => {
         }
     }
 
-    const observations = {
-        xg: xGModule.calculate(fixture),
-        leagueProfile: leagueProfileModule.getProfile(fixture.leagueName),
-        pressure,
-        velocity,
-        bayesian: null,
-        reverseSignal
-    };
-
     // 2. Advanced EdgeScore Calculation
     // Base EdgeScore = (Pressure Total / 50) + Velocity Bonus
     // Max Pressure(100) / 50 = 2.0 Edge.
     const baseMomentum = (pressure.total / 50);
     const edgeScore = baseMomentum * (velocity.score || 1.0);
 
-    // Bayesian Refinement (Observational)
+    // Update observations with refined data
+    observations.reverseSignal = reverseSignal;
     observations.bayesian = bayesianModel.refine(0.5, edgeScore);
 
     // 3. Counter-Argument Engine (Discipline Guard)

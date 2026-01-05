@@ -4,6 +4,7 @@
  */
 
 import { CONFIG } from '../config';
+import { database, ref, get } from '../firebase/config';
 
 export const sofaScoreAdapter = {
     /**
@@ -11,9 +12,11 @@ export const sofaScoreAdapter = {
      */
     async fetchScheduledEvents() {
         try {
-            const response = await fetch('/api/sofascore/live');
-            if (!response.ok) throw new Error('API fetch failed');
-            const data = await response.json();
+            // Fetch from Firebase
+            const snapshot = await get(ref(database, 'live_events'));
+            if (!snapshot.exists()) return [];
+
+            const data = snapshot.val();
 
             // The JSON from the scraper is already the events list
             if (data && data.events) {
@@ -77,30 +80,29 @@ export const sofaScoreAdapter = {
      * Fetches full details for a specific event.
      */
     fetchEventDetails: async (eventId) => {
-        const baseUrl = `/api/sofascore/event`;
-        const detailUrl = `${baseUrl}/${eventId}`;
-        const statsUrl = `${baseUrl}/${eventId}/statistics`;
+        const startTime = Date.now(); // Start timing
 
         try {
-            const [detailRes, statsRes] = await Promise.all([
-                fetch(detailUrl),
-                fetch(statsUrl)
+            const [detailSnap, statsSnap] = await Promise.all([
+                get(ref(database, `stats/${eventId}/detail`)),
+                get(ref(database, `stats/${eventId}/stats`))
             ]);
 
-            if (!detailRes.ok || !statsRes.ok) {
-                console.warn(`[SOFASCORE] Detail/Stats not ready in cache for ${eventId} (Status: ${detailRes.status}/${statsRes.status})`);
+            const latency = Date.now() - startTime; // Calculate latency
+
+            if (!detailSnap.exists() || !statsSnap.exists()) {
+                // console.warn('[SOFASCORE ADAPTER] Detail/Stats not found in Firebase');
                 return null;
             }
 
-            const detail = await detailRes.json();
-            const stats = await statsRes.json();
+            const detail = detailSnap.val();
+            const stats = statsSnap.val();
 
-            // Handle queued response from proxy
-            if (detail.status === 'queued' || stats.status === 'queued') {
-                return null;
-            }
+            if (detail?.error || stats?.error) return null;
 
-            return sofaScoreAdapter.normalize(detail, stats);
+            const normalized = sofaScoreAdapter.normalize(detail, stats);
+            normalized.latency = latency; // Attach actual latency
+            return normalized;
         } catch (error) {
             console.error(`SofaScore fetchEventDetails Error for ${eventId}:`, error);
             return null;
@@ -113,6 +115,7 @@ export const sofaScoreAdapter = {
     normalize(detail, stats) {
         const event = detail.event;
         let isPartial = false;
+        let dataQuality = 'OK';
 
         const normalizedStats = {
             possession: { home: 0, away: 0 },
@@ -120,6 +123,8 @@ export const sofaScoreAdapter = {
             dangerousAttacks: { home: 0, away: 0 },
             corners: { home: 0, away: 0 },
             xg: { home: 0, away: 0 },
+            bigChances: { home: 0, away: 0 },
+            totalShots: { home: 0, away: 0 },
             cards: { home: { yellow: 0, red: 0 }, away: { yellow: 0, red: 0 } },
             rawStats: {}
         };
@@ -127,6 +132,7 @@ export const sofaScoreAdapter = {
         if (stats.statistics && stats.statistics.length > 0) {
             const allStats = stats.statistics.find(s => s.period === 'ALL');
             if (allStats) {
+                normalizedStats.groups = allStats.groups;
                 allStats.groups.forEach(group => {
                     group.statisticsItems.forEach(item => {
                         const name = item.name.toLowerCase();
@@ -140,29 +146,41 @@ export const sofaScoreAdapter = {
                             return parseFloat(v) || 0;
                         };
 
+                        // Unified mapping with fallbacks and more synonyms
                         if (name.includes('possession')) {
                             normalizedStats.possession.home = parseVal(homeVal);
                             normalizedStats.possession.away = parseVal(awayVal);
                         }
-                        if (name.includes('shots on target') || name === 'shots on goal') {
+
+                        if (name.includes('shots on target') || name === 'shots on goal' || name === 'isabetli şut') {
                             normalizedStats.shotsOnGoal.home = parseVal(homeVal);
                             normalizedStats.shotsOnGoal.away = parseVal(awayVal);
                         }
 
-                        if (name === 'dangerous attacks') {
+                        if (name === 'total shots' || name === 'shots' || name === 'toplam şut') {
+                            normalizedStats.totalShots.home = parseVal(homeVal);
+                            normalizedStats.totalShots.away = parseVal(awayVal);
+                        }
+
+                        if (name === 'dangerous attacks' || name === 'dangerous attack' || name === 'tehlikeli atak') {
                             normalizedStats.dangerousAttacks.home = parseVal(homeVal);
                             normalizedStats.dangerousAttacks.away = parseVal(awayVal);
-                        } else if ((name === 'final third entries' || name === 'big chances') && normalizedStats.dangerousAttacks.home === 0) {
+                        } else if ((name === 'final third entries' || name === 'big chances' || name === 'büyük şans') && normalizedStats.dangerousAttacks.home === 0) {
                             normalizedStats.dangerousAttacks.home = parseVal(homeVal);
                             normalizedStats.dangerousAttacks.away = parseVal(awayVal);
                         }
 
-                        if (name.includes('expected goals') || name === 'xg') {
+                        if (name === 'big chances' || name === 'büyük şans') {
+                            normalizedStats.bigChances.home = parseVal(homeVal);
+                            normalizedStats.bigChances.away = parseVal(awayVal);
+                        }
+
+                        if (name.includes('expected goals') || name === 'xg' || name === 'beklenen gol') {
                             normalizedStats.xg.home = parseVal(homeVal);
                             normalizedStats.xg.away = parseVal(awayVal);
                         }
 
-                        if (name === 'corner kicks' || name === 'corners') {
+                        if (name === 'corner kicks' || name === 'corners' || name === 'köşe vuruşu') {
                             normalizedStats.corners.home = parseVal(homeVal);
                             normalizedStats.corners.away = parseVal(awayVal);
                         }
@@ -181,20 +199,30 @@ export const sofaScoreAdapter = {
                 });
                 normalizedStats.groups = allStats.groups;
 
-                // If major stats are missing AFTER checking all groups, it might be a limited coverage match
+                // Determine quality based on major stats
                 const hasMajorStats = normalizedStats.shotsOnGoal.home > 0 || normalizedStats.shotsOnGoal.away > 0 ||
                     normalizedStats.dangerousAttacks.home > 0 || normalizedStats.dangerousAttacks.away > 0;
 
-                if (!hasMajorStats) {
-                    // Check if other groups exist to decide if it's partial or just limited
-                    const totalItems = allStats.groups.reduce((acc, g) => acc + g.statisticsItems.length, 0);
-                    if (totalItems < 5) isPartial = true;
+                // We only mark as partial if we have absolutely no groups or very few items
+                const totalItems = allStats.groups.reduce((acc, g) => acc + g.statisticsItems.length, 0);
+
+                if (totalItems < 3) {
+                    isPartial = true;
+                    dataQuality = 'PARTIAL';
+                } else if (!hasMajorStats) {
+                    isPartial = false; // Show what we have
+                    dataQuality = 'LIMITED';
+                } else {
+                    isPartial = false;
+                    dataQuality = 'OK';
                 }
             } else {
                 isPartial = true;
+                dataQuality = 'PARTIAL'; // No 'ALL' period stats found
             }
         } else {
             isPartial = true;
+            dataQuality = 'PARTIAL'; // No stats object at all
         }
 
         return {
@@ -207,7 +235,7 @@ export const sofaScoreAdapter = {
             stats: normalizedStats,
             isPartial: isPartial,
             latency: 0,
-            dataQuality: isPartial ? 'PARTIAL' : (normalizedStats.shotsOnGoal.home === 0 && normalizedStats.shotsOnGoal.away === 0 ? 'LIMITED' : 'OK'),
+            dataQuality: dataQuality,
             source: 'SOFASCORE'
         };
     },

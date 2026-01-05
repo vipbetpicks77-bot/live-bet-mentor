@@ -1,53 +1,49 @@
 @echo off
-TITLE Live Bet Mentor - Baslatici
-SETLOCAL EnableDelayedExpansion
+REM Live Bet Mentor - Baslatici
+cd /d "%~dp0"
 
 echo ==========================================
 echo    Live Bet Mentor Baslatiliyor...
 echo ==========================================
 
-:: 1. Node.js Kontrolu
-where node >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo [HATA] Node.js yuklu degil! Lutfen https://nodejs.org/ adresinden kurun.
-    pause
-    exit /b
+REM 1. Gereksinim Kontrolu
+echo [1/4] Node ve Python kontrol ediliyor...
+node -v
+python --version
+
+REM 2. Cache Temizleme
+echo [2/4] Eski cache temizleniyor...
+if exist "dist" (
+    echo [BILGI] dist klasoru siliniyor...
+    rmdir /s /q "dist"
+)
+if exist "node_modules\.vite" (
+    echo [BILGI] Vite cache temizleniyor...
+    rmdir /s /q "node_modules\.vite"
 )
 
-:: 2. Python Kontrolu
-where python >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo [HATA] Python yuklu degil! Lutfen https://www.python.org/ adresinden kurun.
-    pause
-    exit /b
-)
-
-:: 3. Node Bagimliliklari Kontrolu
-if not exist "node_modules\" (
-    echo [BILGI] Node modulleri eksik, yukleniyor...
+REM 3. Modul Kontrolu
+echo [3/4] Bagimliliklar kontrol ediliyor...
+if not exist node_modules (
+    echo [BILGI] Moduller yukleniyor, lutfen bekleyin...
     call npm install
 )
 
-:: 4. Python Bagimliliklari Kontrolu
-echo [BILGI] Python kütüphaneleri kontrol ediliyor...
-python -c "import undetected_chromedriver; import selenium" >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo [BILGI] Gerekli Python kütüphaneleri yukleniyor...
-    pip install undetected-chromedriver selenium
-)
+REM 4. Sunucuyu Baslat
+echo [4/4] Uygulama baslatiliyor...
+echo Bu pencereyi kapatmayin.
+echo Tarayici 10 saniye icinde otomatik acilacak.
 
-:: 5. Sunuculari Baslat
-echo [BILGI] Sunucular baslatiliyor... (Yeni pencerede acilacak)
-start "Live Bet Mentor - Proxy & Scraper" cmd /k "npm run start"
+REM Yeni pencerede sunuculari baslat
+start "LBM-Sunucu" cmd /k "npm run start"
 
-:: 6. Tarayiciyi Ac (Biraz bekle)
-echo [BILGI] Uygulama hazirlaniyor, tarayici 5 saniye icinde acilacak...
-timeout /t 5 /nobreak >nul
-start http://localhost:5173
+REM Tarayiciyi acmak icin bekle
+timeout /t 10
 
-echo ==========================================
-echo    Uygulama Calisiyor! 
-echo    Bu pencereyi kapatabilirsin.
-echo ==========================================
-timeout /t 3 >nul
-exit
+REM Tarayiciyi cache bypass ile ac (Ctrl+Shift+R efekti)
+start "" "http://localhost:5173/?v=%random%"
+
+echo.
+echo Islem tamam! 
+echo [IPUCU] Hala eski goruyorsan tarayicida Ctrl+Shift+R yap.
+pause

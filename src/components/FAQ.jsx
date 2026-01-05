@@ -190,6 +190,56 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
                                         <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '0.6rem' }}>{t.faq_q9_title}</h3>
                                         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_q9_desc}</p>
                                     </div>
+                                    <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(167, 139, 250, 0.05)', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
+                                        <h3 style={{ fontSize: '1.1rem', color: '#a78bfa', fontWeight: 800, marginBottom: '0.6rem' }}>{t.faq_q16_title}</h3>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_q16_desc}</p>
+                                    </div>
+                                    <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                                        <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '0.6rem' }}>{t.faq_q17_title}</h3>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '0.8rem' }}>{t.faq_q17_desc}</p>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--accent-color)', background: 'rgba(56, 189, 248, 0.05)', padding: '0.6rem', borderRadius: '8px' }}>
+                                            <b>{safeSplit(t.faq_q17_example, 0)}:</b> {safeSplit(t.faq_q17_example, 1)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* AI Prediction Logic Section */}
+                            <section>
+                                <h2 style={{ color: 'var(--accent-color)', fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                    <span style={{ width: '8px', height: '24px', background: 'var(--accent-color)', borderRadius: '4px' }}></span>
+                                    {t.faq_ai_logic_title}
+                                </h2>
+                                <p style={{ lineHeight: '1.8', color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '1.5rem' }}>
+                                    {t.faq_ai_logic_desc}
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+                                    {[1, 2, 3, 4].map(num => (
+                                        <div key={num} style={{ background: 'rgba(56, 189, 248, 0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.1)' }}>
+                                            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', display: 'block' }}>
+                                                {t[`faq_ai_data_l${num}`]}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div style={{ background: 'rgba(56, 189, 248, 0.08)', padding: '1.2rem', borderRadius: '12px', marginTop: '1.5rem', border: '1px solid var(--accent-color)', borderLeft: '6px solid var(--accent-color)' }}>
+                                    <b style={{ color: 'var(--accent-color)', fontSize: '1rem' }}>{t.faq_ai_logic_summary}</b>
+                                </div>
+                            </section>
+
+                            {/* Smart Alert & Tracking Section */}
+                            <section>
+                                <h2 style={{ color: 'var(--accent-color)', fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                    <span style={{ width: '8px', height: '24px', background: 'var(--accent-color)', borderRadius: '4px' }}></span>
+                                    {t.faq_alert_title}
+                                </h2>
+                                <p style={{ lineHeight: '1.8', color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '1.5rem' }}>
+                                    {t.faq_alert_desc}
+                                </p>
+
+                                <div style={{ background: 'rgba(167, 139, 250, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
+                                    <h3 style={{ fontSize: '1.1rem', color: '#a78bfa', fontWeight: 800, marginBottom: '0.8rem' }}>{t.faq_tracking_title}</h3>
+                                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_tracking_desc}</p>
                                 </div>
                             </section>
                         </>
@@ -202,26 +252,61 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
                                 <span style={{ width: '12px', height: '32px', background: '#00f2fe', borderRadius: '4px' }}></span>
                                 {t.radar_faq_title}
                             </h2>
-                            <div className="faq-modules-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(0, 242, 254, 0.05)', border: '1px solid rgba(0, 242, 254, 0.2)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: '#00f2fe', fontWeight: 800, marginBottom: '1rem' }}>{t.radar_faq_q1_title}</h3>
-                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>{t.radar_faq_q1_desc}</p>
-                                </div>
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(52, 211, 153, 0.05)', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: '#34d399', fontWeight: 800, marginBottom: '1rem' }}>{t.radar_faq_q2_title}</h3>
-                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>{t.radar_faq_q2_desc}</p>
-                                </div>
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(251, 191, 36, 0.05)', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: '#fbbf24', fontWeight: 800, marginBottom: '1rem' }}>{t.radar_faq_q3_title}</h3>
-                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>{t.radar_faq_q3_desc}</p>
-                                </div>
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(244, 63, 94, 0.05)', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: '#f43f5e', fontWeight: 800, marginBottom: '1rem' }}>{t.radar_faq_q4_title}</h3>
-                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>{t.radar_faq_q4_desc}</p>
-                                </div>
-                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(167, 139, 250, 0.05)', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: '#a78bfa', fontWeight: 800, marginBottom: '1rem' }}>{t.radar_faq_q5_title}</h3>
-                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>{t.radar_faq_q5_desc}</p>
+                            <div className="faq-modules-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => {
+                                    const titleKey = `radar_faq_q${num}_title`;
+                                    const descKey = `radar_faq_q${num}_desc`;
+                                    if (!t[titleKey]) return null;
+
+                                    // Dynamic colors for each block to make it vibrant
+                                    const colors = [
+                                        { border: '#00f2fe', bg: 'rgba(0, 242, 254, 0.05)' },
+                                        { border: '#34d399', bg: 'rgba(52, 211, 153, 0.05)' },
+                                        { border: '#fbbf24', bg: 'rgba(251, 191, 36, 0.05)' },
+                                        { border: '#f43f5e', bg: 'rgba(244, 63, 94, 0.05)' },
+                                        { border: '#a78bfa', bg: 'rgba(167, 139, 250, 0.05)' },
+                                        { border: '#38bdf8', bg: 'rgba(56, 189, 248, 0.05)' },
+                                        { border: '#f472b6', bg: 'rgba(244, 114, 182, 0.05)' }
+                                    ];
+                                    const theme = colors[(num - 1) % colors.length];
+
+                                    return (
+                                        <div
+                                            key={num}
+                                            className="glass-panel"
+                                            style={{
+                                                padding: '2rem',
+                                                background: theme.bg,
+                                                border: `1px solid ${theme.border}33`,
+                                                borderLeft: `4px solid ${theme.border}`,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '1rem'
+                                            }}
+                                        >
+                                            <h3 style={{ fontSize: '1.1rem', color: theme.border, fontWeight: 800 }}>{t[titleKey]}</h3>
+                                            <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.7' }}>{t[descKey]}</p>
+                                        </div>
+                                    );
+                                })}
+
+                                {/* IQ Guide Quick-view */}
+                                <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', gridColumn: 'span 2' }}>
+                                    <h3 style={{ fontSize: '1.2rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '1.5rem' }}>🎯 IQ & ANALİZ KILAVUZU</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+                                        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
+                                            <b style={{ color: '#34d399', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>Forebet / Statarea</b>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>Saf istatistik ve matematiksel modeller. Duygusuz veri setleri ve algoritmik olasılığa odaklanın.</p>
+                                        </div>
+                                        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
+                                            <b style={{ color: '#fb923c', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>SoccerVista</b>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>Saha içi trend ve form takibi. Takımların son haftalardaki ritmini ölçmek için en iyi kaynaktır.</p>
+                                        </div>
+                                        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
+                                            <b style={{ color: '#00f2fe', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>OLBG / Community</b>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>İnsan aklı ve profesyonel görüşü. Market hareketlerine ve sakatlık/ceza durumlarına duyarlı topluluk verisi.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>

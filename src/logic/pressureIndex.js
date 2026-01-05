@@ -8,30 +8,49 @@
  */
 export const pressureIndex = {
     calculate(stats) {
-        if (!stats) return 0;
+        // Fallback for missing/null stats
+        const s = stats || {
+            shotsOnGoal: { home: 0, away: 0 },
+            dangerousAttacks: { home: 0, away: 0 },
+            corners: { home: 0, away: 0 },
+            totalShots: { home: 0, away: 0 }
+        };
 
-        // Weights
-        const W_SOG = 15;        // İsabetli şut her zaman en değerlidir
-        const W_ATTACKS = 1.5;   // Tehlikeli ataklar baskının sürekliliğini gösterir
-        const W_CORNERS = 5;     // Kornerler duran top baskısını gösterir
+        const W_SOG = 15;
+        const W_ATTACKS = 1.5;
+        const W_CORNERS = 5;
+        const W_TOTAL_SHOTS = 3; // Fallback factor if SOG is missing
 
-        const homeScore =
-            ((stats.shotsOnGoal?.home || 0) * W_SOG) +
-            ((stats.dangerousAttacks?.home || 0) * W_ATTACKS) +
-            ((stats.corners?.home || 0) * W_CORNERS);
+        const getScore = (side) => {
+            let score = 0;
 
-        const awayScore =
-            ((stats.shotsOnGoal?.away || 0) * W_SOG) +
-            ((stats.dangerousAttacks?.away || 0) * W_ATTACKS) +
-            ((stats.corners?.away || 0) * W_CORNERS);
+            // Primary metrics
+            score += (s.shotsOnGoal?.[side] || 0) * W_SOG;
+            score += (s.dangerousAttacks?.[side] || 0) * W_ATTACKS;
+            score += (s.corners?.[side] || 0) * W_CORNERS;
 
-        // Normalize to 0-100 (Simplified max-bound)
+            // Secondary fallback (Total shots)
+            if ((s.shotsOnGoal?.[side] || 0) === 0) {
+                score += (s.totalShots?.[side] || 0) * W_TOTAL_SHOTS;
+            }
+
+            return score;
+        };
+
+        const homeScore = getScore('home');
+        const awayScore = getScore('away');
+
+        const dominantTeam = homeScore > awayScore ? 'HOME' : (awayScore > homeScore ? 'AWAY' : 'NONE');
+
         const normalize = (val) => Math.min(100, Math.round(val));
 
-        return {
+        const result = {
             home: normalize(homeScore),
             away: normalize(awayScore),
-            total: normalize(homeScore + awayScore)
+            total: normalize(homeScore + awayScore),
+            dominantTeam
         };
+
+        return result;
     }
 };
