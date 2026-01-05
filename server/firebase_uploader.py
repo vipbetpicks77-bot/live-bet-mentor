@@ -6,11 +6,27 @@ import json
 
 FIREBASE_URL = "https://livebetmentor-default-rtdb.europe-west1.firebasedatabase.app"
 
+def sanitise_for_firebase(data):
+    """Recursively sanitise keys for Firebase (no . $ # [ ] /)"""
+    if isinstance(data, dict):
+        new_dict = {}
+        for k, v in data.items():
+            # Sanitise the key
+            safe_key = str(k).replace('.', '_').replace('$', '_').replace('#', '_').replace('[', '_').replace(']', '_').replace('/', '_')
+            new_dict[safe_key] = sanitise_for_firebase(v)
+        return new_dict
+    elif isinstance(data, list):
+        return [sanitise_for_firebase(i) for i in data]
+    else:
+        return data
+
 def upload_to_firebase(path, data):
     """Upload data to Firebase Realtime Database"""
     try:
+        # Sanitise data before upload
+        safe_data = sanitise_for_firebase(data)
         url = f"{FIREBASE_URL}/{path}.json"
-        response = requests.put(url, json=data)
+        response = requests.put(url, json=safe_data)
         if response.status_code == 200:
             print(f"[FIREBASE] Successfully uploaded to /{path}")
             return True
