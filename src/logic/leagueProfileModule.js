@@ -15,18 +15,67 @@ export class LeagueProfileModule {
         const tiers = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS;
         const normalizedName = leagueName.toLowerCase().trim();
 
-        // Helper: Check if league name matches (exact or valid variant)
+
+
+        // EXCLUSION LIST: Never match these as Tier 1 or 2
+        const excludedPatterns = [
+            'serie b', 'serie c', 'serie d',       // Lower divisions (Brazil, Italy, etc.)
+            'segunda', '2. liga', '2.liga',        // Second divisions
+            'u20', 'u21', 'u19', 'u23', 'u18', 'u17', // Youth leagues
+            'women', 'kadın', 'feminino',          // Women's leagues
+            'reserve', 'reserves',                  // Reserve leagues
+            'cup', 'kupa', 'copa',                  // Cup competitions (except Champions/Europa)
+            'playoff', 'play-off',                 // Playoff matches
+            'copinha',                              // Brazilian youth cup
+            'group a', 'group b', 'group c', 'group d', 'group e', 'group f', 'group g', 'group h',  // Group stage of minor leagues
+            'grupo',                                // Spanish/Portuguese group stages
+            // Brazilian State Leagues (NOT top-flight Serie A)
+            'catarinense', 'cearense', 'paulista', 'carioca', 'mineiro', 'gaúcho', 'gaucho',
+            'paranaense', 'baiano', 'pernambucano', 'goiano', 'amazonense', 'paraense',
+            'alagoano', 'sergipano', 'potiguar', 'piauiense', 'maranhense', 'tocantinense',
+            'mato-grossense', 'sul-mato-grossense', 'acreano', 'rondoniense', 'roraimense', 'amapaense',
+            // Other regional/minor leagues
+            'a.f.', 'taça', 'taca'                 // Portuguese amateur/cup
+        ];
+
+        // If league contains an excluded pattern, skip to Tier 3
+        const hasExcludedPattern = excludedPatterns.some(pattern => normalizedName.includes(pattern));
+
+        // Exception: Europa/Champions should not be excluded even if they have "cup" relationship
+        const isProtectedCompetition = normalizedName.includes('champions') || normalizedName.includes('europa league');
+
+        if (hasExcludedPattern && !isProtectedCompetition) {
+
+            return 3; // Discovery tier for excluded leagues
+        }
+
+        // Special handling for "Serie A" - must be specifically the main league, not a state championship
+        // "Serie A" should only match if the league name is EXACTLY "Serie A" or starts with "Serie A"
+        // NOT if it's something like "Catarinense, Serie A"
+        const isRealSerieA = normalizedName === 'serie a' ||
+            normalizedName.startsWith('serie a ') ||
+            normalizedName === 'serie a tim' ||  // Official Italy Serie A name
+            normalizedName.includes('brasileirão') || normalizedName.includes('brasileirao') ||
+            normalizedName.includes('campeonato brasileiro serie a');
+
+        // Helper: Check if league name matches (more strict matching)
         const matchesLeague = (tierLeague) => {
             const tierLower = tierLeague.toLowerCase();
+
+            // Special case for Serie A - require strict matching
+            if (tierLower === 'serie a') {
+                return isRealSerieA;
+            }
 
             // Exact match
             if (normalizedName === tierLower) return true;
 
-            // Handle common prefixes (e.g., "UEFA Champions League" should match "Champions League")
-            if (normalizedName.endsWith(tierLower)) return true;
+            // Contains match - the whole tier league name must be found within the actual league name
+            // This handles cases like "UEFA Champions League" containing "Champions League"
+            if (normalizedName.includes(tierLower)) return true;
 
             // Handle Turkish variations (Süper Lig / Super Lig)
-            if (tierLower === 'süper lig' && (normalizedName === 'super lig' || normalizedName === 'süper lig')) return true;
+            if (tierLower === 'süper lig' && (normalizedName === 'super lig' || normalizedName.includes('süper lig') || normalizedName.includes('super lig'))) return true;
 
             return false;
         };

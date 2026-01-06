@@ -8,6 +8,7 @@ import { translations } from '../locales/translations';
 import { AdminPanel } from './AdminPanel';
 import { consensusAdapter } from '../backend/consensusAdapter';
 import { aiAnalystService } from '../backend/aiAnalystService';
+import { aiUsageLimiter } from '../backend/aiUsageLimiter';
 import { liveOpportunityScorer } from '../logic/liveOpportunityScorer';
 import { smartAlertService } from '../backend/smartAlertService';
 import { predictionTracker } from '../backend/predictionTracker';
