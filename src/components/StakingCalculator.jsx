@@ -201,8 +201,8 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
 
                 {/* Input Section */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                    display: 'flex',
+                    flexDirection: 'column',
                     gap: '1.5rem',
                     marginBottom: '2rem'
                 }}>
@@ -235,7 +235,7 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
                         <label style={{ display: 'block', marginBottom: '0.8rem', color: 'var(--accent-color)', fontWeight: 700, fontSize: '0.95rem' }}>
                             {t.risk_level || '⚠️ Risk Seviyesi'}
                         </label>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                             {[
                                 { value: 30, label: t.safe_mode || '🛡️ Güvenli (%30)', color: '#10b981' },
                                 { value: 50, label: t.normal_mode || '⚖️ Normal (%50)', color: '#fbbf24' },
@@ -245,16 +245,18 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
                                     key={r.value}
                                     onClick={() => setRiskLevel(r.value)}
                                     style={{
-                                        flex: 1,
-                                        padding: '0.8rem 0.5rem',
+                                        flex: '1 1 80px',
+                                        minWidth: '80px',
+                                        padding: '0.6rem 0.3rem',
                                         borderRadius: '8px',
                                         border: `2px solid ${riskLevel === r.value ? r.color : 'rgba(255,255,255,0.1)'}`,
                                         background: riskLevel === r.value ? `${r.color}22` : 'rgba(0,0,0,0.2)',
                                         color: riskLevel === r.value ? r.color : 'var(--text-secondary)',
                                         fontWeight: 700,
-                                        fontSize: '0.8rem',
+                                        fontSize: '0.7rem',
                                         cursor: 'pointer',
-                                        transition: 'all 0.2s'
+                                        transition: 'all 0.2s',
+                                        whiteSpace: 'nowrap'
                                     }}
                                 >
                                     {r.label}
@@ -304,11 +306,11 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
                             <div
                                 key={match.id}
                                 style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'auto 1fr auto auto',
-                                    gap: '1rem',
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '0.5rem',
                                     alignItems: 'center',
-                                    padding: '1rem',
+                                    padding: '0.8rem',
                                     background: 'rgba(0,0,0,0.2)',
                                     borderRadius: '10px',
                                     border: '1px solid rgba(255,255,255,0.05)'
@@ -330,16 +332,18 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
                                 </span>
                                 <input
                                     type="text"
-                                    placeholder={t.match_name_placeholder || 'Maç adı (ör: Fenerbahçe - Galatasaray)'}
+                                    placeholder={t.match_name_placeholder || 'Maç adı (ör: Fenerbahçe - Galat'}
                                     value={match.name}
                                     onChange={(e) => updateMatch(match.id, 'name', e.target.value)}
                                     style={{
-                                        padding: '0.8rem 1rem',
+                                        flex: '1 1 120px',
+                                        minWidth: '100px',
+                                        padding: '0.6rem 0.8rem',
                                         borderRadius: '8px',
                                         border: '1px solid rgba(255,255,255,0.1)',
                                         background: 'rgba(0,0,0,0.3)',
                                         color: 'var(--text-primary)',
-                                        fontSize: '0.95rem'
+                                        fontSize: '0.85rem'
                                     }}
                                 />
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -353,13 +357,13 @@ export const StakingCalculator = ({ onClose, lang = 'tr' }) => {
                                         value={match.odds}
                                         onChange={(e) => updateMatch(match.id, 'odds', e.target.value)}
                                         style={{
-                                            width: '80px',
-                                            padding: '0.8rem',
+                                            width: '60px',
+                                            padding: '0.6rem',
                                             borderRadius: '8px',
                                             border: '1px solid rgba(251, 191, 36, 0.3)',
                                             background: 'rgba(0,0,0,0.3)',
                                             color: '#fbbf24',
-                                            fontSize: '1rem',
+                                            fontSize: '0.9rem',
                                             fontWeight: 700,
                                             textAlign: 'center'
                                         }}
