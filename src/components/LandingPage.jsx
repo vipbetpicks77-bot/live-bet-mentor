@@ -204,6 +204,86 @@ export const LandingPage = ({ onLoginSuccess, onNavigate, lang, setLang }) => {
                 }
                 button:hover { transform: translateY(-2px); filter: brightness(1.1); }
                 input:focus { border-color: #38bdf8 !important; }
+                
+                /* Mobile Responsive Styles */
+                @media (max-width: 768px) {
+                    .landing-page main {
+                        flex-direction: column !important;
+                    }
+                    .landing-page main > div:first-child {
+                        padding: 6rem 1.5rem 2rem !important;
+                        order: 2;
+                    }
+                    .landing-page main > div:first-child > div {
+                        max-width: 100% !important;
+                    }
+                    .landing-page main > div:first-child h1 {
+                        font-size: 2rem !important;
+                        letter-spacing: -1px !important;
+                    }
+                    .landing-page main > div:first-child p {
+                        font-size: 1rem !important;
+                        margin-bottom: 2rem !important;
+                    }
+                    .landing-page main > div:last-child {
+                        border-left: none !important;
+                        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+                        padding: 5rem 1.5rem 2rem !important;
+                        order: 1;
+                    }
+                    .landing-page main > div:last-child > div {
+                        padding: 2rem !important;
+                        max-width: 100% !important;
+                    }
+                    .landing-page nav {
+                        padding: 1rem !important;
+                    }
+                    .landing-page nav > div:first-child span {
+                        font-size: 0.9rem !important;
+                    }
+                    .landing-page nav > div:last-child {
+                        gap: 0.5rem !important;
+                    }
+                    .landing-page nav > div:last-child button {
+                        padding: 0.4rem 0.6rem !important;
+                        font-size: 0.7rem !important;
+                    }
+                    .glass-panel h2 {
+                        font-size: 1.5rem !important;
+                    }
+                    .landing-page main > div:first-child > div > div:last-child {
+                        grid-template-columns: 1fr !important;
+                        gap: 1.5rem !important;
+                    }
+                    .landing-page footer {
+                        padding: 1.5rem 1rem !important;
+                        font-size: 0.7rem !important;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .landing-page main > div:first-child {
+                        padding: 5rem 1rem 1.5rem !important;
+                    }
+                    .landing-page main > div:first-child h1 {
+                        font-size: 1.6rem !important;
+                    }
+                    .landing-page main > div:last-child {
+                        padding: 4.5rem 1rem 1.5rem !important;
+                    }
+                    .landing-page main > div:last-child > div {
+                        padding: 1.5rem !important;
+                        border-radius: 20px !important;
+                    }
+                    .landing-page nav > div:first-child > div:first-child {
+                        width: 28px !important;
+                        height: 28px !important;
+                        font-size: 0.7rem !important;
+                    }
+                    .landing-page nav > div:first-child span {
+                        font-size: 0.75rem !important;
+                    }
+                }
             `}</style>
         </div>
     );
