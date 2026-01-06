@@ -3,6 +3,7 @@ import { CONFIG } from '../config';
 import { dataWorker } from '../backend/dataWorker';
 import { bankrollManager } from '../logic/bankrollManager';
 import { FAQ } from './FAQ';
+import { StakingCalculator } from './StakingCalculator';
 import { translations } from '../locales/translations';
 import { AdminPanel } from './AdminPanel';
 import { consensusAdapter } from '../backend/consensusAdapter';
@@ -11,6 +12,7 @@ import { liveOpportunityScorer } from '../logic/liveOpportunityScorer';
 import { smartAlertService } from '../backend/smartAlertService';
 import { predictionTracker } from '../backend/predictionTracker';
 import { database, ref, get } from '../firebase/config';
+import { supabase } from '../backend/supabaseClient';
 import '../styles/global.css';
 
 const RADAR_SOURCES = [
@@ -39,7 +41,7 @@ const RADAR_BASE_URLS = {
     superbet: 'https://superbetpredictions.com'
 };
 
-export const Dashboard = ({ user, userProfile, onLogout }) => {
+export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings = {} }) => {
     const [matches, setMatches] = useState([]);
     const [signals, setSignals] = useState({});
     const [bankState, setBankState] = useState(bankrollManager.getState());
@@ -48,7 +50,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
     const [decisionMode, setDecisionMode] = useState(dataWorker.decisionMode);
     const [showFAQ, setShowFAQ] = useState(false);
     const [faqMode, setFaqMode] = useState('live');
-    const [lang, setLang] = useState('tr');
+
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [activeTierFilter, setActiveTierFilter] = useState('ALL');
     const [leagueTierMap, setLeagueTierMap] = useState({
@@ -68,6 +70,19 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
             predictionTracker.init(user.id).then(() => {
                 setTrackingStats(predictionTracker.getStats());
             });
+
+            // Fetch pending membership request
+            const fetchPendingRequest = async () => {
+                const { data, error } = await supabase
+                    .from('membership_requests')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('status', 'pending')
+                    .maybeSingle();
+
+                if (data) setPendingRequest(data);
+            };
+            fetchPendingRequest();
         }
     }, [user, userProfile]);
 
@@ -97,11 +112,62 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
     // Live Odds State for Opportunity Scoring
     const [liveOdds, setLiveOdds] = useState(null);
 
+    // Membership Request State
+    const [pendingRequest, setPendingRequest] = useState(null);
+    const [showPlanComparison, setShowPlanComparison] = useState(false);
+    const [selectedPlanForUpgrade, setSelectedPlanForUpgrade] = useState(null);
+    const [requestLoading, setRequestLoading] = useState(false);
+
     // Alert & Tracking System State
     const [activeAlerts, setActiveAlerts] = useState([]);
     const [showAlertPopup, setShowAlertPopup] = useState(null);
     const [trackingStats, setTrackingStats] = useState(predictionTracker.getStats());
     const [showTrackingPanel, setShowTrackingPanel] = useState(false);
+    const [showStakingCalc, setShowStakingCalc] = useState(false);
+
+    const getRemainingDays = (endDate) => {
+        if (!endDate) return 0;
+        const end = new Date(endDate);
+        const now = new Date();
+        const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+        return diff > 0 ? diff : 0;
+    };
+
+    const requestUpgrade = async (requestedPlan) => {
+        if (!user || requestLoading) return;
+        setRequestLoading(true);
+        try {
+            const { error } = await supabase
+                .from('membership_requests')
+                .insert([
+                    {
+                        user_id: user.id,
+                        email: user.email,
+                        current_plan: userProfile?.plan || 'trial',
+                        requested_plan: requestedPlan,
+                        status: 'pending'
+                    }
+                ]);
+
+            if (error) throw error;
+
+            // Update local state
+            setPendingRequest({
+                user_id: user.id,
+                email: user.email,
+                current_plan: userProfile?.plan || 'trial',
+                requested_plan: requestedPlan,
+                status: 'pending'
+            });
+
+            alert(lang === 'tr' ? 'Yükseltme talebiniz iletildi! Yönetici onayı bekleniyor.' : 'Upgrade request submitted! Awaiting admin approval.');
+        } catch (err) {
+            console.error('Request Error:', err);
+            alert(lang === 'tr' ? 'Bir hata oluştu. Lütfen tekrar deneyin.' : 'An error occurred. Please try again.');
+        } finally {
+            setRequestLoading(false);
+        }
+    };
 
     const radarMatches = React.useMemo(() => {
         return consensusAdapter.getAllConsensusSummary(consensusData, selectedMarket);
@@ -131,6 +197,20 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                 if (m.date !== todayStr) return false;
             }
 
+            // --- PLAN BASED LEAGUE ENFORCEMENT ---
+            const userPlan = userProfile?.plan || 'trial';
+            const league = m.league || '';
+            const tier1 = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_1;
+            const tier2 = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS.TIER_2;
+
+            if (userPlan === 'trial') {
+                if (!tier1.some(l => league.includes(l))) return false;
+            } else if (userPlan === 'pro') {
+                const isTier1 = tier1.some(l => league.includes(l));
+                const isTier2 = tier2.some(l => league.includes(l));
+                if (!isTier1 && !isTier2) return false;
+            }
+
             return true;
         }).sort((a, b) => {
             if (radarFilters.sortBy === 'TIME') {
@@ -158,6 +238,222 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
     const isAdmin = user?.email === 'karabulut.hamza@gmail.com';
 
     const t = translations[lang];
+
+    const renderPlanComparison = () => {
+        if (!showPlanComparison) return null;
+
+        const plans = [
+            { id: 'trial', name: t.trial_badge, color: '#94a3b8', features: t.plan_trial_features, price: t.plan_trial_price || 'Free' },
+            { id: 'pro', name: t.pro_badge, color: '#38bdf8', features: t.plan_pro_features, price: (t.plan_pro_price || '$29/mo').replace('{price}', settings.price_pro || '29').replace('{curr}', settings.price_currency || '€') },
+            { id: 'premium', name: t.premium_badge, color: '#00f2fe', features: t.plan_premium_features, price: (t.plan_premium_price || '$79/mo').replace('{price}', settings.price_premium || '79').replace('{curr}', settings.price_currency || '€') }
+        ];
+
+        return (
+            <div className="modal-overlay" onClick={() => setShowPlanComparison(false)} style={{ zIndex: 10001 }}>
+                <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{
+                    maxWidth: '1000px',
+                    padding: '3rem',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                }}>
+                    <button className="close-btn" onClick={() => setShowPlanComparison(false)}>×</button>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', textAlign: 'center', fontWeight: 900, background: 'linear-gradient(to right, #fff, var(--accent-color))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t.compare_plans}</h2>
+                    <p style={{ textAlign: 'center', opacity: 0.6, marginBottom: '3rem', fontSize: '1rem' }}>{t.select_best_plan || 'Sizin için en uygun planı seçin ve profesyonel analizin keyfini çıkarın.'}</p>
+
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '1.5rem',
+                        alignItems: 'stretch'
+                    }}>
+                        {plans.map(p => (
+                            <div key={p.id} style={{
+                                padding: '2.5rem 2rem',
+                                background: 'rgba(15, 23, 42, 0.6)',
+                                borderRadius: '24px',
+                                border: `2px solid ${p.id === userProfile?.plan ? p.color : 'rgba(255,255,255,0.05)'}`,
+                                position: 'relative',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                boxShadow: p.id === userProfile?.plan ? `0 0 30px ${p.color}22` : 'none'
+                            }}
+                                className="plan-card"
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.transform = 'translateY(-10px)';
+                                    e.currentTarget.style.boxShadow = `0 20px 40px rgba(0,0,0,0.4), 0 0 20px ${p.color}11`;
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.transform = 'none';
+                                    e.currentTarget.style.boxShadow = p.id === userProfile?.plan ? `0 0 30px ${p.color}22` : 'none';
+                                }}>
+                                {p.id === userProfile?.plan && (
+                                    <div style={{
+                                        position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)',
+                                        background: p.color, color: '#000', padding: '4px 12px', borderRadius: '20px', fontSize: '0.65rem', fontWeight: 900,
+                                        boxShadow: `0 0 15px ${p.color}`
+                                    }}>{t.current_plan_label || 'MEVCUT PLANINIZ'}</div>
+                                )}
+                                <h3 style={{ color: p.color, fontSize: '1.8rem', marginBottom: '0.5rem', fontWeight: 900 }}>{p.name}</h3>
+                                <div style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                    {p.price}
+                                    <span style={{ fontSize: '0.8rem', opacity: 0.4, fontWeight: 600 }}>/ay</span>
+                                </div>
+
+                                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2.5rem 0', flex: 1 }}>
+                                    {p.features?.map((f, i) => (
+                                        <li key={i} style={{ fontSize: '0.85rem', marginBottom: '1rem', display: 'flex', gap: '0.8rem', alignItems: 'flex-start' }}>
+                                            <span style={{ color: p.color, fontWeight: 900 }}>✓</span>
+                                            <span style={{ opacity: 0.85, lineHeight: '1.4' }}>{f}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <button
+                                    onClick={() => {
+                                        if (p.id === userProfile?.plan) return;
+                                        if (pendingRequest?.requested_plan === p.id) return;
+                                        setSelectedPlanForUpgrade(p);
+                                    }}
+                                    disabled={p.id === userProfile?.plan || (pendingRequest?.requested_plan === p.id) || requestLoading}
+                                    style={{
+                                        width: '100%',
+                                        padding: '1.2rem',
+                                        borderRadius: '16px',
+                                        background: p.id === userProfile?.plan ? 'rgba(255,255,255,0.05)' : p.color,
+                                        color: p.id === userProfile?.plan ? 'rgba(255,255,255,0.3)' : '#000',
+                                        border: 'none',
+                                        fontWeight: 900,
+                                        fontSize: '1rem',
+                                        cursor: (p.id === userProfile?.plan || pendingRequest?.requested_plan === p.id) ? 'not-allowed' : 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px'
+                                    }}>
+                                    {p.id === userProfile?.plan ? t.current_plan : (pendingRequest?.requested_plan === p.id ? t.request_pending : t.select_plan)}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const renderUpgradeConfirmation = () => {
+        if (!selectedPlanForUpgrade) return null;
+
+        const p = selectedPlanForUpgrade;
+        const features = p.id === 'pro' ? t.plan_pro_features : t.plan_premium_features;
+
+        return (
+            <div className="modal-overlay" style={{ zIndex: 10002 }} onClick={() => setSelectedPlanForUpgrade(null)}>
+                <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', padding: '2.5rem' }}>
+                    <button className="close-btn" onClick={() => setSelectedPlanForUpgrade(null)}>×</button>
+                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{p.id === 'pro' ? '🚀' : '💎'}</div>
+                        <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: p.color }}>{p.name} {t.upgrade_plan}</h2>
+                        <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '0.5rem' }}>{t.confirmation_desc || 'Sistemin tam gücüne erişmek üzeresiniz.'}</p>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--glass-border)' }}>
+                        <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', opacity: 0.5, marginBottom: '1rem', letterSpacing: '1px' }}>{t.top_benefits || 'ÖNE ÇIKAN AVANTAJLAR'}</h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            {features.slice(0, 3).map((f, i) => (
+                                <li key={i} style={{ display: 'flex', gap: '0.7rem', marginBottom: '0.8rem', fontSize: '0.9rem', alignItems: 'center' }}>
+                                    <span style={{ color: p.color }}>✦</span> {f}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <button
+                            onClick={() => {
+                                const whatsappNum = (settings.whatsapp_number || CONFIG.SUPPORT.WHATSAPP).replace('+', '').replace(/\s/g, '');
+                                const msg = encodeURIComponent(`Merhaba, ${p.name} paketi için üyeliğimi yükseltmek istiyorum. (Email: ${user?.email})`);
+                                window.open(`https://wa.me/${whatsappNum}?text=${msg}`, '_blank');
+                                setSelectedPlanForUpgrade(null);
+                            }}
+                            className="btn btn-primary"
+                            style={{ background: '#25D366', border: 'none', padding: '1rem', borderRadius: '12px', fontSize: '1rem', color: '#000' }}
+                        >
+                            🟢 {t.whatsapp_upgrade_now || 'WhatsApp ile Hemen Aktif Et'}
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                requestUpgrade(p.id);
+                                setSelectedPlanForUpgrade(null);
+                                setShowPlanComparison(false);
+                            }}
+                            className="btn btn-outline"
+                            style={{ padding: '1rem', borderRadius: '12px', fontSize: '0.9rem' }}
+                        >
+                            📩 {t.request_upgrade || 'Sistemden Talep Gönder'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const renderBayesianIntelligence = (match) => {
+        const data = match?.observations?.bayesian;
+        if (!data || userProfile?.plan !== 'premium' || !advancedSettings.BAYESIAN_PRICING) return null;
+
+        return (
+            <div className="grid-col" style={{ gridColumn: 'span 3', marginTop: '1.5rem' }}>
+                <div className="stats-card" style={{
+                    background: 'linear-gradient(135deg, rgba(0, 242, 254, 0.05) 0%, rgba(15, 23, 42, 0.4) 100%)',
+                    border: '1px solid rgba(0, 242, 254, 0.2)',
+                    padding: '1.5rem'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 style={{ margin: 0, color: 'var(--accent-color)', fontSize: '0.9rem' }}>
+                            <span style={{ marginRight: '0.5rem' }}>🧠</span> BAYESIAN INTELLIGENCE
+                        </h3>
+                        <div style={{ background: 'var(--accent-color)', color: '#000', fontSize: '0.6rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 900 }}>PRODUCTION ENGINE</div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '2rem', alignItems: 'center' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', opacity: 0.5, marginBottom: '0.5rem' }}>PRIOR PROB</div>
+                            <div style={{ fontSize: '1.2rem', fontWeight: 800 }}>%{(data.prior * 100).toFixed(0)}</div>
+                        </div>
+
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', opacity: 0.5, marginBottom: '1rem' }}>POSTERIOR (REFINED)</div>
+                            <div style={{ position: 'relative', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg width="100" height="60" viewBox="0 0 100 60">
+                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
+                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--accent-color)" strokeWidth="8" strokeDasharray={`${data.posterior * 125}, 125`} />
+                                </svg>
+                                <div style={{ position: 'absolute', bottom: '0', fontSize: '1.8rem', fontWeight: 900, color: 'var(--accent-color)' }}>
+                                    %{(data.posterior * 100).toFixed(1)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', opacity: 0.5, marginBottom: '0.5rem' }}>IMPACT</div>
+                            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: data.impact > 0 ? 'var(--success-color)' : (data.impact < 0 ? 'var(--danger-color)' : '#fff') }}>
+                                {data.impact > 0 ? `+${(data.impact * 100).toFixed(1)}%` : `${(data.impact * 100).toFixed(1)}%`}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <span style={{ opacity: 0.6 }}>CONFIDENCE:</span>
+                            <span style={{ color: data.confidence === 'HIGH' ? 'var(--success-color)' : 'var(--warning-color)', fontWeight: 800 }}>{data.confidence}</span>
+                        </div>
+                        <div style={{ opacity: 0.6, fontStyle: 'italic' }}>Evidence update based on DQS, Momentum & xG support.</div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     useEffect(() => {
         if (selectedMatch) {
@@ -204,24 +500,28 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                 return;
             }
 
-            setMatches([...currentFixtures]); // Use spread to force new reference for React
+            setMatches([...currentFixtures]);
 
             const updatedSignals = {};
-            currentFixtures.forEach(m => {
+            const enrichedFixtures = currentFixtures.map(m => {
                 const sig = dataWorker.getSignalForMatch(m.id);
                 if (sig) {
                     updatedSignals[m.id] = sig;
                     bankrollManager.logVerdict(m.id, sig.verdict);
                 }
+
+                // ENRICH: Add opportunity data for Smart Alerts
+                const opp = liveOpportunityScorer.calculateOpportunityScore(m, sig);
+                return { ...m, opportunityData: opp };
             });
+
             setSignals(updatedSignals);
             setBankState(bankrollManager.getState());
 
-            // Check for smart alerts
-            const newAlerts = smartAlertService.checkMatches(currentFixtures, updatedSignals);
+            // Check for smart alerts with enriched data
+            const newAlerts = smartAlertService.checkMatches(enrichedFixtures, updatedSignals);
             if (newAlerts.length > 0) {
                 setActiveAlerts([...smartAlertService.getActiveAlerts()]);
-                // Show popup for the first new alert
                 setShowAlertPopup(newAlerts[0]);
                 setTrackingStats(predictionTracker.getStats());
             }
@@ -251,15 +551,35 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
         };
     }, []);
 
+    const getEnforcedMatches = () => {
+        if (userProfile?.plan === 'trial') {
+            return matches.filter(m => m.tier === 1);
+        }
+        return matches;
+    };
+
+    const enforcedMatches = getEnforcedMatches();
     const analytics = bankrollManager.getAnalytics();
-    const eligibleMatches = matches.filter(m => m.dqs >= CONFIG.DECISION.DQS_THRESHOLD);
-    const observationMatches = matches
+
+    const eligibleMatches = enforcedMatches
+        .filter(m => m.dqs >= CONFIG.DECISION.DQS_THRESHOLD);
+
+    const observationMatches = enforcedMatches
         .filter(m => (m.dqs || 0) < CONFIG.DECISION.DQS_THRESHOLD)
         .sort((a, b) => (b.dqs || 0) - (a.dqs || 0));
 
     const filterByTier = (m) => activeTierFilter === 'ALL' || m.tier === activeTierFilter;
 
     const handleGenerateGlobalReport = async (type) => {
+        // Enforce AI Usage Limits
+        const limitCheck = aiUsageLimiter.canMakeAIRequest(user?.id, userProfile?.plan || 'trial');
+        if (!limitCheck.allowed) {
+            alert(lang === 'tr'
+                ? `Günlük AI rapor limitinize ulaştınız (${limitCheck.limit}). Yarın tekrar deneyebilir veya planınızı yükseltebilirsiniz.`
+                : `You've reached your daily AI report limit (${limitCheck.limit}). Try again tomorrow or upgrade your plan.`);
+            return;
+        }
+
         setGlobalReport({ content: '', type, loading: true });
 
         try {
@@ -284,6 +604,10 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                     report = await aiAnalystService.getGlobalIntelligenceReport(candidates, 'PRE-MATCH');
                 }
             }
+
+            // Record usage
+            aiUsageLimiter.recordAIUsage(user?.id, 'report');
+
             setGlobalReport({ content: report, type, loading: false });
         } catch (error) {
             console.error('[AI_REPORT] Generation Error:', error);
@@ -313,7 +637,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '0.6rem', letterSpacing: '0.5px' }}>
                             <span style={{ fontSize: '1.2rem' }}>💎</span>
-                            {lang === 'tr' ? 'PRO AI KÜRESEL İSTİHBARAT' : 'PRO AI GLOBAL INTELLIGENCE'}
+                            {t.global_title}
                         </h4>
                         <span style={{
                             background: 'var(--accent-color)',
@@ -348,12 +672,12 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                         {isLoading ? (
                             <>
                                 <span style={{ animation: 'spin 2s linear infinite', display: 'inline-block' }}>🌀</span>
-                                {lang === 'tr' ? 'ANALİZ EDİLİYOR...' : 'ANALYZING...'}
+                                {t.analyzing}
                             </>
                         ) : (
                             <>
                                 <span>🚀</span>
-                                {lang === 'tr' ? 'RAPOR OLUŞTUR' : 'GENERATE REPORT'}
+                                {t.generate_report}
                             </>
                         )}
                     </button>
@@ -535,9 +859,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                     </div>
                 ) : (
                     <div style={{ textAlign: 'center', padding: '1rem', opacity: 0.5, fontSize: '0.8rem', fontStyle: 'italic' }}>
-                        {lang === 'tr'
-                            ? "Şu anki maç verilerini toplu analiz etmek ve 'Altın Seçimleri' görmek için butona tıklayın."
-                            : "Click the button to analyze current match data and see 'Golden Picks'."}
+                        {t.report_standby_desc}
                     </div>
                 )}
             </div>
@@ -546,6 +868,30 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
 
     return (
         <div className="dashboard-container" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', minHeight: '100vh', background: 'radial-gradient(circle at top right, #1e293b, #030712)' }}>
+
+            {pendingRequest && (
+                <div style={{
+                    background: 'rgba(56, 189, 248, 0.1)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    padding: '1rem 2rem',
+                    borderRadius: '12px',
+                    marginBottom: '2rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    animation: 'fadeIn 0.5s ease'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '1.2rem' }}>⏳</span>
+                        <div>
+                            <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{t.request_pending_title || 'Yükseltme Talebi Beklemede'}</div>
+                            <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+                                {pendingRequest.requested_plan.toUpperCase()} planı için talebiniz iletildi. Onaylanınca özellikleriniz açılacaktır.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Header */}
             <header className="glass-panel" style={{ padding: '2rem', marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--glass-border)' }}>
                 <div className="header-title-area">
@@ -566,27 +912,48 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                 </div>
 
                 <div className="header-actions" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                    <div className="auth-user-info" style={{ textAlign: 'right' }}>
-                        <div style={{ color: 'var(--accent-color)', fontWeight: 800, fontSize: '0.7rem', opacity: 0.8 }}>{user?.email}</div>
-                        <button
-                            onClick={onLogout}
-                            className="logout-btn"
-                            style={{
-                                background: 'rgba(239, 68, 68, 0.1)',
-                                border: '1px solid rgba(239, 68, 68, 0.2)',
-                                color: '#ef4444',
-                                fontSize: '0.6rem',
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                padding: '0.35rem 0.7rem',
+                    <div className="auth-user-info" style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <div style={{
+                                background: PLAN_COLORS[userProfile?.plan || 'trial'] + '22',
+                                color: PLAN_COLORS[userProfile?.plan || 'trial'],
+                                border: `1px solid ${PLAN_COLORS[userProfile?.plan || 'trial']}44`,
+                                padding: '0.2rem 0.6rem',
                                 borderRadius: '6px',
-                                marginTop: '0.4rem',
-                                transition: 'all 0.2s',
-                                whiteSpace: 'nowrap'
-                            }}
-                        >
-                            🚪 {lang === 'tr' ? 'ÇIKIŞ YAP' : 'LOGOUT'}
-                        </button>
+                                fontSize: '0.6rem',
+                                fontWeight: 900,
+                                letterSpacing: '0.5px'
+                            }}>
+                                {t[(userProfile?.plan || 'trial') + '_badge']}
+                            </div>
+                            <div style={{ color: 'var(--accent-color)', fontWeight: 800, fontSize: '0.7rem', opacity: 0.8 }}>{user?.email}</div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            {userProfile?.subscription_end && (
+                                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: getRemainingDays(userProfile.subscription_end) <= 3 ? '#ef4444' : '#94a3b8' }}>
+                                    ⏳ {getRemainingDays(userProfile.subscription_end)} {t.days_remaining}
+                                </div>
+                            )}
+                            <button
+                                onClick={onLogout}
+                                className="logout-btn"
+                                style={{
+                                    background: 'rgba(239, 68, 68, 0.1)',
+                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                    color: '#ef4444',
+                                    fontSize: '0.6rem',
+                                    fontWeight: 800,
+                                    cursor: 'pointer',
+                                    padding: '0.35rem 0.7rem',
+                                    borderRadius: '6px',
+                                    transition: 'all 0.2s',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                🚪 {t.logout}
+                            </button>
+                        </div>
                     </div>
 
                     {/* View Toggle - Available to all users */}
@@ -604,7 +971,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                 fontWeight: 800,
                                 transition: 'all 0.2s'
                             }}
-                        >📊 {lang === 'tr' ? 'CANLI' : 'LIVE'}</button>
+                        >📊 {t.title}</button>
                         <button
                             onClick={() => setView('RADAR')}
                             style={{
@@ -686,6 +1053,63 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                 </div>
             </header>
 
+            {/* Membership Warning Banner */}
+            {(userProfile?.plan === 'trial' || getRemainingDays(userProfile?.subscription_end) <= 3) && (
+                <div className="glass-panel" style={{
+                    marginBottom: '3rem',
+                    padding: '1.2rem 2.5rem',
+                    background: getRemainingDays(userProfile?.subscription_end) <= 3
+                        ? 'linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(15, 23, 42, 0.4))'
+                        : 'linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(15, 23, 42, 0.4))',
+                    border: `1px solid ${getRemainingDays(userProfile?.subscription_end) <= 3 ? 'var(--danger-color)' : 'var(--success-color)'}44`,
+                    borderRadius: '16px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    animation: 'pulse 3s infinite'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                        <div style={{
+                            width: '45px',
+                            height: '45px',
+                            borderRadius: '50%',
+                            background: getRemainingDays(userProfile?.subscription_end) <= 3 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.5rem'
+                        }}>
+                            {getRemainingDays(userProfile?.subscription_end) <= 3 ? '⚠️' : '🎁'}
+                        </div>
+                        <div>
+                            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff', letterSpacing: '0.5px' }}>
+                                {getRemainingDays(userProfile?.subscription_end) <= 3 ? t.expiry_warning : t.trial_banner_title}
+                            </h4>
+                            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', opacity: 0.6, fontWeight: 500 }}>{t.trial_banner_desc}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowAdvanced(true)}
+                        style={{
+                            background: getRemainingDays(userProfile?.subscription_end) <= 3 ? 'var(--danger-color)' : 'var(--success-color)',
+                            color: '#000',
+                            border: 'none',
+                            padding: '0.7rem 1.8rem',
+                            borderRadius: '10px',
+                            fontSize: '0.8rem',
+                            fontWeight: 900,
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                    >
+                        {t.upgrade_plan}
+                    </button>
+                </div>
+            )}
+
             {view === 'ADMIN' ? (
                 <AdminPanel lang={lang} />
             ) : view === 'RADAR' ? (
@@ -694,18 +1118,18 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                         <div>
                             <h3 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-1px' }}>
                                 <span style={{ marginRight: '1rem' }}>🎯</span>
-                                {t.daily_radar || 'GÜNLÜK RADAR (PRE-MATCH)'}
+                                {t.daily_radar}
                             </h3>
                             <div style={{ marginTop: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>
-                                {filteredRadarMatches.length} / {radarMatches.length} {t.matches_found || 'Maç Bulundu'}
+                                {filteredRadarMatches.length} / {radarMatches.length} {t.matches_found}
                             </div>
 
                             {/* Market Selector Tabs */}
                             <div className="market-tabs" style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
                                 {[
                                     { id: '1X2', label: '1X2', icon: '🎯' },
-                                    { id: 'OU25', label: lang === 'tr' ? 'Alt/Üst 2.5' : 'Over/Under 2.5', icon: '📊' },
-                                    { id: 'BTTS', label: lang === 'tr' ? 'KG Var/Yok' : 'Both Teams to Score', icon: '🔥' }
+                                    { id: 'OU25', label: t.market_ou25 || 'Over/Under 2.5', icon: '📊' },
+                                    { id: 'BTTS', label: t.market_btts || 'Both Teams to Score', icon: '🔥' }
                                 ].map(m => (
                                     <button
                                         key={m.id}
@@ -730,6 +1154,26 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                 ))}
 
                                 <button
+                                    onClick={() => setShowStakingCalc(true)}
+                                    style={{
+                                        padding: '0.6rem 1.2rem',
+                                        borderRadius: '10px',
+                                        border: '1px solid #fbbf24',
+                                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.05))',
+                                        color: '#fbbf24',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        boxShadow: '0 4px 15px rgba(251, 191, 36, 0.2)'
+                                    }}
+                                >
+                                    <span>💰</span> {t.open_staking_calc || 'BAHİS HESAPLAYICI'}
+                                </button>
+                                <button
                                     onClick={() => { setFaqMode('radar'); setShowFAQ(true); }}
                                     style={{
                                         padding: '0.6rem 1.2rem',
@@ -744,10 +1188,10 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '0.5rem',
-                                        marginLeft: '1.5rem'
+                                        marginLeft: '0.5rem'
                                     }}
                                 >
-                                    <span>❓</span> {lang === 'tr' ? 'Ortak Akıl Rehberi' : 'Consensus Guide'}
+                                    <span>❓</span> {t.consensus_guide}
                                 </button>
                             </div>
                         </div>
@@ -766,7 +1210,12 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                 <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.source_selection}</span>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    {RADAR_SOURCES.map(source => {
+                                    {RADAR_SOURCES.filter(s => {
+                                        if (userProfile?.plan === 'trial') {
+                                            return ['forebet', 'predictz', 'statarea'].includes(s.id);
+                                        }
+                                        return true;
+                                    }).map(source => {
                                         const isActive = radarFilters.sources.includes(source.id);
                                         return (
                                             <button
@@ -849,7 +1298,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.search_label || 'ARA'}</span>
+                                <span style={{ fontSize: '0.65rem', fontWeight: 900, opacity: 0.5, letterSpacing: '1px' }}>{t.search_label}</span>
                                 <input
                                     type="text"
                                     placeholder={t.search_team}
@@ -879,7 +1328,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                         display: 'flex', alignItems: 'center', gap: '0.5rem'
                                     }}
                                 >
-                                    {radarFilters.sortBy === 'TIME' ? '🕒 SAATE GÖRE' : '🎯 UYUMA GÖRE'}
+                                    {radarFilters.sortBy === 'TIME' ? t.sort_by_time : t.sort_by_fit}
                                 </button>
                                 <button
                                     onClick={() => setRadarFilters(prev => ({ ...prev, valueOnly: !prev.valueOnly }))}
@@ -889,7 +1338,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                         border: `1px solid ${radarFilters.valueOnly ? 'var(--success-color)' : 'rgba(255,255,255,0.1)'}`,
                                         borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
                                     }}
-                                >💎 VALUE</button>
+                                >{t.value_mode}</button>
                                 <button
                                     onClick={() => setRadarFilters(prev => ({ ...prev, hideDivergent: !prev.hideDivergent }))}
                                     style={{
@@ -898,7 +1347,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                         border: `1px solid ${radarFilters.hideDivergent ? 'var(--danger-color)' : 'rgba(255,255,255,0.1)'}`,
                                         borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
                                     }}
-                                >⚠️ SAFE MODE</button>
+                                >{t.safe_mode}</button>
                                 <button
                                     onClick={() => setRadarFilters(prev => ({ ...prev, todayOnly: !prev.todayOnly }))}
                                     style={{
@@ -907,18 +1356,26 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                         border: `1px solid ${radarFilters.todayOnly ? '#a78bfa66' : 'rgba(255,255,255,0.1)'}`,
                                         borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer'
                                     }}
-                                >📅 {radarFilters.todayOnly ? (lang === 'tr' ? 'BUGÜN' : 'TODAY') : (lang === 'tr' ? 'HEPSİ' : 'ALL')}</button>
+                                >📅 {radarFilters.todayOnly ? t.today : t.all_matches}</button>
                             </div>
 
                             <button
-                                onClick={() => setRadarFilters({
-                                    sources: RADAR_SOURCES.map(s => s.id),
-                                    minSources: 1,
-                                    search: '',
-                                    valueOnly: false,
-                                    hideDivergent: false,
-                                    todayOnly: true
-                                })}
+                                onClick={() => {
+                                    const userPlan = userProfile?.plan || 'trial';
+                                    const allowedSources = RADAR_SOURCES.filter(s => {
+                                        if (userPlan === 'trial') return ['forebet', 'predictz', 'statarea'].includes(s.id);
+                                        return true;
+                                    }).map(s => s.id);
+
+                                    setRadarFilters({
+                                        sources: allowedSources,
+                                        minSources: 1,
+                                        search: '',
+                                        valueOnly: false,
+                                        hideDivergent: false,
+                                        todayOnly: true
+                                    });
+                                }}
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
@@ -1354,13 +1811,14 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
 
                     {/* Live Opportunities Panel */}
                     {(() => {
-                        const opportunities = liveOpportunityScorer.getOpportunities(matches, signals);
+                        const opportunities = liveOpportunityScorer.getOpportunities(enforcedMatches, signals);
                         const topOpportunities = opportunities.slice(0, 5);
 
                         const heatColors = {
+                            ALPHA: { bg: 'rgba(56, 189, 248, 0.2)', border: 'var(--accent-color)', text: 'var(--accent-color)', icon: '🚀' },
                             ALEV: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: '#ef4444', icon: '🔥' },
                             SICAK: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.4)', text: '#fbbf24', icon: '⚡' },
-                            SOGUK: { bg: 'rgba(56, 189, 248, 0.1)', border: 'rgba(56, 189, 248, 0.3)', text: '#38bdf8', icon: '❄️' }
+                            SOGUK: { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#94a3b8', icon: '❄️' }
                         };
 
                         return (
@@ -1449,7 +1907,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                                                     )}
                                                                 </div>
                                                                 <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
-                                                                    {match.minute}' • <span style={{ fontWeight: 800, color: 'var(--accent-color)' }}>{match.score?.home ?? 0} - {match.score?.away ?? 0}</span> • {opp.suggestedMarket?.market || opp.suggestedMarket || '-'}
+                                                                    {match.minute}' • <span style={{ fontWeight: 800, color: 'var(--accent-color)' }}>{match.score?.home ?? 0} - {match.score?.away ?? 0}</span> • {opp.suggestedMarket?.marketKey ? (t[opp.suggestedMarket.marketKey] ? (opp.suggestedMarket.marketParams ? Object.entries(opp.suggestedMarket.marketParams).reduce((acc, [k, v]) => acc.replace(`{${k}}`, v), t[opp.suggestedMarket.marketKey]) : t[opp.suggestedMarket.marketKey]) : opp.suggestedMarket.marketKey) : (opp.suggestedMarket?.market || '-')}
                                                                     {opp.suggestedMarket?.confidence && (
                                                                         <span style={{
                                                                             marginLeft: '0.5rem',
@@ -1465,9 +1923,47 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                                                             fontWeight: 700
                                                                         }}>{opp.suggestedMarket.confidence}</span>
                                                                     )}
+                                                                    {opp.heatLevel === 'ALPHA' && (
+                                                                        <span style={{
+                                                                            marginLeft: '0.5rem',
+                                                                            padding: '0.1rem 0.5rem',
+                                                                            background: 'var(--accent-color)',
+                                                                            color: '#000',
+                                                                            borderRadius: '6px',
+                                                                            fontSize: '0.6rem',
+                                                                            fontWeight: 900,
+                                                                            boxShadow: '0 0 10px var(--accent-glow)'
+                                                                        }}>{t.heat_alpha}</span>
+                                                                    )}
                                                                 </div>
-                                                                <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
-                                                                    {opp.reason}
+                                                                <div style={{ fontSize: '0.7rem', opacity: 0.6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                                        {Array.isArray(opp.reason) ? opp.reason.map(r => {
+                                                                            if (typeof r === 'string') return r;
+                                                                            let txt = t[r.key] || r.key;
+                                                                            if (r.params) Object.entries(r.params).forEach(([k, v]) => txt = txt.replace(`{${k}}`, v));
+                                                                            return txt;
+                                                                        }).join(' • ') : opp.reason}
+                                                                    </div>
+
+                                                                    {/* Bot vs Site Comparison */}
+                                                                    {opp.oddsInfo && (
+                                                                        <div style={{
+                                                                            display: 'flex',
+                                                                            gap: '0.8rem',
+                                                                            alignItems: 'center',
+                                                                            background: 'rgba(255,255,255,0.05)',
+                                                                            padding: '0.2rem 0.6rem',
+                                                                            borderRadius: '6px'
+                                                                        }}>
+                                                                            <div style={{ fontSize: '0.6rem' }}>
+                                                                                <span style={{ opacity: 0.5 }}>BOT:</span> <b style={{ color: 'var(--accent-color)' }}>%{Math.round(opp.oddsInfo.pSit * 100)}</b>
+                                                                            </div>
+                                                                            <div style={{ fontSize: '0.6rem' }}>
+                                                                                <span style={{ opacity: 0.5 }}>SITE:</span> <b style={{ color: '#fff' }}>%{Math.round(opp.oddsInfo.pMkt * 100)}</b>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
 
                                                                 {/* Consensus Preview - Show if available */}
@@ -2007,15 +2503,27 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                                             ) : (
                                                                 <button
                                                                     onClick={async () => {
+                                                                        // Enforce AI Usage Limits
+                                                                        const limitCheck = aiUsageLimiter.canMakeAIRequest(user?.id, userProfile?.plan || 'trial');
+                                                                        if (!limitCheck.allowed) {
+                                                                            alert(lang === 'tr'
+                                                                                ? `Günlük AI rapor limitinize ulaştınız (${limitCheck.limit}). Yarın tekrar deneyebilir veya planınızı yükseltebilirsiniz.`
+                                                                                : `You've reached your daily AI report limit (${limitCheck.limit}). Try again tomorrow or upgrade your plan.`);
+                                                                            return;
+                                                                        }
+
                                                                         // First set loading state immediately
                                                                         const matchIdx = dataWorker.fixtures.findIndex(f => String(f.id) === String(currentMatch.id));
                                                                         if (matchIdx !== -1) {
-                                                                            dataWorker.fixtures[matchIdx].aiSummary = "AI Analiz yapıyor...";
+                                                                            dataWorker.fixtures[matchIdx].aiSummary = t.report_analyzing || "AI Analiz yapıyor...";
                                                                             setMatches([...dataWorker.fixtures]);
                                                                         }
 
                                                                         // Then trigger the actual analysis
                                                                         const summary = await dataWorker.triggerDeepAnalysis(currentMatch.id);
+
+                                                                        // Record usage
+                                                                        aiUsageLimiter.recordAIUsage(user?.id, 'report');
 
                                                                         // Update state with the result
                                                                         if (matchIdx !== -1 && summary) {
@@ -2042,7 +2550,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                                         )}
                                                     </div>
 
-                                                    {currentMatch.aiSummary === "AI Analiz yapıyor..." ? (
+                                                    {(currentMatch.aiSummary === (t.report_analyzing || "AI Analiz yapıyor...") || currentMatch.aiSummary === "AI Analiz yapıyor...") ? (
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                                             <div className="skeleton-loader" style={{ height: '0.8rem', width: '90%', borderRadius: '4px' }}></div>
                                                             <div className="skeleton-loader" style={{ height: '0.8rem', width: '70%', borderRadius: '4px' }}></div>
@@ -2241,6 +2749,9 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                                         )}
                                                     </div>
                                                 </div>
+
+                                                {/* Bayesian Intelligence Section (Premium Only) */}
+                                                {renderBayesianIntelligence(currentMatch)}
                                             </div>
 
                                             <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--glass-border)' }}>
@@ -2267,7 +2778,8 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
             )
             }
 
-            {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} mode={faqMode} />}
+            {renderPlanComparison()}
+            {renderUpgradeConfirmation()}
 
             {
                 showAdvanced && (
@@ -2276,24 +2788,102 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                             <button className="close-btn" onClick={() => setShowAdvanced(false)}>×</button>
                             <h2>{t.advanced_settings_title}</h2>
 
+                            {/* Membership Info */}
+                            <div style={{ marginBottom: '2rem', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                                <h3 style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span>👤</span> {t.account_details}
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <div style={{ fontSize: '0.65rem', opacity: 0.5, textTransform: 'uppercase' }}>{t.membership_plan}</div>
+                                        <div style={{ fontWeight: 800, color: PLAN_COLORS[userProfile?.plan || 'trial'] }}>{t[(userProfile?.plan || 'trial') + '_badge']}</div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.65rem', opacity: 0.5, textTransform: 'uppercase' }}>{t.expiry_date}</div>
+                                        <div style={{ fontWeight: 800 }}>{userProfile?.subscription_end ? new Date(userProfile.subscription_end).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US') : '-'}</div>
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', fontSize: '0.75rem', color: '#94a3b8', borderLeft: '3px solid var(--accent-color)' }}>
+                                    <div>{t.extend_info}</div>
+                                    <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <div style={{ opacity: 0.6, fontSize: '0.65rem' }}>{userProfile?.plan === 'trial' ? t.plan_features_trial : t.plan_features_pro}</div>
+                                        <button
+                                            onClick={() => setShowPlanComparison(true)}
+                                            style={{
+                                                marginTop: '0.5rem',
+                                                background: 'var(--accent-color)',
+                                                color: '#000',
+                                                border: 'none',
+                                                padding: '0.7rem',
+                                                borderRadius: '8px',
+                                                fontWeight: 800,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '0.5rem',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+                                            onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+                                        >
+                                            <span style={{ fontSize: '1.1rem' }}>🏆</span> {t.compare_plans}
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const whatsappNum = (settings.whatsapp_number || CONFIG.SUPPORT.WHATSAPP).replace('+', '').replace(/\s/g, '');
+                                                window.open(`https://wa.me/${whatsappNum}?text=Merhaba,%20üyeliğimi%20yükseltmek%20istiyorum.`, '_blank');
+                                            }}
+                                            style={{
+                                                marginTop: '0.3rem',
+                                                background: 'rgba(37, 211, 102, 0.1)',
+                                                color: '#25D366',
+                                                border: '1px solid #25D366',
+                                                padding: '0.6rem',
+                                                borderRadius: '8px',
+                                                fontWeight: 800,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '0.5rem',
+                                                fontSize: '0.7rem'
+                                            }}
+                                        >
+                                            <span style={{ fontSize: '1rem' }}>📱</span> {t.whatsapp_upgrade}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="settings-list">
                                 {[
-                                    { id: 'XG_ANALYSIS', label: t.toggle_xg },
-                                    { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian },
-                                    { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles }
-                                ].map(setting => (
-                                    <div key={setting.id} className="setting-item">
-                                        <span>{setting.label}</span>
-                                        <div
-                                            className={`toggle ${advancedSettings[setting.id] ? 'on' : ''}`}
-                                            onClick={() => {
-                                                const newVal = !advancedSettings[setting.id];
-                                                setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
-                                                CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
-                                            }}
-                                        ><div className="knob"></div></div>
-                                    </div>
-                                ))}
+                                    { id: 'XG_ANALYSIS', label: t.toggle_xg, premium: true },
+                                    { id: 'BAYESIAN_PRICING', label: t.toggle_bayesian, premium: true },
+                                    { id: 'LEAGUE_PROFILES', label: t.toggle_league_profiles, premium: false }
+                                ].map(setting => {
+                                    const isLocked = setting.premium && userProfile?.plan !== 'premium';
+                                    return (
+                                        <div key={setting.id} className={`setting-item ${isLocked ? 'locked' : ''}`}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <span>{setting.label}</span>
+                                                {isLocked && <span style={{ background: 'var(--accent-color)', color: '#000', fontSize: '0.5rem', padding: '2px 4px', borderRadius: '4px', fontWeight: 900 }}>PREMIUM</span>}
+                                            </div>
+                                            <div
+                                                className={`toggle ${advancedSettings[setting.id] ? 'on' : ''} ${isLocked ? 'disabled' : ''}`}
+                                                onClick={() => {
+                                                    if (isLocked) {
+                                                        alert(t.premium_required || 'Bu özellik sadece Premium üyeler içindir.');
+                                                        return;
+                                                    }
+                                                    const newVal = !advancedSettings[setting.id];
+                                                    setAdvancedSettings(prev => ({ ...prev, [setting.id]: newVal }));
+                                                    CONFIG.MODULAR_SYSTEM.OPTIONAL_MODULES[setting.id] = newVal;
+                                                }}
+                                            ><div className="knob"></div></div>
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <div className="league-management">
@@ -2362,14 +2952,29 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                             }}>
                                 <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.5rem' }}>ÖNERİ</div>
                                 <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--accent-color)', marginBottom: '0.5rem' }}>
-                                    {showAlertPopup.recommendation?.market}
+                                    {showAlertPopup.recommendation?.marketKey ?
+                                        (t[showAlertPopup.recommendation.marketKey] ?
+                                            (showAlertPopup.recommendation.marketParams ?
+                                                Object.entries(showAlertPopup.recommendation.marketParams).reduce((acc, [k, v]) => acc.replace(`{${k}}`, v), t[showAlertPopup.recommendation.marketKey])
+                                                : t[showAlertPopup.recommendation.marketKey])
+                                            : showAlertPopup.recommendation.marketKey)
+                                        : showAlertPopup.recommendation?.market}
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.8rem' }}>
                                     <span style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
-                                        %{showAlertPopup.recommendation?.confidence} Güven
+                                        %{showAlertPopup.recommendation?.confidence} {t.confidence_score}
                                     </span>
                                 </div>
-                                <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>{showAlertPopup.recommendation?.reasoning}</div>
+                                <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                                    {Array.isArray(showAlertPopup.recommendation?.reasoning) ?
+                                        showAlertPopup.recommendation.reasoning.map(r => {
+                                            if (typeof r === 'string') return r;
+                                            let txt = t[r.key] || r.key;
+                                            if (r.params) Object.entries(r.params).forEach(([k, v]) => txt = txt.replace(`{${k}}`, v));
+                                            return txt;
+                                        }).join(' • ')
+                                        : showAlertPopup.recommendation?.reasoning}
+                                </div>
                             </div>
 
                             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -2384,8 +2989,8 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                             awayTeam: showAlertPopup.awayTeam,
                                             minute: showAlertPopup.minute,
                                             score: showAlertPopup.score,
-                                            market: showAlertPopup.recommendation?.market,
-                                            prediction: showAlertPopup.recommendation?.market,
+                                            market: showAlertPopup.recommendation?.marketKey || showAlertPopup.recommendation?.market,
+                                            prediction: showAlertPopup.recommendation?.marketKey || showAlertPopup.recommendation?.market,
                                             confidence: showAlertPopup.recommendation?.confidence,
                                             source: 'ALERT',
                                             dqs: match?.dqs,
@@ -2439,7 +3044,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                             <button className="close-btn" onClick={() => setShowTrackingPanel(false)}>×</button>
 
                             <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                <span>📊</span> TAHMİN PERFORMANSI
+                                <span>📊</span> {t.tracking_title}
                             </h2>
 
                             {/* Summary Stats */}
@@ -2497,7 +3102,7 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{pred.match}</div>
                                                 <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
-                                                    {pred.market} • %{pred.confidence} güven
+                                                    {t[pred.market] || pred.market} • %{pred.confidence} {t.confidence_score}
                                                     {pred.minute && <span style={{ marginLeft: '0.5rem', color: 'var(--text-primary)', opacity: 0.8 }}>@{pred.minute}' ({typeof pred.scoreAtPrediction === 'object' ? `${pred.scoreAtPrediction.home}-${pred.scoreAtPrediction.away}` : pred.scoreAtPrediction})</span>}
                                                 </div>
                                             </div>
@@ -2539,6 +3144,8 @@ export const Dashboard = ({ user, userProfile, onLogout }) => {
             }
 
             {/* Floating Tracking Button */}
+            {showStakingCalc && <StakingCalculator onClose={() => setShowStakingCalc(false)} lang={lang} />}
+            {showFAQ && <FAQ onClose={() => setShowFAQ(false)} lang={lang} mode={faqMode} />}
             <button
                 onClick={() => {
                     setTrackingStats(predictionTracker.getStats());

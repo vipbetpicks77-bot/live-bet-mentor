@@ -88,7 +88,7 @@ export const CONFIG = {
     OPTIONAL_MODULES: {
       XG_ANALYSIS: true,
       LEAGUE_PROFILES: true,
-      BAYESIAN_PRICING: false
+      BAYESIAN_PRICING: true
     },
     // Phase 12: Tiered League System
     LEAGUE_TIERS: {
@@ -133,5 +133,15 @@ export const CONFIG = {
         }
       }
     }
+  },
+  SUPPORT: {
+    WHATSAPP: '+905320000000', // Placeholder - User can change this
+    EMAIL: 'karabulut.hamza@gmail.com'
+  },
+  MEMBERSHIP_PRICING: {
+    trial: 0,
+    pro: 29,
+    premium: 79,
+    currency: '€'
   }
 };

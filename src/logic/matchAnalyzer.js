@@ -66,7 +66,11 @@ export const analyzeMatch = (fixture, odds, consensusReport) => {
 
     // Update observations with refined data
     observations.reverseSignal = reverseSignal;
-    observations.bayesian = bayesianModel.refine(0.5, edgeScore);
+    observations.bayesian = bayesianModel.refine(0.5, {
+        edgeScore,
+        dqs: fixture.dqs || 0,
+        xgRatio: (observations.xg.home + 0.1) / (observations.xg.away + 0.1)
+    });
 
     // 3. Counter-Argument Engine (Discipline Guard)
     const counterArgs = [];

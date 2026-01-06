@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../backend/supabaseClient';
+import { translations } from '../locales/translations';
 
-export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
+export const RegisterPage = ({ onNavigate, lang = 'tr', setLang }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -10,162 +11,102 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
         phone: '',
         acceptTerms: false
     });
-    const [status, setStatus] = useState({ type: '', message: '' });
-    const [loading, setLoading] = useState(false);
-    const [registered, setRegistered] = useState(false);
 
-    const t = lang === 'tr' ? {
-        title: 'Kayıt Ol',
-        subtitle: 'Profesyonel analiz sistemine katıl',
-        email: 'E-posta',
-        emailPlaceholder: 'ornek@email.com',
-        password: 'Şifre',
-        passwordPlaceholder: 'En az 6 karakter',
-        confirmPassword: 'Şifre Tekrar',
-        confirmPlaceholder: 'Şifrenizi tekrar girin',
-        fullName: 'İsim Soyisim (Opsiyonel)',
-        namePlaceholder: 'Adınız Soyadınız',
-        phone: 'Telefon (Opsiyonel)',
-        phonePlaceholder: '+90 555 123 4567',
-        acceptTerms: 'Kullanım şartlarını ve gizlilik politikasını kabul ediyorum',
-        register: 'KAYIT OL',
-        haveAccount: 'Zaten hesabın var mı?',
-        login: 'Giriş Yap',
-        backToHome: '← Ana Sayfa',
-        successTitle: '🎉 Kayıt Başarılı!',
-        successMsg: 'Kaydınız alındı. Admin onayı sonrası sisteme giriş yapabilirsiniz.',
-        successNote: 'E-posta adresinize onay durumu hakkında bilgilendirme yapılacaktır.',
-        goToLogin: 'Giriş Sayfasına Git',
-        errorPasswordMatch: 'Şifreler eşleşmiyor',
-        errorTerms: 'Kullanım şartlarını kabul etmelisiniz',
-        errorGeneral: 'Bir hata oluştu. Lütfen tekrar deneyin.'
-    } : {
-        title: 'Sign Up',
-        subtitle: 'Join the professional analysis system',
-        email: 'Email',
-        emailPlaceholder: 'example@email.com',
-        password: 'Password',
-        passwordPlaceholder: 'At least 6 characters',
-        confirmPassword: 'Confirm Password',
-        confirmPlaceholder: 'Re-enter your password',
-        fullName: 'Full Name (Optional)',
-        namePlaceholder: 'Your Full Name',
-        phone: 'Phone (Optional)',
-        phonePlaceholder: '+90 555 123 4567',
-        acceptTerms: 'I accept the terms of use and privacy policy',
-        register: 'SIGN UP',
-        haveAccount: 'Already have an account?',
-        login: 'Login',
-        backToHome: '← Home',
-        successTitle: '🎉 Registration Successful!',
-        successMsg: 'Your registration has been received. You can login after admin approval.',
-        successNote: 'You will be notified about approval status via email.',
-        goToLogin: 'Go to Login Page',
-        errorPasswordMatch: 'Passwords do not match',
-        errorTerms: 'You must accept the terms of use',
-        errorGeneral: 'An error occurred. Please try again.'
-    };
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState({ type: '', message: '' });
+
+    const t = translations[lang];
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         setStatus({ type: '', message: '' });
 
-        // Validation
         if (formData.password !== formData.confirmPassword) {
-            setStatus({ type: 'error', message: t.errorPasswordMatch });
+            setStatus({ type: 'error', message: lang === 'tr' ? 'Şifreler eşleşmiyor' : 'Passwords do not match' });
+            setLoading(false);
             return;
         }
 
         if (!formData.acceptTerms) {
-            setStatus({ type: 'error', message: t.errorTerms });
+            setStatus({ type: 'error', message: lang === 'tr' ? 'Kullanım koşullarını kabul etmelisiniz' : 'You must accept the terms' });
+            setLoading(false);
             return;
         }
 
-        setLoading(true);
-
         try {
-            // Register with Supabase Auth
-            const { data, error } = await supabase.auth.signUp({
+            // 1. Sign up user
+            const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
-                options: {
-                    data: {
-                        full_name: formData.fullName,
-                        phone: formData.phone,
-                        status: 'pending' // Will be updated by trigger or admin
-                    }
-                }
             });
 
-            if (error) {
-                setStatus({ type: 'error', message: error.message });
-            } else {
-                // Try to update the profile with pending status
-                if (data.user) {
-                    await supabase
-                        .from('profiles')
-                        .update({
-                            status: 'pending',
+            if (authError) throw authError;
+
+            // 2. Create profile entry
+            if (authData.user) {
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            email: formData.email,
                             full_name: formData.fullName,
-                            phone: formData.phone
-                        })
-                        .eq('id', data.user.id);
-                }
+                            phone: formData.phone,
+                            status: 'pending',
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
 
-                setRegistered(true);
+                if (profileError) console.error('Profile creation error:', profileError);
             }
-        } catch (err) {
-            setStatus({ type: 'error', message: t.errorGeneral });
-        }
 
-        setLoading(false);
+            setStatus({
+                type: 'success',
+                message: t.register_success_desc
+            });
+        } catch (err) {
+            console.error('Registration error:', err);
+            setStatus({ type: 'error', message: err.message || 'Registration failed' });
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Success Screen
-    if (registered) {
+    if (status.type === 'success') {
         return (
             <div style={{
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #030712 0%, #0f172a 50%, #030712 100%)',
+                background: 'linear-gradient(135deg, #030712, #0f172a)',
                 padding: '2rem'
             }}>
                 <div className="glass-panel" style={{
                     padding: '3rem',
                     maxWidth: '500px',
-                    width: '100%',
                     textAlign: 'center',
                     background: 'rgba(15, 23, 42, 0.8)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    borderRadius: '20px'
+                    borderRadius: '20px',
+                    border: '1px solid rgba(16, 185, 129, 0.3)'
                 }}>
                     <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>✅</div>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '1rem', color: '#10b981' }}>
-                        {t.successTitle}
-                    </h2>
-                    <p style={{ color: '#94a3b8', marginBottom: '1rem', lineHeight: 1.6 }}>
-                        {t.successMsg}
-                    </p>
-                    <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '2rem' }}>
-                        {t.successNote}
-                    </p>
+                    <h2 style={{ color: '#10b981', marginBottom: '1rem' }}>{t.register_success}</h2>
+                    <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>{status.message}</p>
                     <button
-                        onClick={() => onNavigate('login')}
+                        onClick={() => onNavigate('landing')}
                         style={{
-                            background: 'linear-gradient(135deg, #10b981, #059669)',
-                            border: 'none',
+                            marginTop: '2rem',
+                            padding: '0.8rem 2rem',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
                             color: '#fff',
-                            padding: '1rem 2rem',
                             borderRadius: '10px',
-                            cursor: 'pointer',
-                            fontSize: '1rem',
-                            fontWeight: 700,
-                            width: '100%'
+                            cursor: 'pointer'
                         }}
                     >
-                        {t.goToLogin}
+                        {t.backToHome}
                     </button>
                 </div>
             </div>
@@ -181,38 +122,43 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
             background: 'linear-gradient(135deg, #030712 0%, #0f172a 50%, #030712 100%)',
             padding: '2rem'
         }}>
-            {/* Background Effects */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
-                <div style={{
-                    position: 'absolute',
-                    top: '20%',
-                    right: '20%',
-                    width: '300px',
-                    height: '300px',
-                    background: 'radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%)',
-                    borderRadius: '50%',
-                    filter: 'blur(60px)'
-                }} />
-            </div>
-
             <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '480px' }}>
-                {/* Back Button */}
-                <button
-                    onClick={() => onNavigate('landing')}
-                    style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#94a3b8',
-                        marginBottom: '2rem',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                    }}
-                >
-                    {t.backToHome}
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <button
+                        onClick={() => onNavigate('landing')}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#94a3b8',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                        }}
+                    >
+                        ← {t.backToHome}
+                    </button>
+
+                    <button
+                        onClick={() => setLang && setLang(lang === 'tr' ? 'en' : 'tr')}
+                        style={{
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#fff',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem'
+                        }}
+                    >
+                        <span>{lang === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}</span>
+                    </button>
+                </div>
 
                 <div className="glass-panel" style={{
                     padding: '3rem',
@@ -221,7 +167,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '20px'
                 }}>
-                    {/* Logo */}
                     <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                         <span style={{ fontSize: '2.5rem' }}>📈</span>
                         <h1 style={{
@@ -235,12 +180,11 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             {t.title}
                         </h1>
                         <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                            {t.subtitle}
+                            {t.register_subtitle || t.subtitle}
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit}>
-                        {/* Email */}
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.5rem' }}>
                                 {t.email} *
@@ -259,13 +203,11 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                                     borderRadius: '10px',
                                     color: '#fff',
                                     fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s'
+                                    outline: 'none'
                                 }}
                             />
                         </div>
 
-                        {/* Password */}
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.5rem' }}>
                                 {t.password} *
@@ -290,7 +232,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             />
                         </div>
 
-                        {/* Confirm Password */}
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.5rem' }}>
                                 {t.confirmPassword} *
@@ -314,7 +255,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             />
                         </div>
 
-                        {/* Full Name */}
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.5rem' }}>
                                 {t.fullName}
@@ -337,7 +277,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             />
                         </div>
 
-                        {/* Phone */}
                         <div style={{ marginBottom: '1.5rem' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.5rem' }}>
                                 {t.phone}
@@ -360,7 +299,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             />
                         </div>
 
-                        {/* Terms Checkbox */}
                         <div style={{ marginBottom: '1.5rem' }}>
                             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
                                 <input
@@ -380,22 +318,20 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                             </label>
                         </div>
 
-                        {/* Error/Status Message */}
-                        {status.message && (
+                        {status.message && status.type === 'error' && (
                             <div style={{
                                 marginBottom: '1.5rem',
                                 padding: '1rem',
                                 borderRadius: '10px',
-                                background: status.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                                border: `1px solid ${status.type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
-                                color: status.type === 'error' ? '#ef4444' : '#10b981',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                color: '#ef4444',
                                 fontSize: '0.9rem'
                             }}>
                                 {status.message}
                             </div>
                         )}
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
@@ -419,7 +355,6 @@ export const RegisterPage = ({ onNavigate, lang = 'tr' }) => {
                         </button>
                     </form>
 
-                    {/* Login Link */}
                     <div style={{ textAlign: 'center', marginTop: '2rem', color: '#64748b', fontSize: '0.9rem' }}>
                         {t.haveAccount}{' '}
                         <button

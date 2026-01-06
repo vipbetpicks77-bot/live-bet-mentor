@@ -104,3 +104,29 @@ CREATE POLICY "Users can delete own predictions" ON predictions FOR DELETE USING
 CREATE INDEX IF NOT EXISTS idx_profiles_plan ON profiles(plan);
 CREATE INDEX IF NOT EXISTS idx_ai_usage_date ON ai_usage_logs(date);
 CREATE INDEX IF NOT EXISTS idx_ai_usage_user ON ai_usage_logs(user_id);
+107: 
+108: -- 7. Membership Upgrade Requests Tablosu (YENİ)
+109: -- ===========================================
+110: 
+111: CREATE TABLE IF NOT EXISTS membership_requests (
+112:     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+113:     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+114:     email TEXT,
+115:     current_plan TEXT,
+116:     requested_plan TEXT NOT NULL,
+117:     status TEXT DEFAULT 'pending', -- pending, approved, rejected
+118:     notes TEXT,
+119:     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+120:     resolved_at TIMESTAMP WITH TIME ZONE
+121: );
+122: 
+123: ALTER TABLE membership_requests ENABLE ROW LEVEL SECURITY;
+124: CREATE POLICY "Users can view own requests" ON membership_requests FOR SELECT USING (auth.uid() = user_id);
+125: CREATE POLICY "Users can insert own requests" ON membership_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
+126: -- Admin role policies (assuming profiles has is_admin or checking specific email)
+127: CREATE POLICY "Admins can view all requests" ON membership_requests FOR SELECT USING (
+128:     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND plan = 'admin')
+129: );
+130: CREATE POLICY "Admins can update all requests" ON membership_requests FOR UPDATE USING (
+131:     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND plan = 'admin')
+132: );

@@ -13,6 +13,7 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
 
     const isLive = mode === 'live';
     const isRadar = mode === 'radar';
+    const isStaking = mode === 'staking';
 
     return (
         <div
@@ -20,7 +21,7 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
             onClick={onClose}
             style={{
                 background: 'rgba(3, 7, 18, 0.98)',
-                zIndex: 4000, // Z-index increased for safety
+                zIndex: 5000, // Even higher to be on top of other modals
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)'
             }}
@@ -72,10 +73,10 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
                         fontWeight: 800,
                         letterSpacing: '-1px'
                     }}>
-                        {isRadar ? t.faq_radar_title : t.faq_live_title}
+                        {isStaking ? t.staking_faq_title : (isRadar ? t.faq_radar_title : t.faq_live_title)}
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '1.1rem' }}>
-                        {isRadar ? t.faq_radar_subtitle : t.faq_live_subtitle}
+                        {isStaking ? 'Mathematical Capital Distribution Models' : (isRadar ? t.faq_radar_subtitle : t.faq_live_subtitle)}
                     </p>
                 </div>
 
@@ -237,15 +238,75 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
                                     {t.faq_alert_desc}
                                 </p>
 
-                                <div style={{ background: 'rgba(167, 139, 250, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
+                                <div style={{ background: 'rgba(167, 139, 250, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.2)', marginBottom: '1.5rem' }}>
                                     <h3 style={{ fontSize: '1.1rem', color: '#a78bfa', fontWeight: 800, marginBottom: '0.8rem' }}>{t.faq_tracking_title}</h3>
                                     <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_tracking_desc}</p>
+                                </div>
+
+                                <div style={{ background: 'rgba(52, 211, 153, 0.05)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
+                                    <h3 style={{ fontSize: '1.1rem', color: '#34d399', fontWeight: 800, marginBottom: '0.8rem' }}>{t.faq_q21_title}</h3>
+                                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.faq_q21_desc}</p>
                                 </div>
                             </section>
                         </>
                     )}
 
-                    {/* Radar / Collective Intelligence Section */}
+                    {/* Staking / Bankroll Section */}
+                    {isStaking && (
+                        <section style={{ gridColumn: '1 / -1' }}>
+                            <h2 style={{ color: '#fbbf24', fontSize: '1.8rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <span style={{ width: '12px', height: '32px', background: '#fbbf24', borderRadius: '4px' }}></span>
+                                {t.staking_faq_title}
+                            </h2>
+                            <div className="faq-modules-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+                                {[1, 2, 3, 4, 5, 6, 7].map(num => {
+                                    const titleKey = `staking_faq_q${num}_title`;
+                                    const descKey = `staking_faq_q${num}_desc`;
+                                    if (!t[titleKey]) return null;
+
+                                    const theme = { border: '#fbbf24', bg: 'rgba(251, 191, 36, 0.05)' };
+
+                                    return (
+                                        <div
+                                            key={num}
+                                            className="glass-panel"
+                                            style={{
+                                                padding: '2rem',
+                                                background: theme.bg,
+                                                border: `1px solid ${theme.border}33`,
+                                                borderLeft: `4px solid ${theme.border}`,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '1rem'
+                                            }}
+                                        >
+                                            <h3 style={{ fontSize: '1.1rem', color: theme.border, fontWeight: 800 }}>{t[titleKey]}</h3>
+                                            <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.7' }}>{t[descKey]}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div style={{
+                                marginTop: '2.5rem',
+                                padding: '2rem',
+                                background: 'rgba(239, 68, 68, 0.05)',
+                                borderRadius: '15px',
+                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1.5rem'
+                            }}>
+                                <span style={{ fontSize: '2.5rem' }}>⚠️</span>
+                                <div style={{ textAlign: 'left' }}>
+                                    <h4 style={{ color: '#ef4444', marginBottom: '0.5rem', fontWeight: 800 }}>CRITICAL WARNING</h4>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                                        {t.staking_warning || 'Düşük oranlı maçlara daha fazla para konulur çünkü olasılıkları yüksektir. En düşük oranlı maçın tutması kritik önemdedir!'}
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    )}
                     {isRadar && (
                         <section style={{ gridColumn: '1 / -1' }}>
                             <h2 style={{ color: '#00f2fe', fontSize: '1.8rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -292,19 +353,19 @@ export const FAQ = ({ onClose, lang = 'tr', mode = 'live' }) => {
 
                                 {/* IQ Guide Quick-view */}
                                 <div className="glass-panel iq-guide-quickview" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                    <h3 style={{ fontSize: '1.2rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '1.5rem' }}>🎯 IQ & ANALİZ KILAVUZU</h3>
+                                    <h3 style={{ fontSize: '1.2rem', color: 'var(--accent-color)', fontWeight: 800, marginBottom: '1.5rem' }}>{t.iq_guide_title}</h3>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
                                         <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
                                             <b style={{ color: '#34d399', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>Forebet / Statarea</b>
-                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>Saf istatistik ve matematiksel modeller. Duygusuz veri setleri ve algoritmik olasılığa odaklanın.</p>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.source_forebet_desc}</p>
                                         </div>
                                         <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
                                             <b style={{ color: '#fb923c', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>SoccerVista</b>
-                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>Saha içi trend ve form takibi. Takımların son haftalardaki ritmini ölçmek için en iyi kaynaktır.</p>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.source_soccervista_desc}</p>
                                         </div>
                                         <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.01)', borderRadius: '10px' }}>
                                             <b style={{ color: '#00f2fe', display: 'block', marginBottom: '0.5rem', fontSize: '1rem' }}>OLBG / Community</b>
-                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>İnsan aklı ve profesyonel görüşü. Market hareketlerine ve sakatlık/ceza durumlarına duyarlı topluluk verisi.</p>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{t.source_olbg_desc}</p>
                                         </div>
                                     </div>
                                 </div>

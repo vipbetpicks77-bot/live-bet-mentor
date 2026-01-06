@@ -243,129 +243,150 @@ class ConsensusScraper:
 
     def scrape_predictz(self):
         print("[CONSENSUS] Scraping PredictZ (Desktop Mode)...")
-        # Use desktop mode - mobile was failing
         driver = self.get_driver(use_mobile=False, headless=False)
         try:
-            url = SITES["predictz"]
-            driver.get(url)
-            time.sleep(15)
-            
-            # Consent handling
-            try:
-                consent_selectors = [
-                    "button[aria-label='Consent']",
-                    ".fc-cta-consent",
-                    ".qc-cmp2-footer button",
-                    "button.consent-btn",
-                    "#onetrust-accept-btn-handler"
-                ]
-                for sel in consent_selectors:
-                    try:
-                        btn = driver.find_element(By.CSS_SELECTOR, sel)
-                        if btn.is_displayed():
-                            btn.click()
-                            print("[PREDICTZ] Consent accepted")
-                            time.sleep(2)
-                            break
-                    except: continue
-            except: pass
-            
             predictions = []
-            # Debug confirmed: .pttr has 60 elements
-            rows = driver.find_elements(By.CSS_SELECTOR, ".pttr")
-            print(f"[CONSENSUS] PredictZ: Found {len(rows)} rows")
             
-            for row in rows:
+            # Scrape both today and tomorrow pages
+            urls_to_scrape = [
+                ("https://www.predictz.com/predictions/today/", datetime.now().strftime("%d.%m")),
+                ("https://www.predictz.com/predictions/tomorrow/", (datetime.now() + __import__('datetime').timedelta(days=1)).strftime("%d.%m"))
+            ]
+            
+            for url, date_str in urls_to_scrape:
+                driver.get(url)
+                time.sleep(10)
+                
+                # Cookie consent handling
                 try:
-                    # Game link with team names
-                    game_el = row.find_elements(By.CSS_SELECTOR, ".ptgame a, .ptgame")
-                    if not game_el:
-                        continue
-                    
-                    match_text = game_el[0].get_attribute("textContent").strip()
-                    if not match_text:
-                        match_text = game_el[0].text.strip()
-                    
-                    # Split teams
-                    home = ""
-                    away = ""
-                    if ' v ' in match_text:
-                        home, away = match_text.split(' v ', 1)
-                    elif ' vs ' in match_text.lower():
-                        home, away = match_text.lower().split(' vs ', 1)
-                    elif ' - ' in match_text:
-                        home, away = match_text.split(' - ', 1)
-                    else:
-                        continue
-                    
-                    home = home.strip()
-                    away = away.strip()
-                    
-                    if not home or not away:
-                        continue
-                    
-                    # Prediction - look for prediction box
-                    pred = "N/A"
-                    markets = {}
-                    
-                    # Try multiple selectors for prediction
-                    pred_selectors = [".ptpredboxsml", ".ptprd", ".pttd:last-child"]
-                    for sel in pred_selectors:
-                        try:
-                            pred_el = row.find_element(By.CSS_SELECTOR, sel)
-                            pred_text = pred_el.get_attribute("textContent").strip().lower()
-                            
-                            # Score prediction (e.g., "2-1")
-                            score_match = re.search(r'(\d+)\s*[-:]\s*(\d+)', pred_text)
-                            if score_match:
-                                h_score = int(score_match.group(1))
-                                a_score = int(score_match.group(2))
-                                if h_score > a_score: pred = "1"
-                                elif h_score < a_score: pred = "2"
-                                else: pred = "X"
-                                markets["1X2"] = {"pred": pred}
-                                markets["BTTS"] = {"pred": "Yes" if h_score > 0 and a_score > 0 else "No"}
-                                markets["OU25"] = {"pred": "OVER" if (h_score + a_score) > 2.5 else "UNDER"}
-                                break
-                            
-                            # Direct prediction text
-                            if "home" in pred_text or pred_text == "1": pred = "1"
-                            elif "away" in pred_text or pred_text == "2": pred = "2"
-                            elif "draw" in pred_text or pred_text == "x": pred = "X"
-                            
-                            if pred != "N/A":
-                                if "1X2" not in markets:
+                    consent_btn = driver.find_element(By.CSS_SELECTOR, ".cc_btn_accept_all, #cc_btn_accept_all, button[class*='accept']")
+                    if consent_btn.is_displayed():
+                        consent_btn.click()
+                        print("[PREDICTZ] Cookie consent accepted")
+                        time.sleep(2)
+                except: pass
+                
+                # Close popup if exists
+                try:
+                    close_btn = driver.find_element(By.CSS_SELECTOR, "#intclose, .closeint, [id*='close']")
+                    if close_btn.is_displayed():
+                        close_btn.click()
+                        print("[PREDICTZ] Popup closed")
+                        time.sleep(1)
+                except: pass
+                
+                # Scroll to load all content
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(3)
+                driver.execute_script("window.scrollTo(0, 0);")
+                time.sleep(2)
+                
+                # Use correct selector: .pttr.ptcnt for match rows (not header rows)
+                rows = driver.find_elements(By.CSS_SELECTOR, ".pttr.ptcnt")
+                print(f"[PREDICTZ] {url.split('/')[-2]}: Found {len(rows)} match rows")
+                
+                for row in rows:
+                    try:
+                        # Teams from .pttd.ptgame
+                        game_el = row.find_elements(By.CSS_SELECTOR, ".pttd.ptgame a, .pttd.ptgame")
+                        if not game_el:
+                            game_el = row.find_elements(By.CSS_SELECTOR, ".ptgame a, .ptgame")
+                        if not game_el:
+                            continue
+                        
+                        match_text = game_el[0].get_attribute("textContent").strip()
+                        if not match_text:
+                            match_text = game_el[0].text.strip()
+                        
+                        # Clean "MATCH PREVIEW" text
+                        match_text = match_text.replace("MATCH PREVIEW", "").strip()
+                        
+                        # Split teams
+                        home = ""
+                        away = ""
+                        if ' v ' in match_text:
+                            home, away = match_text.split(' v ', 1)
+                        elif ' vs ' in match_text.lower():
+                            parts = match_text.lower().split(' vs ', 1)
+                            home, away = parts[0], parts[1]
+                        elif ' - ' in match_text:
+                            home, away = match_text.split(' - ', 1)
+                        else:
+                            continue
+                        
+                        home = home.strip()
+                        away = away.strip()
+                        
+                        if not home or not away:
+                            continue
+                        
+                        # Prediction from .pttd.ptprd
+                        pred = "N/A"
+                        markets = {}
+                        score_pred = "N/A"
+                        
+                        pred_selectors = [".pttd.ptprd", ".ptprd", ".ptpredboxsml"]
+                        for sel in pred_selectors:
+                            try:
+                                pred_el = row.find_element(By.CSS_SELECTOR, sel)
+                                pred_text = pred_el.get_attribute("textContent").strip().replace("MATCH PREVIEW", "").strip().lower()
+                                
+                                # Score prediction (e.g., "Home 2-1" or just "2-1")
+                                score_match = re.search(r'(\d+)\s*[-:]\s*(\d+)', pred_text)
+                                if score_match:
+                                    h_score = int(score_match.group(1))
+                                    a_score = int(score_match.group(2))
+                                    score_pred = f"{h_score}-{a_score}"
+                                    if h_score > a_score: pred = "1"
+                                    elif h_score < a_score: pred = "2"
+                                    else: pred = "X"
                                     markets["1X2"] = {"pred": pred}
-                                break
-                        except: continue
-                    
-                    # Store score prediction if found
-                    score_pred = "N/A"
-                    for sel in pred_selectors:
+                                    markets["BTTS"] = {"pred": "Yes" if h_score > 0 and a_score > 0 else "No"}
+                                    markets["OU25"] = {"pred": "OVER" if (h_score + a_score) > 2.5 else "UNDER"}
+                                    break
+                                
+                                # Direct prediction text
+                                if "home" in pred_text or pred_text == "1": 
+                                    pred = "1"
+                                elif "away" in pred_text or pred_text == "2": 
+                                    pred = "2"
+                                elif "draw" in pred_text or pred_text == "x": 
+                                    pred = "X"
+                                
+                                if pred != "N/A":
+                                    markets["1X2"] = {"pred": pred}
+                                    break
+                            except: 
+                                continue
+                        
+                        # Get odds from .pttd.ptodds elements
                         try:
-                            pred_el = row.find_element(By.CSS_SELECTOR, sel)
-                            pred_text = pred_el.get_attribute("textContent").strip()
-                            score_match = re.search(r'(\d+)\s*[-:]\s*(\d+)', pred_text)
-                            if score_match:
-                                score_pred = f"{score_match.group(1)}-{score_match.group(2)}"
-                                break
-                        except: continue
-                    
-                    if home and away and pred != "N/A":
-                        predictions.append({
-                            "home": home.strip(),
-                            "away": away.strip(),
-                            "score_pred": score_pred,
-                            "markets": markets,
-                            "timestamp": datetime.now().isoformat(),
-                            "date": datetime.now().strftime("%d.%m")
-                        })
-                except:
-                    continue
+                            odds_els = row.find_elements(By.CSS_SELECTOR, ".pttd.ptodds")
+                            if len(odds_els) >= 3:
+                                odds_1 = odds_els[0].get_attribute("textContent").strip()
+                                odds_x = odds_els[1].get_attribute("textContent").strip()
+                                odds_2 = odds_els[2].get_attribute("textContent").strip()
+                                if "1X2" in markets:
+                                    markets["1X2"]["odds_1"] = odds_1
+                                    markets["1X2"]["odds_x"] = odds_x
+                                    markets["1X2"]["odds_2"] = odds_2
+                        except: pass
+                        
+                        if home and away and pred != "N/A":
+                            predictions.append({
+                                "home": home.strip(),
+                                "away": away.strip(),
+                                "score_pred": score_pred,
+                                "markets": markets,
+                                "timestamp": datetime.now().isoformat(),
+                                "date": date_str
+                            })
+                    except:
+                        continue
             
             if predictions:
                 self.results["predictz"] = predictions
-                print(f"[CONSENSUS] PredictZ: Scraped {len(predictions)} matches")
+                print(f"[CONSENSUS] PredictZ: Scraped {len(predictions)} total matches")
             else:
                 print("[CONSENSUS] PredictZ: No new predictions found, keeping old ones.")
         except Exception as e:

@@ -43,7 +43,9 @@ const DEFAULT_THRESHOLDS = {
     SICAK_THRESHOLD: 55,
     MAX_MINUTE: 85,
     MIN_DQS: 0.35,
-    VALUE_THRESHOLD: 0.10  // 10% implied probability edge required
+    VALUE_THRESHOLD: 0.15, // Required edge for Value
+    ALPHA_THRESHOLD: 0.25, // Required edge for Alpha (Extreme Value)
+    TRAP_DRIFT_THRESHOLD: 0.10 // If odds rise despite stats
 };
 
 class LiveOpportunityScorer {
@@ -225,35 +227,43 @@ class LiveOpportunityScorer {
     }
 
     /**
-     * ENHANCED: Momentum with recency bias (last 5 min boost)
+     * ENHANCED: Momentum with side-specific bias
      */
-    _calculateMomentumScore(match, minute) {
+    _calculateMomentumScore(match, minute, side = 'total') {
         let baseScore = 40;
 
-        // Try velocity module first
+        // Try velocity module
         try {
             const velocity = velocityModule.calculate(match);
             if (velocity) {
                 const gearMap = { 5: 100, 4: 80, 3: 60, 2: 40, 1: 20 };
                 baseScore = gearMap[velocity.gear] || 50;
+
+                // If specific side, adjust based on dominance
+                if (side !== 'total' && velocity.dominantSide) {
+                    if (velocity.dominantSide !== side) baseScore *= 0.6;
+                }
             }
         } catch (e) { }
 
-        // Fallback: Based on stats
+        // Based on stats
         const stats = match.stats || {};
-        const sog = (stats.shotsOnGoal?.home || 0) + (stats.shotsOnGoal?.away || 0);
-        const da = (stats.dangerousAttacks?.home || 0) + (stats.dangerousAttacks?.away || 0);
+        const homeSog = stats.shotsOnGoal?.home || 0;
+        const awaySog = stats.shotsOnGoal?.away || 0;
+        const homeDa = stats.dangerousAttacks?.home || 0;
+        const awayDa = stats.dangerousAttacks?.away || 0;
 
-        if (minute > 0) {
-            const sogPerMin = sog / minute;
-            const daPerMin = da / minute;
-            const activityScore = Math.min(100, (sogPerMin * 40) + (daPerMin * 1.5));
-            baseScore = Math.max(baseScore, activityScore);
+        if (side === 'home') {
+            const sogScore = Math.min(100, (homeSog / Math.max(1, minute)) * 200);
+            const daScore = Math.min(100, (homeDa / Math.max(1, minute)) * 5);
+            baseScore = (sogScore * 0.7 + daScore * 0.3);
+        } else if (side === 'away') {
+            const sogScore = Math.min(100, (awaySog / Math.max(1, minute)) * 200);
+            const daScore = Math.min(100, (awayDa / Math.max(1, minute)) * 5);
+            baseScore = (sogScore * 0.7 + daScore * 0.3);
         }
 
-        // RECENCY BOOST: If we have recent events data
         const recentBoost = this._getRecentActivityBoost(match.id, stats);
-
         return Math.min(100, Math.round(baseScore + recentBoost));
     }
 
@@ -284,48 +294,44 @@ class LiveOpportunityScorer {
         return Math.min(20, sogDelta * 10 + daDelta * 2);
     }
 
-    _calculatePressureScore(match) {
+    _calculatePressureScore(match, side = 'total') {
         try {
             const pressure = pressureIndex.calculate(match);
-            if (pressure?.total) {
-                return Math.min(100, pressure.total);
+            if (pressure) {
+                if (side === 'home') return pressure.home || 0;
+                if (side === 'away') return pressure.away || 0;
+                return pressure.total || 0;
             }
         } catch (e) { }
 
         const stats = match.stats || {};
-        const daHome = stats.dangerousAttacks?.home || 0;
-        const daAway = stats.dangerousAttacks?.away || 0;
-        const total = daHome + daAway;
+        if (side === 'home') return Math.min(100, (stats.dangerousAttacks?.home || 0) * 1.5);
+        if (side === 'away') return Math.min(100, (stats.dangerousAttacks?.away || 0) * 1.5);
 
-        if (total < 20) return 35;
-        if (total < 40) return 55;
-        if (total < 60) return 70;
-        return Math.min(100, 75 + (total - 60) / 2);
+        const total = (stats.dangerousAttacks?.home || 0) + (stats.dangerousAttacks?.away || 0);
+        return Math.min(100, total * 0.8);
     }
 
     /**
-     * ENHANCED: xG with velocity tracking
+     * ENHANCED: xG with velocity tracking and side support
      */
-    _calculateXGScore(match) {
+    _calculateXGScore(match, side = 'total') {
         const stats = match.stats || {};
         const xgHome = stats.xg?.home || 0;
         const xgAway = stats.xg?.away || 0;
-        const totalXG = xgHome + xgAway;
 
-        // Base score from total xG
+        const val = side === 'home' ? xgHome : (side === 'away' ? xgAway : xgHome + xgAway);
+
         let baseScore;
-        if (totalXG === 0) baseScore = 40;
-        else if (totalXG < 0.5) baseScore = 35;
-        else if (totalXG < 1.0) baseScore = 50;
-        else if (totalXG < 1.5) baseScore = 65;
-        else if (totalXG < 2.0) baseScore = 75;
-        else if (totalXG < 3.0) baseScore = 85;
-        else baseScore = 95;
+        if (val === 0) baseScore = 40;
+        else if (val < 0.3) baseScore = 35; // Adjusted for side vs total
+        else if (val < 0.8) baseScore = 60;
+        else if (val < 1.5) baseScore = 80;
+        else baseScore = 100;
 
-        // xG velocity bonus
+        // Velocity bonus
         const xgVelocity = this._getXGVelocity(match.id);
-        if (xgVelocity > 0.1) baseScore = Math.min(100, baseScore + 15);
-        else if (xgVelocity > 0.05) baseScore = Math.min(100, baseScore + 10);
+        if (xgVelocity > 0.05) baseScore = Math.min(100, baseScore + 10);
 
         return Math.round(baseScore);
     }
@@ -385,48 +391,57 @@ class LiveOpportunityScorer {
     }
 
     /**
-     * NEW: Calculate odds-based value score
+     * ALPHA MODEL: Calculate EV-based value score
+     * Compares Situation Probability (P_sit) vs Market Implied Probability (P_mkt)
      */
     _calculateOddsScore(match, signal) {
         const oddsInfo = this._getMatchOdds(match);
-        if (!oddsInfo) return 50;  // Neutral without odds data
+        if (!oddsInfo) return 50;
 
         const { thresholds } = this.getConfig();
-        let score = 50;
+        const stats = match.stats || {};
 
-        // Calculate implied probability from odds
+        // 1. Get Market Probability (P_mkt)
         const homeOdds = parseFloat(oddsInfo.home) || 0;
         const drawOdds = parseFloat(oddsInfo.draw) || 0;
         const awayOdds = parseFloat(oddsInfo.away) || 0;
+        if (homeOdds <= 1 || awayOdds <= 1) return 50;
 
-        if (homeOdds <= 0 || drawOdds <= 0 || awayOdds <= 0) return 50;
+        const pMktHome = 1 / homeOdds;
+        const pMktAway = 1 / awayOdds;
 
-        const homeProb = 1 / homeOdds;
-        const drawProb = 1 / drawOdds;
-        const awayProb = 1 / awayOdds;
+        // 2. Derive Situational Probability (P_sit) from stats (0.0 - 1.0)
+        // High weights on Pressure and Momentum
+        const pSitHome = (this._calculatePressureScore(match, 'home') * 0.4 +
+            this._calculateMomentumScore(match, 'home') * 0.4 +
+            this._calculateXGScore(match, 'home') * 0.2) / 100;
 
-        // Check for value based on match situation
-        const stats = match.stats || {};
-        const homePressure = stats.dangerousAttacks?.home || 0;
-        const awayPressure = stats.dangerousAttacks?.away || 0;
+        const pSitAway = (this._calculatePressureScore(match, 'away') * 0.4 +
+            this._calculateMomentumScore(match, 'away') * 0.4 +
+            this._calculateXGScore(match, 'away') * 0.2) / 100;
 
-        // If home is pressing hard but odds are good
-        if (homePressure > awayPressure * 1.3 && homeOdds >= 2.0) {
-            score += 25;  // Value detected on home
+        // 3. Calculate Expected Value (EV)
+        const evHome = (pSitHome * homeOdds) - 1;
+        const evAway = (pSitAway * awayOdds) - 1;
+
+        // 4. Trap Detection: Drifting Odds
+        const movement = this._detectOddsMovement(match);
+        let trapPenalty = 0;
+        // If stats are great for home but home odds are rising (drifting)
+        if (pSitHome > 0.6 && movement.homeWeight > 0.05) {
+            trapPenalty = 30; // High risk of trap
         }
-        if (awayPressure > homePressure * 1.3 && awayOdds >= 2.0) {
-            score += 25;  // Value detected on away
-        }
 
-        // Odds movement detection
-        const oddsMovement = this._detectOddsMovement(match);
-        if (oddsMovement.shortening) score += 15;  // Sharp money indicator
+        // 5. Final Score Mapping
+        const maxEV = Math.max(evHome, evAway);
+        let valueScore = 50;
 
-        // Low margin = sharp bookmaker = good signal
-        const margin = homeProb + drawProb + awayProb - 1;
-        if (margin < 0.05) score += 10;
+        if (maxEV > thresholds.ALPHA_THRESHOLD) valueScore = 95;
+        else if (maxEV > thresholds.VALUE_THRESHOLD) valueScore = 80;
+        else if (maxEV > 0) valueScore = 65;
+        else if (maxEV < -0.2) valueScore = 30;
 
-        return Math.min(100, Math.round(score));
+        return Math.max(0, valueScore - trapPenalty);
     }
 
     /**
@@ -450,21 +465,26 @@ class LiveOpportunityScorer {
     }
 
     /**
-     * NEW: Detect if odds are shortening (sharp money indicator)
+     * NEW: Detect if odds are shortening (sharp) or drifting (trap)
      */
     _detectOddsMovement(match) {
         const currentOdds = this._getMatchOdds(match);
-        if (!currentOdds) return { shortening: false };
+        if (!currentOdds) return { shortening: false, homeWeight: 0, awayWeight: 0 };
 
         const key = `${(match.homeTeam || '').toLowerCase()}_${(match.awayTeam || '').toLowerCase()}`;
         const prevOdds = this.previousOdds[key];
 
-        if (!prevOdds) return { shortening: false };
+        if (!prevOdds) return { shortening: false, homeWeight: 0, awayWeight: 0 };
 
-        const homeDropped = parseFloat(currentOdds.home) < parseFloat(prevOdds.home);
-        const awayDropped = parseFloat(currentOdds.away) < parseFloat(prevOdds.away);
+        const homeWeight = parseFloat(currentOdds.home) - parseFloat(prevOdds.home);
+        const awayWeight = parseFloat(currentOdds.away) - parseFloat(prevOdds.away);
 
-        return { shortening: homeDropped || awayDropped };
+        return {
+            shortening: homeWeight < 0 || awayWeight < 0,
+            drifting: homeWeight > 0.05 || awayWeight > 0.05,
+            homeWeight,
+            awayWeight
+        };
     }
 
     _calculateTrend(matchId, currentScore) {
@@ -485,13 +505,18 @@ class LiveOpportunityScorer {
      * ENHANCED: Heat level now considers odds value
      */
     _getHeatLevel(score, trend, thresholds, oddsScore) {
-        // ALEV requires high score + not declining + value indicator
+        // ALPHA: Extreme Score + High Value + Positive Trend
+        if (score >= 90 && oddsScore >= 80 && trend.direction !== 'DOWN') {
+            return 'ALPHA';
+        }
+
+        // ALEV: High score + not declining
         if (score >= thresholds.ALEV_THRESHOLD && trend.direction !== 'DOWN') {
             return 'ALEV';
         }
 
-        // Can also be ALEV if score is 70+ with strong value
-        if (score >= 70 && oddsScore >= 75 && trend.direction === 'UP') {
+        // Strong value can also push to ALEV
+        if (score >= 75 && oddsScore >= 75 && trend.direction === 'UP') {
             return 'ALEV';
         }
 
@@ -513,18 +538,16 @@ class LiveOpportunityScorer {
         const totalGoals = (match.score?.home || 0) + (match.score?.away || 0);
         const xgTotal = (stats.xg?.home || 0) + (stats.xg?.away || 0);
 
-        // Over 2.5 suggestion with odds validation
+        // Over 2.5 suggestion
         if (minute < 65 && xgTotal > 1.2 && totalGoals < 2) {
-            if (!oddsInfo || parseFloat(oddsInfo.home) > 1.5) {
-                return { market: 'OVER_25', confidence: xgTotal > 1.8 ? 'HIGH' : 'MEDIUM' };
-            }
+            return { marketKey: 'market_over_25', confidence: xgTotal > 1.8 ? 'HIGH' : 'MEDIUM' };
         }
 
         // Goal next suggestion
-        if (minute >= 55 && minute < 80) {
+        if (minute >= 50 && minute < 85) {
             const sog = (stats.shotsOnGoal?.home || 0) + (stats.shotsOnGoal?.away || 0);
-            if (sog >= 7 && totalGoals < 3) {
-                return { market: 'GOAL_NEXT', confidence: sog >= 10 ? 'HIGH' : 'MEDIUM' };
+            if (sog >= 6 && totalGoals < 4) {
+                return { marketKey: 'market_goal_next', confidence: sog >= 10 ? 'HIGH' : 'MEDIUM' };
             }
         }
 
@@ -532,17 +555,11 @@ class LiveOpportunityScorer {
         const daHome = stats.dangerousAttacks?.home || 0;
         const daAway = stats.dangerousAttacks?.away || 0;
 
-        if (daHome > daAway * 1.4 && signal?.verdict === 'BET') {
-            const homeOdds = parseFloat(oddsInfo?.home || 0);
-            if (homeOdds >= 1.8) {
-                return { market: 'HOME_WIN', confidence: homeOdds >= 2.5 ? 'VALUE' : 'MEDIUM' };
-            }
+        if (daHome > daAway * 1.5 && signal?.verdict === 'BET') {
+            return { marketKey: 'market_home_win', confidence: 'VALUE' };
         }
-        if (daAway > daHome * 1.4 && signal?.verdict === 'BET') {
-            const awayOdds = parseFloat(oddsInfo?.away || 0);
-            if (awayOdds >= 1.8) {
-                return { market: 'AWAY_WIN', confidence: awayOdds >= 2.5 ? 'VALUE' : 'MEDIUM' };
-            }
+        if (daAway > daHome * 1.5 && signal?.verdict === 'BET') {
+            return { marketKey: 'market_away_win', confidence: 'VALUE' };
         }
 
         return null;
@@ -555,39 +572,41 @@ class LiveOpportunityScorer {
         const minute = this._parseMinute(match.minute);
         const parts = [];
 
-        if (heatLevel === 'ALEV') {
-            parts.push('🔥 Yüksek aktivite');
+        if (heatLevel === 'ALPHA') {
+            parts.push({ key: 'reason_alpha_signal' });
+        } else if (heatLevel === 'ALEV') {
+            parts.push({ key: 'reason_high_activity' });
         }
 
         if (momentumScore >= 75) {
-            parts.push(`Güçlü momentum (${minute}')`);
+            parts.push({ key: 'reason_strong_momentum', params: { minute } });
         } else if (momentumScore >= 60) {
-            parts.push(`İyi momentum`);
+            parts.push({ key: 'reason_good_momentum' });
         }
 
         if (pressureScore >= 75) {
-            parts.push('Yoğun baskı');
+            parts.push({ key: 'reason_high_pressure' });
         }
 
         if (oddsScore >= 70) {
-            parts.push('💰 Değer tespit edildi');
+            parts.push({ key: 'reason_value_detected' });
         }
 
         if (signal?.verdict === 'BET') {
-            parts.push('✅ DQS+');
+            parts.push({ key: 'reason_dqs_plus' });
         }
 
         // xG velocity note
         const xgVelocity = this._getXGVelocity(match.id);
         if (xgVelocity > 0.1) {
-            parts.push('📈 xG yükseliyor');
+            parts.push({ key: 'reason_xg_rising' });
         }
 
         if (parts.length === 0) {
-            return 'Ortalama aktivite';
+            parts.push({ key: 'reason_avg_activity' });
         }
 
-        return parts.join(' • ');
+        return parts;
     }
 
     _updateHistory(matchId, score) {

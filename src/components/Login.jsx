@@ -1,27 +1,33 @@
 import React, { useState } from 'react';
 import { supabase } from '../backend/supabaseClient';
+import { translations } from '../locales/translations';
 
-export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
+export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr', setLang }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const t = translations[lang];
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        try {
+            const { data, error: authError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-        if (error) {
-            setError(lang === 'tr' ? 'Hatalı giriş bilgileri.' : 'Invalid login credentials.');
-            setLoading(false);
-        } else {
+            if (authError) throw authError;
             if (onLoginSuccess) onLoginSuccess(data.session);
+        } catch (err) {
+            console.error('Login error:', err);
+            setError(err.message || 'Login failed');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -46,25 +52,46 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
             </div>
 
             <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '400px' }}>
-                {/* Back to Landing */}
-                {onNavigate && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    {/* Back to Landing */}
+                    {onNavigate && (
+                        <button
+                            onClick={() => onNavigate('landing')}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#94a3b8',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
+                            }}
+                        >
+                            ← {t.backToHome}
+                        </button>
+                    )}
+
+                    {/* Language Toggle */}
                     <button
-                        onClick={() => onNavigate('landing')}
+                        onClick={() => setLang && setLang(lang === 'tr' ? 'en' : 'tr')}
                         style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: '#94a3b8',
-                            marginBottom: '2rem',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#fff',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '8px',
                             cursor: 'pointer',
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.5rem'
+                            gap: '0.4rem'
                         }}
                     >
-                        ← {lang === 'tr' ? 'Ana Sayfa' : 'Home'}
+                        <span>{lang === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}</span>
                     </button>
-                )}
+                </div>
 
                 <div className="glass-panel" style={{
                     width: '100%',
@@ -82,14 +109,14 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
                             LIVE BET MENTOR
                         </h1>
                         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>
-                            {lang === 'tr' ? 'Algoritmik Analiz Paneline Giriş Yap' : 'Login to the Algorithmic Analysis Panel'}
+                            {t.login_to_panel}
                         </p>
                     </div>
 
                     <form onSubmit={handleLogin} style={{ display: 'grid', gap: '1.5rem' }}>
                         <div style={{ textAlign: 'left' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-color)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                {lang === 'tr' ? 'E-POSTA' : 'EMAIL'}
+                                {t.email}
                             </label>
                             <input
                                 type="email"
@@ -106,13 +133,13 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
                                     outline: 'none',
                                     transition: 'border-color 0.3s'
                                 }}
-                                placeholder="ornek@email.com"
+                                placeholder={t.emailPlaceholder}
                             />
                         </div>
 
                         <div style={{ textAlign: 'left' }}>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-color)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                {lang === 'tr' ? 'ŞİFRE' : 'PASSWORD'}
+                                {t.password}
                             </label>
                             <input
                                 type="password"
@@ -129,7 +156,7 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
                                     outline: 'none',
                                     transition: 'border-color 0.3s'
                                 }}
-                                placeholder="••••••••"
+                                placeholder={t.passwordPlaceholder}
                             />
                         </div>
 
@@ -156,14 +183,14 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
                                 boxShadow: '0 4px 15px rgba(56, 189, 248, 0.3)'
                             }}
                         >
-                            {loading ? '...' : (lang === 'tr' ? 'GİRİŞ YAP' : 'SIGN IN')}
+                            {loading ? '...' : t.login.toUpperCase()}
                         </button>
                     </form>
 
                     {/* Register Link */}
                     {onNavigate && (
                         <div style={{ marginTop: '2rem', color: '#64748b', fontSize: '0.9rem' }}>
-                            {lang === 'tr' ? 'Hesabın yok mu?' : "Don't have an account?"}{' '}
+                            {t.haveAccount}{' '}
                             <button
                                 onClick={() => onNavigate('register')}
                                 style={{
@@ -174,7 +201,7 @@ export const Login = ({ onLoginSuccess, onNavigate, lang = 'tr' }) => {
                                     fontWeight: 600
                                 }}
                             >
-                                {lang === 'tr' ? 'Kayıt Ol' : 'Sign Up'}
+                                {t.register}
                             </button>
                         </div>
                     )}

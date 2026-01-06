@@ -6,11 +6,14 @@ export const AdminPanel = ({ lang = 'tr' }) => {
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [subscriptionDays, setSubscriptionDays] = useState(30);
-    const [selectedPlan, setSelectedPlan] = useState('pro');
+    const [subscriptionDays, setSubscriptionDays] = useState(7);
+    const [selectedPlan, setSelectedPlan] = useState('trial');
     const [status, setStatus] = useState({ type: '', message: '' });
-    const [activeTab, setActiveTab] = useState('pending'); // 'pending', 'active', 'all'
+    const [activeTab, setActiveTab] = useState('pending'); // 'pending', 'active', 'all', 'upgrades'
+    const [upgradeRequests, setUpgradeRequests] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
+    const [systemSettings, setSystemSettings] = useState({});
+    const [settingsLoading, setSettingsLoading] = useState(false);
 
     const PLANS = {
         trial: { label: 'Trial', color: '#10b981' },
@@ -60,7 +63,17 @@ export const AdminPanel = ({ lang = 'tr' }) => {
         subscriptionUpdated: 'Üyelik süresi güncellendi!',
         loading: 'Yükleniyor...',
         noUsers: 'Kullanıcı bulunamadı.',
-        quickDurations: 'Hızlı:'
+        quickDurations: 'Hızlı:',
+        requestedPlan: 'TALEP EDİLEN',
+        currentPlan: 'MEVCUT PLAN',
+        tabSettings: 'SİSTEM AYARLARI',
+        saveSettings: 'AYARLARI KAYDET',
+        whatsappSupport: 'WhatsApp Destek Hattı',
+        proPrice: 'Pro Plan Fiyatı',
+        premiumPrice: 'Premium Plan Fiyatı',
+        currency: 'Para Birimi',
+        supportEmail: 'Destek E-postası',
+        settingsUpdated: 'Sistem ayarları güncellendi!'
     } : {
         title: '🛡️ ADMIN CONTROL CENTER',
         addMember: 'ADD NEW MEMBER',
@@ -102,11 +115,24 @@ export const AdminPanel = ({ lang = 'tr' }) => {
         subscriptionUpdated: 'Subscription updated!',
         loading: 'Loading...',
         noUsers: 'No users found.',
-        quickDurations: 'Quick:'
+        quickDurations: 'Quick:',
+        tabUpgrades: 'UPGRADE REQUESTS',
+        requestedPlan: 'REQUESTED',
+        currentPlan: 'CURRENT',
+        tabSettings: 'SYSTEM SETTINGS',
+        saveSettings: 'SAVE SETTINGS',
+        whatsappSupport: 'WhatsApp Support Number',
+        proPrice: 'Pro Plan Price',
+        premiumPrice: 'Premium Plan Price',
+        currency: 'Currency Symbol',
+        supportEmail: 'Support Email',
+        settingsUpdated: 'System settings updated!'
     };
 
     useEffect(() => {
         fetchProfiles();
+        fetchUpgradeRequests();
+        fetchSystemSettings();
     }, []);
 
     const fetchProfiles = async () => {
@@ -122,6 +148,108 @@ export const AdminPanel = ({ lang = 'tr' }) => {
             setProfiles(data || []);
         }
         setLoading(false);
+    };
+
+    const fetchUpgradeRequests = async () => {
+        const { data, error } = await supabase
+            .from('membership_requests')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+
+        if (!error) setUpgradeRequests(data || []);
+    };
+
+    const approveUpgrade = async (request) => {
+        try {
+            // 1. Update Profile
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30); // Default 30 days for upgrades
+
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({
+                    plan: request.requested_plan,
+                    status: 'approved',
+                    subscription_start: new Date().toISOString(),
+                    subscription_end: expiryDate.toISOString()
+                })
+                .eq('id', request.user_id);
+
+            if (profileError) throw profileError;
+
+            // 2. Update Request Status
+            const { error: requestError } = await supabase
+                .from('membership_requests')
+                .update({
+                    status: 'approved',
+                    resolved_at: new Date().toISOString()
+                })
+                .eq('id', request.id);
+
+            if (requestError) throw requestError;
+
+            setStatus({ type: 'success', message: t.userApproved });
+            fetchProfiles();
+            fetchUpgradeRequests();
+        } catch (err) {
+            console.error(err);
+            setStatus({ type: 'error', message: 'Hata oluştu' });
+        }
+    };
+
+    const rejectUpgrade = async (requestId) => {
+        if (!window.confirm(t.confirmReject)) return;
+        try {
+            const { error } = await supabase
+                .from('membership_requests')
+                .update({
+                    status: 'rejected',
+                    resolved_at: new Date().toISOString()
+                })
+                .eq('id', requestId);
+
+            if (error) throw error;
+            setStatus({ type: 'success', message: t.userRejected });
+            fetchUpgradeRequests();
+        } catch (err) {
+            console.error(err);
+            setStatus({ type: 'error', message: 'Hata oluştu' });
+        }
+    };
+
+    const fetchSystemSettings = async () => {
+        setSettingsLoading(true);
+        const { data, error } = await supabase.from('system_settings').select('*');
+        if (!error && data) {
+            const settingsObj = {};
+            data.forEach(item => {
+                settingsObj[item.key] = item.value;
+            });
+            setSystemSettings(settingsObj);
+        }
+        setSettingsLoading(false);
+    };
+
+    const handleUpdateSettings = async (e) => {
+        e.preventDefault();
+        setSettingsLoading(true);
+        try {
+            const updates = Object.entries(systemSettings).map(([key, value]) => ({
+                key, value, updated_at: new Date().toISOString()
+            }));
+
+            const { error } = await supabase
+                .from('system_settings')
+                .upsert(updates);
+
+            if (error) throw error;
+            setStatus({ type: 'success', message: t.settingsUpdated });
+        } catch (err) {
+            console.error(err);
+            setStatus({ type: 'error', message: 'Ayarlar güncellenirken hata oluştu' });
+        }
+        setSettingsLoading(false);
     };
 
     const handleCreateUser = async (e) => {
@@ -430,14 +558,189 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                 >
                     {t.tabAll} ({profiles.length})
                 </button>
+                <button
+                    onClick={() => setActiveTab('upgrades')}
+                    style={{
+                        padding: '0.8rem 1.5rem',
+                        background: activeTab === 'upgrades' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(255,255,255,0.02)',
+                        border: `1px solid ${activeTab === 'upgrades' ? '#a78bfa' : 'var(--glass-border)'}`,
+                        borderRadius: '10px',
+                        color: activeTab === 'upgrades' ? '#a78bfa' : '#94a3b8',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}
+                >
+                    {t.tabUpgrades}
+                    {upgradeRequests.length > 0 && (
+                        <span style={{
+                            background: '#a78bfa',
+                            color: '#000',
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '10px',
+                            fontSize: '0.7rem',
+                            fontWeight: 900
+                        }}>
+                            {upgradeRequests.length}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveTab('settings')}
+                    style={{
+                        padding: '0.8rem 1.5rem',
+                        background: activeTab === 'settings' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.02)',
+                        border: `1px solid ${activeTab === 'settings' ? '#38bdf8' : 'var(--glass-border)'}`,
+                        borderRadius: '10px',
+                        color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}
+                >
+                    ⚙️ {t.tabSettings}
+                </button>
             </div>
 
-            {/* Member List */}
+            {/* Content Section */}
             <div className="glass-panel" style={{ padding: '2rem' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', fontWeight: 800 }}>{t.memberList}</h3>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', fontWeight: 800 }}>
+                    {activeTab === 'upgrades' ? t.tabUpgrades : activeTab === 'settings' ? t.tabSettings : t.memberList}
+                </h3>
 
                 {loading ? (
                     <p>{t.loading}</p>
+                ) : activeTab === 'upgrades' ? (
+                    upgradeRequests.length === 0 ? (
+                        <p style={{ color: '#64748b' }}>{t.noUsers}</p>
+                    ) : (
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
+                                <thead>
+                                    <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--glass-border)', fontSize: '0.7rem', opacity: 0.5, textTransform: 'uppercase' }}>
+                                        <th style={{ padding: '1rem' }}>{t.emailCol}</th>
+                                        <th style={{ padding: '1rem' }}>{t.currentPlan}</th>
+                                        <th style={{ padding: '1rem' }}>{t.requestedPlan}</th>
+                                        <th style={{ padding: '1rem' }}>{t.dateCol}</th>
+                                        <th style={{ padding: '1rem', textAlign: 'right' }}>{t.actionsCol}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {upgradeRequests.map(req => (
+                                        <tr key={req.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                            <td style={{ padding: '1rem', fontWeight: 600 }}>{req.email}</td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <span style={{ padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 900, background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
+                                                    {(req.current_plan || 'trial').toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <span style={{ padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 900, background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+                                                    {(req.requested_plan || '').toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{new Date(req.created_at).toLocaleDateString('tr-TR')}</td>
+                                            <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => approveUpgrade(req)}
+                                                        style={{ background: '#10b981', color: '#000', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}
+                                                    >
+                                                        {t.approve}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => rejectUpgrade(req.id)}
+                                                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}
+                                                    >
+                                                        {t.reject}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )
+                ) : activeTab === 'settings' ? (
+                    <div style={{ maxWidth: '600px' }}>
+                        <form onSubmit={handleUpdateSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.5rem' }}>{t.whatsappSupport}</label>
+                                    <input
+                                        type="text"
+                                        value={systemSettings.whatsapp_number || ''}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, whatsapp_number: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.5rem' }}>{t.supportEmail}</label>
+                                    <input
+                                        type="email"
+                                        value={systemSettings.support_email || ''}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, support_email: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.5rem' }}>{t.proPrice}</label>
+                                    <input
+                                        type="text"
+                                        value={systemSettings.price_pro || ''}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, price_pro: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.5rem' }}>{t.premiumPrice}</label>
+                                    <input
+                                        type="text"
+                                        value={systemSettings.price_premium || ''}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, price_premium: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.5rem' }}>{t.currency}</label>
+                                    <input
+                                        type="text"
+                                        value={systemSettings.price_currency || ''}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, price_currency: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={settingsLoading}
+                                style={{
+                                    padding: '1rem',
+                                    background: 'var(--accent-color)',
+                                    color: '#000',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: 800,
+                                    cursor: settingsLoading ? 'not-allowed' : 'pointer',
+                                    marginTop: '1rem',
+                                    opacity: settingsLoading ? 0.7 : 1
+                                }}
+                            >
+                                {settingsLoading ? t.loading : t.saveSettings}
+                            </button>
+                        </form>
+                    </div>
                 ) : filteredProfiles.length === 0 ? (
                     <p style={{ color: '#64748b' }}>{t.noUsers}</p>
                 ) : (
@@ -446,7 +749,6 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                             <thead>
                                 <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--glass-border)', fontSize: '0.7rem', opacity: 0.5, textTransform: 'uppercase' }}>
                                     <th style={{ padding: '1rem' }}>{t.emailCol}</th>
-                                    <th style={{ padding: '1rem' }}>{t.fullName}</th>
                                     <th style={{ padding: '1rem' }}>{t.dateCol}</th>
                                     <th style={{ padding: '1rem' }}>{t.statusCol}</th>
                                     <th style={{ padding: '1rem' }}>{t.planCol}</th>
@@ -464,7 +766,6 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                                     return (
                                         <tr key={profile.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                             <td style={{ padding: '1rem', fontWeight: 600 }}>{profile.email}</td>
-                                            <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#94a3b8' }}>{profile.full_name || '-'}</td>
                                             <td style={{ padding: '1rem', fontSize: '0.85rem' }}>{new Date(profile.created_at).toLocaleDateString('tr-TR')}</td>
                                             <td style={{ padding: '1rem' }}>
                                                 <span style={{
@@ -473,20 +774,20 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                                                     fontSize: '0.7rem',
                                                     fontWeight: 700,
                                                     background: statusInfo.bg,
-                                                    color: statusInfo.color,
-                                                    border: `1px solid ${statusInfo.color}33`
+                                                    color: statusInfo.color
                                                 }}>
                                                     {statusInfo.label}
                                                 </span>
                                             </td>
                                             <td style={{ padding: '1rem' }}>
                                                 <span style={{
-                                                    padding: '0.25rem 0.8rem',
-                                                    borderRadius: '12px',
-                                                    fontSize: '0.7rem',
-                                                    fontWeight: 700,
+                                                    padding: '0.2rem 0.6rem',
+                                                    borderRadius: '6px',
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: 900,
+                                                    background: planInfo.color + '15',
                                                     color: planInfo.color,
-                                                    border: `1px solid ${planInfo.color}33`
+                                                    border: `1px solid ${planInfo.color}30`
                                                 }}>
                                                     {planInfo.label}
                                                 </span>
@@ -494,96 +795,93 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                                             <td style={{ padding: '1rem', fontSize: '0.85rem' }}>
                                                 {profile.subscription_end ? new Date(profile.subscription_end).toLocaleDateString('tr-TR') : '-'}
                                             </td>
-                                            <td style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: 600 }}>
+                                            <td style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: 700 }}>
                                                 {getRemainingDays(profile.subscription_end)}
                                             </td>
                                             <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                                {profile.email !== 'karabulut.hamza@gmail.com' && (
-                                                    <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                                                        {/* Pending Actions */}
-                                                        {(profile.status === 'pending' || !profile.status) && !profile.is_banned && (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => approveUser(profile)}
-                                                                    title="Approve as Pro"
-                                                                    style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#10b981', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
-                                                                >
-                                                                    {t.approve}
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => rejectUser(profile.id)}
-                                                                    style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
-                                                                >
-                                                                    {t.reject}
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', position: 'relative' }}>
+                                                    {(profile.status === 'pending' || !profile.status) && !profile.is_banned && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => approveUser(profile)}
+                                                                title="Approve as Pro"
+                                                                style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#10b981', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
+                                                            >
+                                                                {t.approve}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => rejectUser(profile.id)}
+                                                                style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
+                                                            >
+                                                                {t.reject}
+                                                            </button>
+                                                        </>
+                                                    )}
 
-                                                        {/* Edit Mode */}
-                                                        {profile.status === 'approved' && !profile.is_banned && (
-                                                            isEditing ? (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', zIndex: 10 }}>
-                                                                    <div style={{ display: 'flex', gap: '0.3rem' }}>
-                                                                        {[7, 30, 90].map(days => (
-                                                                            <button
-                                                                                key={days}
-                                                                                onClick={() => updateSubscription(profile.id, days)}
-                                                                                style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid #38bdf8', padding: '0.3rem 0.5rem', borderRadius: '4px', color: '#38bdf8', cursor: 'pointer', fontSize: '0.6rem', fontWeight: 700 }}
-                                                                            >
-                                                                                +{days}
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                    <div style={{ display: 'flex', gap: '0.3rem' }}>
-                                                                        {Object.keys(PLANS).filter(k => k !== 'admin').map(p => (
-                                                                            <button
-                                                                                key={p}
-                                                                                onClick={() => updateSubscription(profile.id, null, p)}
-                                                                                style={{
-                                                                                    background: profile.plan === p ? PLANS[p].color : 'transparent',
-                                                                                    color: profile.plan === p ? '#000' : PLANS[p].color,
-                                                                                    border: `1px solid ${PLANS[p].color}`,
-                                                                                    padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem', fontWeight: 700
-                                                                                }}
-                                                                            >
-                                                                                {PLANS[p].label}
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => setEditingUser(null)}
-                                                                        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.7rem' }}
-                                                                    >
-                                                                        {t.cancel}
-                                                                    </button>
+                                                    {/* Edit Mode */}
+                                                    {profile.status === 'approved' && !profile.is_banned && (
+                                                        isEditing ? (
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', zIndex: 10 }}>
+                                                                <div style={{ display: 'flex', gap: '0.3rem' }}>
+                                                                    {[7, 30, 90].map(days => (
+                                                                        <button
+                                                                            key={days}
+                                                                            onClick={() => updateSubscription(profile.id, days)}
+                                                                            style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid #38bdf8', padding: '0.3rem 0.5rem', borderRadius: '4px', color: '#38bdf8', cursor: 'pointer', fontSize: '0.6rem', fontWeight: 700 }}
+                                                                        >
+                                                                            +{days}
+                                                                        </button>
+                                                                    ))}
                                                                 </div>
-                                                            ) : (
+                                                                <div style={{ display: 'flex', gap: '0.3rem' }}>
+                                                                    {Object.keys(PLANS).filter(k => k !== 'admin').map(p => (
+                                                                        <button
+                                                                            key={p}
+                                                                            onClick={() => updateSubscription(profile.id, null, p)}
+                                                                            style={{
+                                                                                background: profile.plan === p ? PLANS[p].color : 'transparent',
+                                                                                color: profile.plan === p ? '#000' : PLANS[p].color,
+                                                                                border: `1px solid ${PLANS[p].color}`,
+                                                                                padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem', fontWeight: 700
+                                                                            }}
+                                                                        >
+                                                                            {PLANS[p].label}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
                                                                 <button
-                                                                    onClick={() => setEditingUser(profile.id)}
-                                                                    style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#38bdf8', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
+                                                                    onClick={() => setEditingUser(null)}
+                                                                    style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.7rem' }}
                                                                 >
-                                                                    {t.extend} / {t.plan}
+                                                                    {t.cancel}
                                                                 </button>
-                                                            )
-                                                        )}
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => setEditingUser(profile.id)}
+                                                                style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#38bdf8', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700 }}
+                                                            >
+                                                                {t.extend} / {t.plan}
+                                                            </button>
+                                                        )
+                                                    )}
 
-                                                        {/* Ban/Unban */}
-                                                        <button
-                                                            onClick={() => toggleBan(profile.id, profile.is_banned)}
-                                                            style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '0.65rem' }}
-                                                        >
-                                                            {profile.is_banned ? t.unban : t.ban}
-                                                        </button>
+                                                    {/* Ban/Unban */}
+                                                    <button
+                                                        onClick={() => toggleBan(profile.id, profile.is_banned)}
+                                                        style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '0.65rem' }}
+                                                    >
+                                                        {profile.is_banned ? t.unban : t.ban}
+                                                    </button>
 
-                                                        {/* Delete */}
-                                                        <button
-                                                            onClick={() => deleteUser(profile.id)}
-                                                            style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '0.65rem' }}
-                                                        >
-                                                            {t.delete}
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                    {/* Delete */}
+                                                    <button
+                                                        onClick={() => deleteUser(profile.id)}
+                                                        style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '0.4rem 0.8rem', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '0.65rem' }}
+                                                    >
+                                                        {t.delete}
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -593,6 +891,6 @@ export const AdminPanel = ({ lang = 'tr' }) => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
