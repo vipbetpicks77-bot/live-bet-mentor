@@ -2234,3 +2234,1073 @@ FileExistsError: [WinError 183] Halen varolan bir dosya oluþturulamaz: 'C:\\User
 2026-01-06 04:31:18,420 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
 2026-01-06 04:31:34,443 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670294)
 2026-01-06 04:31:35,785 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:31:45,805 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:31:51,814 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670311)
+2026-01-06 04:31:53,273 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:32:09,334 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670329)
+2026-01-06 04:32:10,708 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:32:16,718 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:32:20,698 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:32:21,023 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:32:21,347 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:32:21,350 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:32:27,366 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670347)
+2026-01-06 04:32:28,786 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:32:32,793 [INFO] Processing queue: 1 matches
+2026-01-06 04:32:32,794 [INFO] Targeted fetch for Match ID: 15013841
+2026-01-06 04:32:36,665 [INFO] Captured DETAIL for 15013841 -> server/stats\15013841_detail.json
+2026-01-06 04:32:37,236 [INFO] Captured STATS for 15013841 -> server/stats\15013841_stats.json
+2026-01-06 04:32:45,253 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670365)
+2026-01-06 04:32:46,561 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:32:48,564 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:33:02,579 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670382)
+2026-01-06 04:33:03,920 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:33:19,937 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670399)
+2026-01-06 04:33:21,517 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:33:21,518 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:33:25,562 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:33:25,866 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:33:26,177 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:33:26,180 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:33:38,200 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670418)
+2026-01-06 04:33:39,578 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:33:53,602 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:33:55,605 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670435)
+2026-01-06 04:33:56,990 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:34:13,006 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670453)
+2026-01-06 04:34:14,420 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:34:24,432 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:34:30,439 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670470)
+2026-01-06 04:34:31,698 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:34:31,699 [INFO] Processing queue: 1 matches
+2026-01-06 04:34:31,699 [INFO] Targeted fetch for Match ID: 15013841
+2026-01-06 04:34:35,604 [INFO] Captured DETAIL for 15013841 -> server/stats\15013841_detail.json
+2026-01-06 04:34:36,142 [INFO] Captured STATS for 15013841 -> server/stats\15013841_stats.json
+2026-01-06 04:34:48,162 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670488)
+2026-01-06 04:34:50,530 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:34:54,536 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:34:58,540 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:34:58,854 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:34:59,167 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:34:59,169 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:35:07,189 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670507)
+2026-01-06 04:35:08,593 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:35:24,610 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670524)
+2026-01-06 04:35:25,984 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:35:27,988 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:35:42,003 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670542)
+2026-01-06 04:35:43,336 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:35:59,360 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670559)
+2026-01-06 04:36:00,745 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:36:00,746 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:36:05,092 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:36:05,511 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:36:05,952 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:36:05,954 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:36:15,974 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670575)
+2026-01-06 04:36:17,311 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:36:31,329 [INFO] Processing queue: 1 matches
+2026-01-06 04:36:31,329 [INFO] Targeted fetch for Match ID: 15013841
+2026-01-06 04:36:35,088 [INFO] Captured DETAIL for 15013841 -> server/stats\15013841_detail.json
+2026-01-06 04:36:35,767 [INFO] Captured STATS for 15013841 -> server/stats\15013841_stats.json
+2026-01-06 04:36:35,767 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670595)
+2026-01-06 04:36:37,157 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:36:37,157 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:36:53,183 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670613)
+2026-01-06 04:36:54,719 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:37:08,736 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:37:12,704 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:37:13,146 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:37:13,588 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:37:13,590 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:37:13,614 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670633)
+2026-01-06 04:37:14,963 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:37:30,982 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670650)
+2026-01-06 04:37:32,331 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:37:42,342 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:37:48,355 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670668)
+2026-01-06 04:37:49,656 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:38:05,674 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670685)
+2026-01-06 04:38:06,974 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:38:12,980 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:38:16,948 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:38:17,277 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:38:17,726 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:38:17,728 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:38:23,767 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670703)
+2026-01-06 04:38:25,097 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:38:41,115 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670721)
+2026-01-06 04:38:42,586 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:38:46,597 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:38:54,606 [INFO] Safety net: Refreshing page...
+2026-01-06 04:39:08,547 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-06 04:39:09,002 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-06 04:39:09,519 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-06 04:39:09,940 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-06 04:39:10,371 [INFO] Captured DETAIL for 14025019 -> server/stats\14025019_detail.json
+2026-01-06 04:39:10,375 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670750)
+2026-01-06 04:39:11,769 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:39:17,777 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:39:21,833 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:39:22,267 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:39:22,603 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:39:22,606 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:39:28,635 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670768)
+2026-01-06 04:39:29,999 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:39:46,016 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670786)
+2026-01-06 04:39:47,396 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:39:51,401 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:40:03,419 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670803)
+2026-01-06 04:40:04,717 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:40:20,737 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670820)
+2026-01-06 04:40:22,143 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:40:22,144 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:40:26,117 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:40:26,451 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:40:26,844 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:40:26,846 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:40:38,881 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670838)
+2026-01-06 04:40:40,309 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:40:54,324 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:40:56,332 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670856)
+2026-01-06 04:40:57,667 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:41:13,685 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670873)
+2026-01-06 04:41:15,183 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:41:25,196 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:41:31,204 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670891)
+2026-01-06 04:41:32,580 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:41:48,598 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670908)
+2026-01-06 04:41:50,016 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:41:56,028 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:42:00,100 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:42:00,418 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:42:00,779 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:42:00,782 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:42:06,806 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670926)
+2026-01-06 04:42:08,129 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:42:24,146 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670944)
+2026-01-06 04:42:25,575 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:42:29,581 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:42:41,595 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670961)
+2026-01-06 04:42:43,008 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:42:59,032 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670979)
+2026-01-06 04:43:00,421 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:43:00,422 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:43:04,432 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:43:04,752 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:43:05,069 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:43:05,071 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:43:17,094 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767670997)
+2026-01-06 04:43:18,467 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:43:32,482 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:43:34,485 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671014)
+2026-01-06 04:43:35,861 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:43:51,880 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671031)
+2026-01-06 04:43:53,372 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:44:03,392 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:44:09,398 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671049)
+2026-01-06 04:44:10,790 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:44:26,807 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671066)
+2026-01-06 04:44:28,152 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:44:34,159 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:44:38,203 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:44:38,633 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:44:39,050 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:44:39,053 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:44:45,079 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671085)
+2026-01-06 04:44:46,458 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:45:02,485 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671102)
+2026-01-06 04:45:03,867 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:45:05,870 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:45:19,888 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671119)
+2026-01-06 04:45:21,196 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:45:37,213 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671137)
+2026-01-06 04:45:38,577 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:45:38,578 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:45:42,633 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:45:43,056 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:45:43,483 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:45:43,485 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:45:55,519 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671155)
+2026-01-06 04:45:56,858 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:46:10,878 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:46:12,880 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671172)
+2026-01-06 04:46:14,162 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:46:30,183 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671190)
+2026-01-06 04:46:31,550 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:46:41,560 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:46:47,566 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671207)
+2026-01-06 04:46:48,966 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:47:04,990 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671224)
+2026-01-06 04:47:06,390 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:47:12,399 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:47:16,443 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:47:16,976 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:47:17,415 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:47:17,418 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:47:21,436 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671241)
+2026-01-06 04:47:22,953 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:47:38,973 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671258)
+2026-01-06 04:47:40,315 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:47:44,320 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:47:56,334 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671276)
+2026-01-06 04:47:57,767 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:48:13,785 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671293)
+2026-01-06 04:48:15,152 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:48:15,153 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:48:31,172 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671311)
+2026-01-06 04:48:32,601 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:48:46,618 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:48:50,617 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:48:51,050 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:48:51,461 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:48:51,462 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:48:51,484 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671331)
+2026-01-06 04:48:52,971 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:49:06,991 [INFO] Safety net: Refreshing page...
+2026-01-06 04:49:19,160 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:49:21,702 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-06 04:49:22,240 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-06 04:49:22,679 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-06 04:49:23,107 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-06 04:49:23,513 [INFO] Captured DETAIL for 14025019 -> server/stats\14025019_detail.json
+2026-01-06 04:49:23,517 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671363)
+2026-01-06 04:49:24,924 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:49:40,943 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671380)
+2026-01-06 04:49:42,304 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:49:50,313 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:49:58,321 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671398)
+2026-01-06 04:49:59,703 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:50:15,765 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671415)
+2026-01-06 04:50:17,162 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:50:21,169 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:50:25,154 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:50:25,590 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:50:26,018 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:50:26,020 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:50:34,054 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671434)
+2026-01-06 04:50:35,398 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:50:51,419 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671451)
+2026-01-06 04:50:52,898 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:50:52,899 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:51:08,922 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671468)
+2026-01-06 04:51:10,331 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:51:24,349 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:51:26,352 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671486)
+2026-01-06 04:51:27,760 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:51:43,780 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671503)
+2026-01-06 04:51:45,141 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:51:55,154 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:51:59,154 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:51:59,494 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:51:59,809 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:51:59,811 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:52:01,822 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671521)
+2026-01-06 04:52:03,156 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:52:19,185 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671539)
+2026-01-06 04:52:20,569 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:52:28,577 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:52:36,586 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671556)
+2026-01-06 04:52:37,982 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:52:54,002 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671574)
+2026-01-06 04:52:55,413 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:52:59,417 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:53:03,358 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:53:03,677 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:53:03,985 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:53:03,987 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:53:12,015 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671592)
+2026-01-06 04:53:13,862 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:53:29,880 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671609)
+2026-01-06 04:53:31,372 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:53:31,372 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:53:47,389 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671627)
+2026-01-06 04:53:48,791 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:54:02,808 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:54:04,810 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671644)
+2026-01-06 04:54:06,116 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:54:22,142 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671662)
+2026-01-06 04:54:23,546 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:54:33,557 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:54:37,608 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:54:37,936 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:54:38,805 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:54:38,807 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:54:38,848 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671678)
+2026-01-06 04:54:40,254 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:54:56,271 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671696)
+2026-01-06 04:54:57,645 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:55:05,656 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:55:13,672 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671713)
+2026-01-06 04:55:15,089 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:55:31,110 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671731)
+2026-01-06 04:55:32,343 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:55:36,348 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:55:48,361 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671748)
+2026-01-06 04:55:49,707 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:56:05,724 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671765)
+2026-01-06 04:56:07,056 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:56:07,057 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:56:11,047 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:56:11,472 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:56:11,791 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:56:11,793 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:56:23,817 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671783)
+2026-01-06 04:56:25,164 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:56:39,181 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:56:41,184 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671801)
+2026-01-06 04:56:42,565 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:56:58,584 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671818)
+2026-01-06 04:56:59,981 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:57:09,997 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:57:16,004 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671836)
+2026-01-06 04:57:17,327 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:57:33,346 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671853)
+2026-01-06 04:57:34,704 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:57:40,711 [INFO] [AUTO-STATS] Processing batch 1/1 (2 matches)
+2026-01-06 04:57:44,776 [INFO] Captured DETAIL for 15233988 -> server/stats\15233988_detail.json
+2026-01-06 04:57:45,181 [INFO] Captured STATS for 15233988 -> server/stats\15233988_stats.json
+2026-01-06 04:57:45,605 [INFO] Captured DETAIL for 15264895 -> server/stats\15264895_detail.json
+2026-01-06 04:57:45,608 [WARNING] API Error for 15264895 (STATS), saving empty marker.
+2026-01-06 04:57:51,646 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671871)
+2026-01-06 04:57:53,061 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:58:09,083 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671889)
+2026-01-06 04:58:10,520 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:58:12,523 [INFO] [AUTO-STATS] Processing batch 1/1 (3 matches)
+2026-01-06 04:58:15,688 [INFO] Captured DETAIL for 15233987 -> server/stats\15233987_detail.json
+2026-01-06 04:58:15,996 [INFO] Captured STATS for 15233987 -> server/stats\15233987_stats.json
+2026-01-06 04:58:26,006 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671906)
+2026-01-06 04:58:27,508 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:58:43,527 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767671923)
+2026-01-06 04:58:44,875 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 04:58:44,875 [INFO] [AUTO-STATS] Processing batch 1/1 (3 matches)
+2026-01-06 04:58:45,188 [ERROR] [AUTO-STATS] Error: ('Connection aborted.', ConnectionResetError(10054, 'Varolan bir baðlantý uzaktaki bir ana bilgisayar tarafýndan zorla kapatýldý', None, 10054, None))
+2026-01-06 15:40:33,546 [INFO] Launching undetected-chromedriver...
+2026-01-06 15:40:38,710 [INFO] patching driver executable C:\Users\ok\appdata\roaming\undetected_chromedriver\undetected_chromedriver.exe
+2026-01-06 15:40:58,786 [INFO] Captured DETAIL for 14025019 -> server/stats\14025019_detail.json
+2026-01-06 15:40:59,044 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-06 15:40:59,205 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-06 15:40:59,373 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-06 15:40:59,585 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-06 15:40:59,590 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710459)
+2026-01-06 15:41:01,690 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:41:01,693 [INFO] [AUTO-STATS] Processing batch 1/14 (5 matches)
+2026-01-06 15:41:08,012 [INFO] Captured DETAIL for 13981609 -> server/stats\13981609_detail.json
+2026-01-06 15:41:08,229 [INFO] Captured STATS for 13981609 -> server/stats\13981609_stats.json
+2026-01-06 15:41:08,405 [INFO] Captured DETAIL for 15211544 -> server/stats\15211544_detail.json
+2026-01-06 15:41:08,581 [INFO] Captured STATS for 15211544 -> server/stats\15211544_stats.json
+2026-01-06 15:41:08,772 [INFO] Captured DETAIL for 15010561 -> server/stats\15010561_detail.json
+2026-01-06 15:41:08,995 [INFO] Captured STATS for 15010561 -> server/stats\15010561_stats.json
+2026-01-06 15:41:09,134 [INFO] Captured DETAIL for 15322950 -> server/stats\15322950_detail.json
+2026-01-06 15:41:09,136 [WARNING] API Error for 15322950 (STATS), saving empty marker.
+2026-01-06 15:41:09,309 [INFO] Captured DETAIL for 15319199 -> server/stats\15319199_detail.json
+2026-01-06 15:41:09,311 [WARNING] API Error for 15319199 (STATS), saving empty marker.
+2026-01-06 15:41:17,329 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710477)
+2026-01-06 15:41:19,029 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:41:35,045 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710495)
+2026-01-06 15:41:36,544 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:41:36,547 [INFO] [AUTO-STATS] Processing batch 2/14 (5 matches)
+2026-01-06 15:41:41,934 [INFO] Captured DETAIL for 15305991 -> server/stats\15305991_detail.json
+2026-01-06 15:41:42,077 [INFO] Captured STATS for 15305991 -> server/stats\15305991_stats.json
+2026-01-06 15:41:42,236 [INFO] Captured DETAIL for 15318076 -> server/stats\15318076_detail.json
+2026-01-06 15:41:42,238 [WARNING] API Error for 15318076 (STATS), saving empty marker.
+2026-01-06 15:41:42,366 [INFO] Captured DETAIL for 15319167 -> server/stats\15319167_detail.json
+2026-01-06 15:41:42,368 [WARNING] API Error for 15319167 (STATS), saving empty marker.
+2026-01-06 15:41:42,498 [INFO] Captured DETAIL for 15317944 -> server/stats\15317944_detail.json
+2026-01-06 15:41:42,649 [INFO] Captured STATS for 15317944 -> server/stats\15317944_stats.json
+2026-01-06 15:41:52,665 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710512)
+2026-01-06 15:41:55,529 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:42:11,546 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710531)
+2026-01-06 15:42:12,990 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:42:12,993 [INFO] [AUTO-STATS] Processing batch 3/14 (5 matches)
+2026-01-06 15:42:19,208 [INFO] Captured DETAIL for 15290787 -> server/stats\15290787_detail.json
+2026-01-06 15:42:19,429 [INFO] Captured STATS for 15290787 -> server/stats\15290787_stats.json
+2026-01-06 15:42:19,587 [INFO] Captured DETAIL for 15319066 -> server/stats\15319066_detail.json
+2026-01-06 15:42:19,717 [INFO] Captured STATS for 15319066 -> server/stats\15319066_stats.json
+2026-01-06 15:42:19,851 [INFO] Captured DETAIL for 14402964 -> server/stats\14402964_detail.json
+2026-01-06 15:42:19,998 [INFO] Captured STATS for 14402964 -> server/stats\14402964_stats.json
+2026-01-06 15:42:20,137 [INFO] Captured DETAIL for 14402960 -> server/stats\14402960_detail.json
+2026-01-06 15:42:20,331 [INFO] Captured STATS for 14402960 -> server/stats\14402960_stats.json
+2026-01-06 15:42:20,463 [INFO] Captured DETAIL for 14402962 -> server/stats\14402962_detail.json
+2026-01-06 15:42:20,589 [INFO] Captured STATS for 14402962 -> server/stats\14402962_stats.json
+2026-01-06 15:42:28,600 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710548)
+2026-01-06 15:42:30,086 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:42:46,108 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710566)
+2026-01-06 15:42:47,588 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:42:47,591 [INFO] [AUTO-STATS] Processing batch 4/14 (5 matches)
+2026-01-06 15:42:53,782 [INFO] Captured DETAIL for 14402966 -> server/stats\14402966_detail.json
+2026-01-06 15:42:53,962 [INFO] Captured STATS for 14402966 -> server/stats\14402966_stats.json
+2026-01-06 15:42:54,132 [INFO] Captured DETAIL for 14403270 -> server/stats\14403270_detail.json
+2026-01-06 15:42:54,278 [INFO] Captured STATS for 14403270 -> server/stats\14403270_stats.json
+2026-01-06 15:42:54,443 [INFO] Captured DETAIL for 14403581 -> server/stats\14403581_detail.json
+2026-01-06 15:42:54,592 [INFO] Captured STATS for 14403581 -> server/stats\14403581_stats.json
+2026-01-06 15:42:54,724 [INFO] Captured DETAIL for 14403890 -> server/stats\14403890_detail.json
+2026-01-06 15:42:54,889 [INFO] Captured STATS for 14403890 -> server/stats\14403890_stats.json
+2026-01-06 15:42:55,023 [INFO] Captured DETAIL for 14404501 -> server/stats\14404501_detail.json
+2026-01-06 15:42:55,140 [INFO] Captured STATS for 14404501 -> server/stats\14404501_stats.json
+2026-01-06 15:43:03,151 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710583)
+2026-01-06 15:43:04,674 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:43:20,692 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710600)
+2026-01-06 15:43:23,058 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:43:23,061 [INFO] [AUTO-STATS] Processing batch 5/14 (5 matches)
+2026-01-06 15:43:29,255 [INFO] Captured DETAIL for 14404500 -> server/stats\14404500_detail.json
+2026-01-06 15:43:29,460 [INFO] Captured STATS for 14404500 -> server/stats\14404500_stats.json
+2026-01-06 15:43:29,644 [INFO] Captured DETAIL for 15227405 -> server/stats\15227405_detail.json
+2026-01-06 15:43:29,646 [WARNING] API Error for 15227405 (STATS), saving empty marker.
+2026-01-06 15:43:29,800 [INFO] Captured DETAIL for 15318895 -> server/stats\15318895_detail.json
+2026-01-06 15:43:29,927 [INFO] Captured STATS for 15318895 -> server/stats\15318895_stats.json
+2026-01-06 15:43:30,074 [INFO] Captured DETAIL for 15238248 -> server/stats\15238248_detail.json
+2026-01-06 15:43:30,222 [INFO] Captured STATS for 15238248 -> server/stats\15238248_stats.json
+2026-01-06 15:43:30,377 [INFO] Captured DETAIL for 15262430 -> server/stats\15262430_detail.json
+2026-01-06 15:43:30,496 [INFO] Captured STATS for 15262430 -> server/stats\15262430_stats.json
+2026-01-06 15:43:38,504 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710618)
+2026-01-06 15:43:39,996 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:43:56,019 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710636)
+2026-01-06 15:43:57,498 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:43:57,501 [INFO] [AUTO-STATS] Processing batch 6/14 (5 matches)
+2026-01-06 15:44:03,686 [INFO] Captured DETAIL for 15318988 -> server/stats\15318988_detail.json
+2026-01-06 15:44:03,688 [WARNING] API Error for 15318988 (STATS), saving empty marker.
+2026-01-06 15:44:03,824 [INFO] Captured DETAIL for 15309687 -> server/stats\15309687_detail.json
+2026-01-06 15:44:03,968 [INFO] Captured STATS for 15309687 -> server/stats\15309687_stats.json
+2026-01-06 15:44:04,103 [INFO] Captured DETAIL for 15319035 -> server/stats\15319035_detail.json
+2026-01-06 15:44:04,228 [INFO] Captured STATS for 15319035 -> server/stats\15319035_stats.json
+2026-01-06 15:44:04,359 [INFO] Captured DETAIL for 15309685 -> server/stats\15309685_detail.json
+2026-01-06 15:44:04,540 [INFO] Captured STATS for 15309685 -> server/stats\15309685_stats.json
+2026-01-06 15:44:04,693 [INFO] Captured DETAIL for 15322535 -> server/stats\15322535_detail.json
+2026-01-06 15:44:04,832 [INFO] Captured STATS for 15322535 -> server/stats\15322535_stats.json
+2026-01-06 15:44:12,844 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710652)
+2026-01-06 15:44:14,600 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:44:30,615 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710670)
+2026-01-06 15:44:33,307 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:44:33,311 [INFO] [AUTO-STATS] Processing batch 7/14 (5 matches)
+2026-01-06 15:44:39,538 [INFO] Captured DETAIL for 14426577 -> server/stats\14426577_detail.json
+2026-01-06 15:44:39,540 [WARNING] API Error for 14426577 (STATS), saving empty marker.
+2026-01-06 15:44:39,711 [INFO] Captured DETAIL for 14426578 -> server/stats\14426578_detail.json
+2026-01-06 15:44:39,713 [WARNING] API Error for 14426578 (STATS), saving empty marker.
+2026-01-06 15:44:39,889 [INFO] Captured DETAIL for 14426579 -> server/stats\14426579_detail.json
+2026-01-06 15:44:39,892 [WARNING] API Error for 14426579 (STATS), saving empty marker.
+2026-01-06 15:44:40,086 [INFO] Captured DETAIL for 14426580 -> server/stats\14426580_detail.json
+2026-01-06 15:44:40,088 [WARNING] API Error for 14426580 (STATS), saving empty marker.
+2026-01-06 15:44:40,330 [INFO] Captured DETAIL for 14426582 -> server/stats\14426582_detail.json
+2026-01-06 15:44:40,332 [WARNING] API Error for 14426582 (STATS), saving empty marker.
+2026-01-06 15:44:48,376 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710688)
+2026-01-06 15:44:49,834 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:45:05,852 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710705)
+2026-01-06 15:45:07,428 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:45:07,431 [INFO] [AUTO-STATS] Processing batch 8/14 (5 matches)
+2026-01-06 15:45:13,642 [INFO] Captured DETAIL for 14426592 -> server/stats\14426592_detail.json
+2026-01-06 15:45:13,644 [WARNING] API Error for 14426592 (STATS), saving empty marker.
+2026-01-06 15:45:13,801 [INFO] Captured DETAIL for 14426593 -> server/stats\14426593_detail.json
+2026-01-06 15:45:13,922 [INFO] Captured STATS for 14426593 -> server/stats\14426593_stats.json
+2026-01-06 15:45:14,051 [INFO] Captured DETAIL for 14803150 -> server/stats\14803150_detail.json
+2026-01-06 15:45:14,052 [WARNING] API Error for 14803150 (STATS), saving empty marker.
+2026-01-06 15:45:14,199 [INFO] Captured DETAIL for 14803157 -> server/stats\14803157_detail.json
+2026-01-06 15:45:14,201 [WARNING] API Error for 14803157 (STATS), saving empty marker.
+2026-01-06 15:45:14,334 [INFO] Captured DETAIL for 14803162 -> server/stats\14803162_detail.json
+2026-01-06 15:45:14,337 [WARNING] API Error for 14803162 (STATS), saving empty marker.
+2026-01-06 15:45:24,361 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710724)
+2026-01-06 15:45:25,795 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:45:41,818 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710741)
+2026-01-06 15:45:43,306 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:45:43,309 [INFO] [AUTO-STATS] Processing batch 9/14 (5 matches)
+2026-01-06 15:45:49,521 [INFO] Captured DETAIL for 14803147 -> server/stats\14803147_detail.json
+2026-01-06 15:45:49,691 [INFO] Captured STATS for 14803147 -> server/stats\14803147_stats.json
+2026-01-06 15:45:49,820 [INFO] Captured DETAIL for 14803173 -> server/stats\14803173_detail.json
+2026-01-06 15:45:49,822 [WARNING] API Error for 14803173 (STATS), saving empty marker.
+2026-01-06 15:45:49,958 [INFO] Captured DETAIL for 14803154 -> server/stats\14803154_detail.json
+2026-01-06 15:45:49,961 [WARNING] API Error for 14803154 (STATS), saving empty marker.
+2026-01-06 15:45:50,109 [INFO] Captured DETAIL for 14803166 -> server/stats\14803166_detail.json
+2026-01-06 15:45:50,112 [WARNING] API Error for 14803166 (STATS), saving empty marker.
+2026-01-06 15:45:50,246 [INFO] Captured DETAIL for 14803169 -> server/stats\14803169_detail.json
+2026-01-06 15:45:50,248 [WARNING] API Error for 14803169 (STATS), saving empty marker.
+2026-01-06 15:46:00,265 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710760)
+2026-01-06 15:46:02,931 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:46:18,948 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710778)
+2026-01-06 15:46:20,431 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:46:20,434 [INFO] [AUTO-STATS] Processing batch 10/14 (5 matches)
+2026-01-06 15:46:26,642 [INFO] Captured DETAIL for 14803168 -> server/stats\14803168_detail.json
+2026-01-06 15:46:26,645 [WARNING] API Error for 14803168 (STATS), saving empty marker.
+2026-01-06 15:46:26,786 [INFO] Captured DETAIL for 14853502 -> server/stats\14853502_detail.json
+2026-01-06 15:46:26,788 [WARNING] API Error for 14853502 (STATS), saving empty marker.
+2026-01-06 15:46:26,915 [INFO] Captured DETAIL for 14853498 -> server/stats\14853498_detail.json
+2026-01-06 15:46:26,917 [WARNING] API Error for 14853498 (STATS), saving empty marker.
+2026-01-06 15:46:27,042 [INFO] Captured DETAIL for 14853503 -> server/stats\14853503_detail.json
+2026-01-06 15:46:27,044 [WARNING] API Error for 14853503 (STATS), saving empty marker.
+2026-01-06 15:46:27,171 [INFO] Captured DETAIL for 14717955 -> server/stats\14717955_detail.json
+2026-01-06 15:46:27,173 [WARNING] API Error for 14717955 (STATS), saving empty marker.
+2026-01-06 15:46:37,195 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710797)
+2026-01-06 15:46:38,678 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:46:54,701 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710814)
+2026-01-06 15:46:56,175 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:46:56,178 [INFO] [AUTO-STATS] Processing batch 11/14 (5 matches)
+2026-01-06 15:47:02,694 [INFO] Captured DETAIL for 15174300 -> server/stats\15174300_detail.json
+2026-01-06 15:47:02,696 [WARNING] API Error for 15174300 (STATS), saving empty marker.
+2026-01-06 15:47:02,895 [INFO] Captured DETAIL for 15320543 -> server/stats\15320543_detail.json
+2026-01-06 15:47:02,897 [WARNING] API Error for 15320543 (STATS), saving empty marker.
+2026-01-06 15:47:03,038 [INFO] Captured DETAIL for 15315634 -> server/stats\15315634_detail.json
+2026-01-06 15:47:03,040 [WARNING] API Error for 15315634 (STATS), saving empty marker.
+2026-01-06 15:47:03,456 [INFO] Captured DETAIL for 15292753 -> server/stats\15292753_detail.json
+2026-01-06 15:47:03,459 [WARNING] API Error for 15292753 (STATS), saving empty marker.
+2026-01-06 15:47:03,707 [INFO] Captured DETAIL for 15292747 -> server/stats\15292747_detail.json
+2026-01-06 15:47:03,709 [WARNING] API Error for 15292747 (STATS), saving empty marker.
+2026-01-06 15:47:11,736 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710831)
+2026-01-06 15:47:13,302 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:47:29,317 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710849)
+2026-01-06 15:47:30,939 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:47:30,943 [INFO] [AUTO-STATS] Processing batch 12/14 (5 matches)
+2026-01-06 15:47:37,170 [INFO] Captured DETAIL for 15292748 -> server/stats\15292748_detail.json
+2026-01-06 15:47:37,173 [WARNING] API Error for 15292748 (STATS), saving empty marker.
+2026-01-06 15:47:37,339 [INFO] Captured DETAIL for 15292751 -> server/stats\15292751_detail.json
+2026-01-06 15:47:37,341 [WARNING] API Error for 15292751 (STATS), saving empty marker.
+2026-01-06 15:47:37,536 [INFO] Captured DETAIL for 15292756 -> server/stats\15292756_detail.json
+2026-01-06 15:47:37,538 [WARNING] API Error for 15292756 (STATS), saving empty marker.
+2026-01-06 15:47:37,692 [INFO] Captured DETAIL for 15292759 -> server/stats\15292759_detail.json
+2026-01-06 15:47:37,694 [WARNING] API Error for 15292759 (STATS), saving empty marker.
+2026-01-06 15:47:37,904 [INFO] Captured DETAIL for 15292760 -> server/stats\15292760_detail.json
+2026-01-06 15:47:37,906 [WARNING] API Error for 15292760 (STATS), saving empty marker.
+2026-01-06 15:47:47,935 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710867)
+2026-01-06 15:47:49,613 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:48:05,630 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710885)
+2026-01-06 15:48:07,101 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:48:07,104 [INFO] [AUTO-STATS] Processing batch 13/14 (5 matches)
+2026-01-06 15:48:13,396 [INFO] Captured DETAIL for 15292750 -> server/stats\15292750_detail.json
+2026-01-06 15:48:13,398 [WARNING] API Error for 15292750 (STATS), saving empty marker.
+2026-01-06 15:48:13,556 [INFO] Captured DETAIL for 15125309 -> server/stats\15125309_detail.json
+2026-01-06 15:48:13,558 [WARNING] API Error for 15125309 (STATS), saving empty marker.
+2026-01-06 15:48:13,744 [INFO] Captured DETAIL for 15286963 -> server/stats\15286963_detail.json
+2026-01-06 15:48:13,883 [INFO] Captured STATS for 15286963 -> server/stats\15286963_stats.json
+2026-01-06 15:48:14,007 [INFO] Captured DETAIL for 15307285 -> server/stats\15307285_detail.json
+2026-01-06 15:48:14,133 [INFO] Captured STATS for 15307285 -> server/stats\15307285_stats.json
+2026-01-06 15:48:14,304 [INFO] Captured DETAIL for 15303842 -> server/stats\15303842_detail.json
+2026-01-06 15:48:14,655 [INFO] Captured STATS for 15303842 -> server/stats\15303842_stats.json
+2026-01-06 15:48:22,663 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710902)
+2026-01-06 15:48:24,471 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:48:40,488 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710920)
+2026-01-06 15:48:42,344 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:48:42,347 [INFO] [AUTO-STATS] Processing batch 14/14 (5 matches)
+2026-01-06 15:48:48,548 [INFO] Captured DETAIL for 15308723 -> server/stats\15308723_detail.json
+2026-01-06 15:48:48,685 [INFO] Captured STATS for 15308723 -> server/stats\15308723_stats.json
+2026-01-06 15:48:48,816 [INFO] Captured DETAIL for 15313672 -> server/stats\15313672_detail.json
+2026-01-06 15:48:48,948 [INFO] Captured STATS for 15313672 -> server/stats\15313672_stats.json
+2026-01-06 15:48:49,211 [INFO] Captured DETAIL for 15319649 -> server/stats\15319649_detail.json
+2026-01-06 15:48:49,213 [WARNING] API Error for 15319649 (STATS), saving empty marker.
+2026-01-06 15:48:49,340 [INFO] Captured DETAIL for 14696460 -> server/stats\14696460_detail.json
+2026-01-06 15:48:49,495 [INFO] Captured STATS for 14696460 -> server/stats\14696460_stats.json
+2026-01-06 15:48:49,635 [INFO] Captured DETAIL for 14696465 -> server/stats\14696465_detail.json
+2026-01-06 15:48:49,759 [INFO] Captured STATS for 14696465 -> server/stats\14696465_stats.json
+2026-01-06 15:48:57,771 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710937)
+2026-01-06 15:48:59,377 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:49:15,398 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710955)
+2026-01-06 15:49:18,531 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:49:18,534 [INFO] [AUTO-STATS] Processing batch 1/14 (5 matches)
+2026-01-06 15:49:24,740 [INFO] Captured DETAIL for 13981609 -> server/stats\13981609_detail.json
+2026-01-06 15:49:24,914 [INFO] Captured STATS for 13981609 -> server/stats\13981609_stats.json
+2026-01-06 15:49:25,074 [INFO] Captured DETAIL for 15211544 -> server/stats\15211544_detail.json
+2026-01-06 15:49:25,225 [INFO] Captured STATS for 15211544 -> server/stats\15211544_stats.json
+2026-01-06 15:49:25,374 [INFO] Captured DETAIL for 15010561 -> server/stats\15010561_detail.json
+2026-01-06 15:49:25,582 [INFO] Captured STATS for 15010561 -> server/stats\15010561_stats.json
+2026-01-06 15:49:25,728 [INFO] Captured DETAIL for 15318077 -> server/stats\15318077_detail.json
+2026-01-06 15:49:25,872 [INFO] Captured STATS for 15318077 -> server/stats\15318077_stats.json
+2026-01-06 15:49:26,017 [INFO] Captured DETAIL for 15322950 -> server/stats\15322950_detail.json
+2026-01-06 15:49:26,019 [WARNING] API Error for 15322950 (STATS), saving empty marker.
+2026-01-06 15:49:34,047 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710974)
+2026-01-06 15:49:35,542 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:49:51,565 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767710991)
+2026-01-06 15:49:53,353 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:49:53,356 [INFO] [AUTO-STATS] Processing batch 2/14 (5 matches)
+2026-01-06 15:49:59,582 [INFO] Captured DETAIL for 15319199 -> server/stats\15319199_detail.json
+2026-01-06 15:49:59,585 [WARNING] API Error for 15319199 (STATS), saving empty marker.
+2026-01-06 15:49:59,728 [INFO] Captured DETAIL for 15305991 -> server/stats\15305991_detail.json
+2026-01-06 15:49:59,856 [INFO] Captured STATS for 15305991 -> server/stats\15305991_stats.json
+2026-01-06 15:49:59,989 [INFO] Captured DETAIL for 15318076 -> server/stats\15318076_detail.json
+2026-01-06 15:49:59,991 [WARNING] API Error for 15318076 (STATS), saving empty marker.
+2026-01-06 15:50:00,108 [INFO] Captured DETAIL for 15319167 -> server/stats\15319167_detail.json
+2026-01-06 15:50:00,110 [WARNING] API Error for 15319167 (STATS), saving empty marker.
+2026-01-06 15:50:00,238 [INFO] Captured DETAIL for 15317944 -> server/stats\15317944_detail.json
+2026-01-06 15:50:00,365 [INFO] Captured STATS for 15317944 -> server/stats\15317944_stats.json
+2026-01-06 15:50:08,376 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711008)
+2026-01-06 15:50:09,836 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:50:25,855 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711025)
+2026-01-06 15:50:27,313 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:50:29,319 [INFO] [AUTO-STATS] Processing batch 3/14 (5 matches)
+2026-01-06 15:50:35,529 [INFO] Captured DETAIL for 15290787 -> server/stats\15290787_detail.json
+2026-01-06 15:50:35,722 [INFO] Captured STATS for 15290787 -> server/stats\15290787_stats.json
+2026-01-06 15:50:35,928 [INFO] Captured DETAIL for 15319066 -> server/stats\15319066_detail.json
+2026-01-06 15:50:36,077 [INFO] Captured STATS for 15319066 -> server/stats\15319066_stats.json
+2026-01-06 15:50:36,216 [INFO] Captured DETAIL for 14402964 -> server/stats\14402964_detail.json
+2026-01-06 15:50:36,349 [INFO] Captured STATS for 14402964 -> server/stats\14402964_stats.json
+2026-01-06 15:50:36,475 [INFO] Captured DETAIL for 14402960 -> server/stats\14402960_detail.json
+2026-01-06 15:50:36,605 [INFO] Captured STATS for 14402960 -> server/stats\14402960_stats.json
+2026-01-06 15:50:36,795 [INFO] Captured DETAIL for 14402962 -> server/stats\14402962_detail.json
+2026-01-06 15:50:36,960 [INFO] Captured STATS for 14402962 -> server/stats\14402962_stats.json
+2026-01-06 15:50:42,970 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711042)
+2026-01-06 15:50:44,485 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:51:00,501 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711060)
+2026-01-06 15:51:02,299 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:51:02,299 [INFO] Safety net: Refreshing page...
+2026-01-06 15:51:13,742 [INFO] [AUTO-STATS] Processing batch 4/14 (5 matches)
+2026-01-06 15:51:19,994 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-06 15:51:20,149 [INFO] Captured DETAIL for 14025019 -> server/stats\14025019_detail.json
+2026-01-06 15:51:20,289 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-06 15:51:20,412 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-06 15:51:20,538 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-06 15:51:20,664 [INFO] Captured DETAIL for 14402966 -> server/stats\14402966_detail.json
+2026-01-06 15:51:20,804 [INFO] Captured STATS for 14402966 -> server/stats\14402966_stats.json
+2026-01-06 15:51:20,955 [INFO] Captured DETAIL for 14403270 -> server/stats\14403270_detail.json
+2026-01-06 15:51:21,109 [INFO] Captured STATS for 14403270 -> server/stats\14403270_stats.json
+2026-01-06 15:51:21,291 [INFO] Captured DETAIL for 14403581 -> server/stats\14403581_detail.json
+2026-01-06 15:51:21,461 [INFO] Captured STATS for 14403581 -> server/stats\14403581_stats.json
+2026-01-06 15:51:21,616 [INFO] Captured DETAIL for 14403890 -> server/stats\14403890_detail.json
+2026-01-06 15:51:21,748 [INFO] Captured STATS for 14403890 -> server/stats\14403890_stats.json
+2026-01-06 15:51:21,873 [INFO] Captured DETAIL for 14404501 -> server/stats\14404501_detail.json
+2026-01-06 15:51:22,001 [INFO] Captured STATS for 14404501 -> server/stats\14404501_stats.json
+2026-01-06 15:51:22,001 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711082)
+2026-01-06 15:51:23,628 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:51:39,647 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711099)
+2026-01-06 15:51:41,497 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:51:49,509 [INFO] [AUTO-STATS] Processing batch 5/14 (5 matches)
+2026-01-06 15:51:55,703 [INFO] Captured DETAIL for 14404500 -> server/stats\14404500_detail.json
+2026-01-06 15:51:55,852 [INFO] Captured STATS for 14404500 -> server/stats\14404500_stats.json
+2026-01-06 15:51:56,003 [INFO] Captured DETAIL for 15227405 -> server/stats\15227405_detail.json
+2026-01-06 15:51:56,005 [WARNING] API Error for 15227405 (STATS), saving empty marker.
+2026-01-06 15:51:56,140 [INFO] Captured DETAIL for 15238248 -> server/stats\15238248_detail.json
+2026-01-06 15:51:56,283 [INFO] Captured STATS for 15238248 -> server/stats\15238248_stats.json
+2026-01-06 15:51:56,864 [INFO] Captured DETAIL for 15262430 -> server/stats\15262430_detail.json
+2026-01-06 15:51:57,024 [INFO] Captured STATS for 15262430 -> server/stats\15262430_stats.json
+2026-01-06 15:51:57,202 [INFO] Captured DETAIL for 15318988 -> server/stats\15318988_detail.json
+2026-01-06 15:51:57,204 [WARNING] API Error for 15318988 (STATS), saving empty marker.
+2026-01-06 15:51:57,219 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711117)
+2026-01-06 15:51:59,207 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:52:15,230 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711135)
+2026-01-06 15:52:16,859 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:52:24,882 [INFO] [AUTO-STATS] Processing batch 6/14 (5 matches)
+2026-01-06 15:52:31,083 [INFO] Captured DETAIL for 15309687 -> server/stats\15309687_detail.json
+2026-01-06 15:52:31,213 [INFO] Captured STATS for 15309687 -> server/stats\15309687_stats.json
+2026-01-06 15:52:31,348 [INFO] Captured DETAIL for 15319035 -> server/stats\15319035_detail.json
+2026-01-06 15:52:31,478 [INFO] Captured STATS for 15319035 -> server/stats\15319035_stats.json
+2026-01-06 15:52:31,617 [INFO] Captured DETAIL for 15309685 -> server/stats\15309685_detail.json
+2026-01-06 15:52:31,738 [INFO] Captured STATS for 15309685 -> server/stats\15309685_stats.json
+2026-01-06 15:52:31,903 [INFO] Captured DETAIL for 15322535 -> server/stats\15322535_detail.json
+2026-01-06 15:52:32,226 [INFO] Captured STATS for 15322535 -> server/stats\15322535_stats.json
+2026-01-06 15:52:32,365 [INFO] Captured DETAIL for 14426577 -> server/stats\14426577_detail.json
+2026-01-06 15:52:32,367 [WARNING] API Error for 14426577 (STATS), saving empty marker.
+2026-01-06 15:52:32,379 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711152)
+2026-01-06 15:52:33,958 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:52:49,978 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711169)
+2026-01-06 15:52:53,244 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:52:59,253 [INFO] [AUTO-STATS] Processing batch 7/14 (5 matches)
+2026-01-06 15:53:05,536 [INFO] Captured DETAIL for 14426578 -> server/stats\14426578_detail.json
+2026-01-06 15:53:05,538 [WARNING] API Error for 14426578 (STATS), saving empty marker.
+2026-01-06 15:53:05,690 [INFO] Captured DETAIL for 14426579 -> server/stats\14426579_detail.json
+2026-01-06 15:53:05,692 [WARNING] API Error for 14426579 (STATS), saving empty marker.
+2026-01-06 15:53:05,819 [INFO] Captured DETAIL for 14426580 -> server/stats\14426580_detail.json
+2026-01-06 15:53:05,821 [WARNING] API Error for 14426580 (STATS), saving empty marker.
+2026-01-06 15:53:05,945 [INFO] Captured DETAIL for 14426582 -> server/stats\14426582_detail.json
+2026-01-06 15:53:05,947 [WARNING] API Error for 14426582 (STATS), saving empty marker.
+2026-01-06 15:53:06,075 [INFO] Captured DETAIL for 14426592 -> server/stats\14426592_detail.json
+2026-01-06 15:53:06,077 [WARNING] API Error for 14426592 (STATS), saving empty marker.
+2026-01-06 15:53:10,086 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711190)
+2026-01-06 15:53:11,542 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:53:27,560 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711207)
+2026-01-06 15:53:29,017 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:53:35,025 [INFO] [AUTO-STATS] Processing batch 8/14 (5 matches)
+2026-01-06 15:53:41,261 [INFO] Captured DETAIL for 14426593 -> server/stats\14426593_detail.json
+2026-01-06 15:53:41,401 [INFO] Captured STATS for 14426593 -> server/stats\14426593_stats.json
+2026-01-06 15:53:41,533 [INFO] Captured DETAIL for 14803150 -> server/stats\14803150_detail.json
+2026-01-06 15:53:41,535 [WARNING] API Error for 14803150 (STATS), saving empty marker.
+2026-01-06 15:53:41,662 [INFO] Captured DETAIL for 14803157 -> server/stats\14803157_detail.json
+2026-01-06 15:53:41,664 [WARNING] API Error for 14803157 (STATS), saving empty marker.
+2026-01-06 15:53:41,783 [INFO] Captured DETAIL for 14803162 -> server/stats\14803162_detail.json
+2026-01-06 15:53:41,785 [WARNING] API Error for 14803162 (STATS), saving empty marker.
+2026-01-06 15:53:41,907 [INFO] Captured DETAIL for 14803147 -> server/stats\14803147_detail.json
+2026-01-06 15:53:42,033 [INFO] Captured STATS for 14803147 -> server/stats\14803147_stats.json
+2026-01-06 15:53:44,038 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711224)
+2026-01-06 15:53:45,548 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:54:01,565 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711241)
+2026-01-06 15:54:03,086 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:54:09,100 [INFO] [AUTO-STATS] Processing batch 9/14 (5 matches)
+2026-01-06 15:54:15,291 [INFO] Captured DETAIL for 14803173 -> server/stats\14803173_detail.json
+2026-01-06 15:54:15,294 [WARNING] API Error for 14803173 (STATS), saving empty marker.
+2026-01-06 15:54:15,481 [INFO] Captured DETAIL for 14803154 -> server/stats\14803154_detail.json
+2026-01-06 15:54:15,483 [WARNING] API Error for 14803154 (STATS), saving empty marker.
+2026-01-06 15:54:15,679 [INFO] Captured DETAIL for 14803166 -> server/stats\14803166_detail.json
+2026-01-06 15:54:15,681 [WARNING] API Error for 14803166 (STATS), saving empty marker.
+2026-01-06 15:54:15,822 [INFO] Captured DETAIL for 14803169 -> server/stats\14803169_detail.json
+2026-01-06 15:54:15,824 [WARNING] API Error for 14803169 (STATS), saving empty marker.
+2026-01-06 15:54:15,949 [INFO] Captured DETAIL for 14803168 -> server/stats\14803168_detail.json
+2026-01-06 15:54:15,951 [WARNING] API Error for 14803168 (STATS), saving empty marker.
+2026-01-06 15:54:19,957 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711259)
+2026-01-06 15:54:21,603 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:54:37,621 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711277)
+2026-01-06 15:54:39,144 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:54:43,151 [INFO] [AUTO-STATS] Processing batch 10/14 (5 matches)
+2026-01-06 15:54:49,361 [INFO] Captured DETAIL for 14853502 -> server/stats\14853502_detail.json
+2026-01-06 15:54:49,363 [WARNING] API Error for 14853502 (STATS), saving empty marker.
+2026-01-06 15:54:49,501 [INFO] Captured DETAIL for 14853498 -> server/stats\14853498_detail.json
+2026-01-06 15:54:49,503 [WARNING] API Error for 14853498 (STATS), saving empty marker.
+2026-01-06 15:54:49,634 [INFO] Captured DETAIL for 14853503 -> server/stats\14853503_detail.json
+2026-01-06 15:54:49,636 [WARNING] API Error for 14853503 (STATS), saving empty marker.
+2026-01-06 15:54:49,760 [INFO] Captured DETAIL for 14717955 -> server/stats\14717955_detail.json
+2026-01-06 15:54:49,762 [WARNING] API Error for 14717955 (STATS), saving empty marker.
+2026-01-06 15:54:49,916 [INFO] Captured DETAIL for 15174300 -> server/stats\15174300_detail.json
+2026-01-06 15:54:49,918 [WARNING] API Error for 15174300 (STATS), saving empty marker.
+2026-01-06 15:54:55,928 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711295)
+2026-01-06 15:54:57,391 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:55:13,457 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711313)
+2026-01-06 15:55:15,139 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:55:19,147 [INFO] [AUTO-STATS] Processing batch 11/14 (5 matches)
+2026-01-06 15:55:25,356 [INFO] Captured DETAIL for 15315634 -> server/stats\15315634_detail.json
+2026-01-06 15:55:25,358 [WARNING] API Error for 15315634 (STATS), saving empty marker.
+2026-01-06 15:55:25,501 [INFO] Captured DETAIL for 15292753 -> server/stats\15292753_detail.json
+2026-01-06 15:55:25,503 [WARNING] API Error for 15292753 (STATS), saving empty marker.
+2026-01-06 15:55:25,632 [INFO] Captured DETAIL for 15292747 -> server/stats\15292747_detail.json
+2026-01-06 15:55:25,634 [WARNING] API Error for 15292747 (STATS), saving empty marker.
+2026-01-06 15:55:25,770 [INFO] Captured DETAIL for 15292748 -> server/stats\15292748_detail.json
+2026-01-06 15:55:25,771 [WARNING] API Error for 15292748 (STATS), saving empty marker.
+2026-01-06 15:55:25,913 [INFO] Captured DETAIL for 15292751 -> server/stats\15292751_detail.json
+2026-01-06 15:55:25,915 [WARNING] API Error for 15292751 (STATS), saving empty marker.
+2026-01-06 15:55:31,928 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711331)
+2026-01-06 15:55:33,313 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:55:49,333 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711349)
+2026-01-06 15:55:50,766 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:55:54,773 [INFO] [AUTO-STATS] Processing batch 12/13 (5 matches)
+2026-01-06 15:56:01,005 [INFO] Captured DETAIL for 15292759 -> server/stats\15292759_detail.json
+2026-01-06 15:56:01,007 [WARNING] API Error for 15292759 (STATS), saving empty marker.
+2026-01-06 15:56:01,159 [INFO] Captured DETAIL for 15292760 -> server/stats\15292760_detail.json
+2026-01-06 15:56:01,161 [WARNING] API Error for 15292760 (STATS), saving empty marker.
+2026-01-06 15:56:01,309 [INFO] Captured DETAIL for 15292750 -> server/stats\15292750_detail.json
+2026-01-06 15:56:01,311 [WARNING] API Error for 15292750 (STATS), saving empty marker.
+2026-01-06 15:56:01,470 [INFO] Captured DETAIL for 15125309 -> server/stats\15125309_detail.json
+2026-01-06 15:56:01,472 [WARNING] API Error for 15125309 (STATS), saving empty marker.
+2026-01-06 15:56:01,687 [INFO] Captured DETAIL for 15286963 -> server/stats\15286963_detail.json
+2026-01-06 15:56:01,846 [INFO] Captured STATS for 15286963 -> server/stats\15286963_stats.json
+2026-01-06 15:56:05,857 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711365)
+2026-01-06 15:56:08,137 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:56:24,155 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711384)
+2026-01-06 15:56:25,742 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:56:29,749 [INFO] [AUTO-STATS] Processing batch 13/13 (2 matches)
+2026-01-06 15:56:33,527 [INFO] Captured DETAIL for 14696460 -> server/stats\14696460_detail.json
+2026-01-06 15:56:33,688 [INFO] Captured STATS for 14696460 -> server/stats\14696460_stats.json
+2026-01-06 15:56:33,873 [INFO] Captured DETAIL for 14696465 -> server/stats\14696465_detail.json
+2026-01-06 15:56:34,026 [INFO] Captured STATS for 14696465 -> server/stats\14696465_stats.json
+2026-01-06 15:56:42,035 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711402)
+2026-01-06 15:56:43,536 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:56:59,555 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711419)
+2026-01-06 15:57:01,291 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:57:03,301 [INFO] [AUTO-STATS] Processing batch 1/13 (5 matches)
+2026-01-06 15:57:09,514 [INFO] Captured DETAIL for 13981609 -> server/stats\13981609_detail.json
+2026-01-06 15:57:09,737 [INFO] Captured STATS for 13981609 -> server/stats\13981609_stats.json
+2026-01-06 15:57:09,872 [INFO] Captured DETAIL for 15211544 -> server/stats\15211544_detail.json
+2026-01-06 15:57:10,126 [INFO] Captured STATS for 15211544 -> server/stats\15211544_stats.json
+2026-01-06 15:57:10,433 [INFO] Captured DETAIL for 15305991 -> server/stats\15305991_detail.json
+2026-01-06 15:57:10,616 [INFO] Captured STATS for 15305991 -> server/stats\15305991_stats.json
+2026-01-06 15:57:10,768 [INFO] Captured DETAIL for 15318076 -> server/stats\15318076_detail.json
+2026-01-06 15:57:10,770 [WARNING] API Error for 15318076 (STATS), saving empty marker.
+2026-01-06 15:57:11,155 [INFO] Captured DETAIL for 15319167 -> server/stats\15319167_detail.json
+2026-01-06 15:57:11,157 [WARNING] API Error for 15319167 (STATS), saving empty marker.
+2026-01-06 15:57:17,178 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711437)
+2026-01-06 15:57:19,070 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:57:35,089 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711455)
+2026-01-06 15:57:36,743 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:57:38,748 [INFO] [AUTO-STATS] Processing batch 2/13 (5 matches)
+2026-01-06 15:57:45,683 [INFO] Captured DETAIL for 15317944 -> server/stats\15317944_detail.json
+2026-01-06 15:57:45,917 [INFO] Captured STATS for 15317944 -> server/stats\15317944_stats.json
+2026-01-06 15:57:46,086 [INFO] Captured DETAIL for 15290787 -> server/stats\15290787_detail.json
+2026-01-06 15:57:46,270 [INFO] Captured STATS for 15290787 -> server/stats\15290787_stats.json
+2026-01-06 15:57:46,404 [INFO] Captured DETAIL for 15319066 -> server/stats\15319066_detail.json
+2026-01-06 15:57:46,539 [INFO] Captured STATS for 15319066 -> server/stats\15319066_stats.json
+2026-01-06 15:57:46,684 [INFO] Captured DETAIL for 14402964 -> server/stats\14402964_detail.json
+2026-01-06 15:57:46,831 [INFO] Captured STATS for 14402964 -> server/stats\14402964_stats.json
+2026-01-06 15:57:46,953 [INFO] Captured DETAIL for 14402960 -> server/stats\14402960_detail.json
+2026-01-06 15:57:47,086 [INFO] Captured STATS for 14402960 -> server/stats\14402960_stats.json
+2026-01-06 15:57:53,094 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711473)
+2026-01-06 15:57:54,542 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:58:10,565 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711490)
+2026-01-06 15:58:12,011 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:58:14,015 [INFO] [AUTO-STATS] Processing batch 3/13 (5 matches)
+2026-01-06 15:58:20,256 [INFO] Captured DETAIL for 14402962 -> server/stats\14402962_detail.json
+2026-01-06 15:58:20,396 [INFO] Captured STATS for 14402962 -> server/stats\14402962_stats.json
+2026-01-06 15:58:20,529 [INFO] Captured DETAIL for 14402966 -> server/stats\14402966_detail.json
+2026-01-06 15:58:20,688 [INFO] Captured STATS for 14402966 -> server/stats\14402966_stats.json
+2026-01-06 15:58:20,850 [INFO] Captured DETAIL for 14403270 -> server/stats\14403270_detail.json
+2026-01-06 15:58:20,980 [INFO] Captured STATS for 14403270 -> server/stats\14403270_stats.json
+2026-01-06 15:58:21,107 [INFO] Captured DETAIL for 14403581 -> server/stats\14403581_detail.json
+2026-01-06 15:58:21,277 [INFO] Captured STATS for 14403581 -> server/stats\14403581_stats.json
+2026-01-06 15:58:21,414 [INFO] Captured DETAIL for 14403890 -> server/stats\14403890_detail.json
+2026-01-06 15:58:21,555 [INFO] Captured STATS for 14403890 -> server/stats\14403890_stats.json
+2026-01-06 15:58:27,563 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711507)
+2026-01-06 15:58:29,018 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:58:45,036 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711525)
+2026-01-06 15:58:46,428 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:58:48,432 [INFO] [AUTO-STATS] Processing batch 4/13 (5 matches)
+2026-01-06 15:58:54,643 [INFO] Captured DETAIL for 14404501 -> server/stats\14404501_detail.json
+2026-01-06 15:58:54,780 [INFO] Captured STATS for 14404501 -> server/stats\14404501_stats.json
+2026-01-06 15:58:54,961 [INFO] Captured DETAIL for 14404500 -> server/stats\14404500_detail.json
+2026-01-06 15:58:55,175 [INFO] Captured STATS for 14404500 -> server/stats\14404500_stats.json
+2026-01-06 15:58:55,384 [INFO] Captured DETAIL for 15227405 -> server/stats\15227405_detail.json
+2026-01-06 15:58:55,386 [WARNING] API Error for 15227405 (STATS), saving empty marker.
+2026-01-06 15:58:55,554 [INFO] Captured DETAIL for 15262430 -> server/stats\15262430_detail.json
+2026-01-06 15:58:55,760 [INFO] Captured STATS for 15262430 -> server/stats\15262430_stats.json
+2026-01-06 15:58:55,914 [INFO] Captured DETAIL for 15318988 -> server/stats\15318988_detail.json
+2026-01-06 15:58:55,917 [WARNING] API Error for 15318988 (STATS), saving empty marker.
+2026-01-06 15:59:01,936 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711541)
+2026-01-06 15:59:03,419 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:59:19,441 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711559)
+2026-01-06 15:59:20,890 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:59:22,895 [INFO] [AUTO-STATS] Processing batch 5/13 (5 matches)
+2026-01-06 15:59:29,087 [INFO] Captured DETAIL for 15309687 -> server/stats\15309687_detail.json
+2026-01-06 15:59:29,225 [INFO] Captured STATS for 15309687 -> server/stats\15309687_stats.json
+2026-01-06 15:59:29,366 [INFO] Captured DETAIL for 15319035 -> server/stats\15319035_detail.json
+2026-01-06 15:59:29,504 [INFO] Captured STATS for 15319035 -> server/stats\15319035_stats.json
+2026-01-06 15:59:29,664 [INFO] Captured DETAIL for 15322535 -> server/stats\15322535_detail.json
+2026-01-06 15:59:29,790 [INFO] Captured STATS for 15322535 -> server/stats\15322535_stats.json
+2026-01-06 15:59:29,934 [INFO] Captured DETAIL for 14426577 -> server/stats\14426577_detail.json
+2026-01-06 15:59:29,936 [WARNING] API Error for 14426577 (STATS), saving empty marker.
+2026-01-06 15:59:30,074 [INFO] Captured DETAIL for 14426578 -> server/stats\14426578_detail.json
+2026-01-06 15:59:30,076 [WARNING] API Error for 14426578 (STATS), saving empty marker.
+2026-01-06 15:59:36,085 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711576)
+2026-01-06 15:59:37,518 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:59:53,535 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711593)
+2026-01-06 15:59:55,002 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 15:59:57,008 [INFO] [AUTO-STATS] Processing batch 6/13 (5 matches)
+2026-01-06 16:00:02,540 [INFO] Captured DETAIL for 14426579 -> server/stats\14426579_detail.json
+2026-01-06 16:00:02,543 [WARNING] API Error for 14426579 (STATS), saving empty marker.
+2026-01-06 16:00:02,682 [INFO] Captured DETAIL for 14426580 -> server/stats\14426580_detail.json
+2026-01-06 16:00:02,684 [WARNING] API Error for 14426580 (STATS), saving empty marker.
+2026-01-06 16:00:02,837 [INFO] Captured DETAIL for 14426582 -> server/stats\14426582_detail.json
+2026-01-06 16:00:02,838 [WARNING] API Error for 14426582 (STATS), saving empty marker.
+2026-01-06 16:00:02,981 [INFO] Captured DETAIL for 14426592 -> server/stats\14426592_detail.json
+2026-01-06 16:00:02,983 [WARNING] API Error for 14426592 (STATS), saving empty marker.
+2026-01-06 16:00:10,999 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711610)
+2026-01-06 16:00:12,459 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:00:28,477 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711628)
+2026-01-06 16:00:29,836 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:00:31,841 [INFO] [AUTO-STATS] Processing batch 7/13 (5 matches)
+2026-01-06 16:00:38,045 [INFO] Captured DETAIL for 14426593 -> server/stats\14426593_detail.json
+2026-01-06 16:00:38,189 [INFO] Captured STATS for 14426593 -> server/stats\14426593_stats.json
+2026-01-06 16:00:38,337 [INFO] Captured DETAIL for 14803150 -> server/stats\14803150_detail.json
+2026-01-06 16:00:38,338 [WARNING] API Error for 14803150 (STATS), saving empty marker.
+2026-01-06 16:00:38,464 [INFO] Captured DETAIL for 14803157 -> server/stats\14803157_detail.json
+2026-01-06 16:00:38,466 [WARNING] API Error for 14803157 (STATS), saving empty marker.
+2026-01-06 16:00:38,608 [INFO] Captured DETAIL for 14803162 -> server/stats\14803162_detail.json
+2026-01-06 16:00:38,609 [WARNING] API Error for 14803162 (STATS), saving empty marker.
+2026-01-06 16:00:38,741 [INFO] Captured DETAIL for 14803147 -> server/stats\14803147_detail.json
+2026-01-06 16:00:38,863 [INFO] Captured STATS for 14803147 -> server/stats\14803147_stats.json
+2026-01-06 16:00:44,871 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711644)
+2026-01-06 16:00:46,306 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:01:02,323 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711662)
+2026-01-06 16:01:03,783 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:01:07,796 [INFO] [AUTO-STATS] Processing batch 8/13 (5 matches)
+2026-01-06 16:01:13,993 [INFO] Captured DETAIL for 14803173 -> server/stats\14803173_detail.json
+2026-01-06 16:01:13,994 [WARNING] API Error for 14803173 (STATS), saving empty marker.
+2026-01-06 16:01:14,902 [INFO] Captured DETAIL for 14803154 -> server/stats\14803154_detail.json
+2026-01-06 16:01:14,904 [WARNING] API Error for 14803154 (STATS), saving empty marker.
+2026-01-06 16:01:15,064 [INFO] Captured DETAIL for 14803166 -> server/stats\14803166_detail.json
+2026-01-06 16:01:15,066 [WARNING] API Error for 14803166 (STATS), saving empty marker.
+2026-01-06 16:01:15,283 [INFO] Captured DETAIL for 14803169 -> server/stats\14803169_detail.json
+2026-01-06 16:01:15,285 [WARNING] API Error for 14803169 (STATS), saving empty marker.
+2026-01-06 16:01:15,421 [INFO] Captured DETAIL for 14803168 -> server/stats\14803168_detail.json
+2026-01-06 16:01:15,423 [WARNING] API Error for 14803168 (STATS), saving empty marker.
+2026-01-06 16:01:15,433 [INFO] Safety net: Refreshing page...
+2026-01-06 16:01:28,835 [INFO] Captured DETAIL for 13981608 -> server/stats\13981608_detail.json
+2026-01-06 16:01:28,980 [INFO] Captured DETAIL for 14025061 -> server/stats\14025061_detail.json
+2026-01-06 16:01:29,131 [INFO] Captured DETAIL for 14025049 -> server/stats\14025049_detail.json
+2026-01-06 16:01:29,343 [INFO] Captured DETAIL for 14025037 -> server/stats\14025037_detail.json
+2026-01-06 16:01:29,490 [INFO] Captured DETAIL for 14025019 -> server/stats\14025019_detail.json
+2026-01-06 16:01:29,493 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711689)
+2026-01-06 16:01:30,926 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:01:42,943 [INFO] [AUTO-STATS] Processing batch 9/13 (5 matches)
+2026-01-06 16:01:49,139 [INFO] Captured DETAIL for 14853502 -> server/stats\14853502_detail.json
+2026-01-06 16:01:49,141 [WARNING] API Error for 14853502 (STATS), saving empty marker.
+2026-01-06 16:01:49,306 [INFO] Captured DETAIL for 14853498 -> server/stats\14853498_detail.json
+2026-01-06 16:01:49,308 [WARNING] API Error for 14853498 (STATS), saving empty marker.
+2026-01-06 16:01:49,440 [INFO] Captured DETAIL for 14853503 -> server/stats\14853503_detail.json
+2026-01-06 16:01:49,442 [WARNING] API Error for 14853503 (STATS), saving empty marker.
+2026-01-06 16:01:49,569 [INFO] Captured DETAIL for 14717955 -> server/stats\14717955_detail.json
+2026-01-06 16:01:49,571 [WARNING] API Error for 14717955 (STATS), saving empty marker.
+2026-01-06 16:01:49,732 [INFO] Captured DETAIL for 15174234 -> server/stats\15174234_detail.json
+2026-01-06 16:01:49,734 [WARNING] API Error for 15174234 (STATS), saving empty marker.
+2026-01-06 16:01:49,741 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711709)
+2026-01-06 16:01:51,167 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:02:07,184 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711727)
+2026-01-06 16:02:08,849 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:02:18,867 [INFO] [AUTO-STATS] Processing batch 10/13 (5 matches)
+2026-01-06 16:02:24,259 [INFO] Captured DETAIL for 15174300 -> server/stats\15174300_detail.json
+2026-01-06 16:02:24,261 [WARNING] API Error for 15174300 (STATS), saving empty marker.
+2026-01-06 16:02:24,405 [INFO] Captured DETAIL for 15320543 -> server/stats\15320543_detail.json
+2026-01-06 16:02:24,408 [WARNING] API Error for 15320543 (STATS), saving empty marker.
+2026-01-06 16:02:24,557 [INFO] Captured DETAIL for 15315634 -> server/stats\15315634_detail.json
+2026-01-06 16:02:24,559 [WARNING] API Error for 15315634 (STATS), saving empty marker.
+2026-01-06 16:02:24,691 [INFO] Captured DETAIL for 15292753 -> server/stats\15292753_detail.json
+2026-01-06 16:02:24,693 [WARNING] API Error for 15292753 (STATS), saving empty marker.
+2026-01-06 16:02:24,714 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711744)
+2026-01-06 16:02:26,116 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:02:42,137 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711762)
+2026-01-06 16:02:43,864 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:02:53,878 [INFO] [AUTO-STATS] Processing batch 11/13 (5 matches)
+2026-01-06 16:03:00,073 [INFO] Captured DETAIL for 15292747 -> server/stats\15292747_detail.json
+2026-01-06 16:03:00,075 [WARNING] API Error for 15292747 (STATS), saving empty marker.
+2026-01-06 16:03:00,216 [INFO] Captured DETAIL for 15292748 -> server/stats\15292748_detail.json
+2026-01-06 16:03:00,218 [WARNING] API Error for 15292748 (STATS), saving empty marker.
+2026-01-06 16:03:00,382 [INFO] Captured DETAIL for 15292751 -> server/stats\15292751_detail.json
+2026-01-06 16:03:00,383 [WARNING] API Error for 15292751 (STATS), saving empty marker.
+2026-01-06 16:03:00,520 [INFO] Captured DETAIL for 15292756 -> server/stats\15292756_detail.json
+2026-01-06 16:03:00,522 [WARNING] API Error for 15292756 (STATS), saving empty marker.
+2026-01-06 16:03:00,660 [INFO] Captured DETAIL for 15292759 -> server/stats\15292759_detail.json
+2026-01-06 16:03:00,663 [WARNING] API Error for 15292759 (STATS), saving empty marker.
+2026-01-06 16:03:00,667 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711780)
+2026-01-06 16:03:02,097 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:03:18,164 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711798)
+2026-01-06 16:03:19,648 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:03:29,661 [INFO] [AUTO-STATS] Processing batch 12/14 (5 matches)
+2026-01-06 16:03:35,044 [INFO] Captured DETAIL for 15292760 -> server/stats\15292760_detail.json
+2026-01-06 16:03:35,047 [WARNING] API Error for 15292760 (STATS), saving empty marker.
+2026-01-06 16:03:35,191 [INFO] Captured DETAIL for 15292750 -> server/stats\15292750_detail.json
+2026-01-06 16:03:35,193 [WARNING] API Error for 15292750 (STATS), saving empty marker.
+2026-01-06 16:03:35,336 [INFO] Captured DETAIL for 15125309 -> server/stats\15125309_detail.json
+2026-01-06 16:03:35,338 [WARNING] API Error for 15125309 (STATS), saving empty marker.
+2026-01-06 16:03:35,476 [INFO] Captured DETAIL for 15319304 -> server/stats\15319304_detail.json
+2026-01-06 16:03:35,590 [INFO] Captured STATS for 15319304 -> server/stats\15319304_stats.json
+2026-01-06 16:03:35,590 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711815)
+2026-01-06 16:03:37,023 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:03:53,039 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711833)
+2026-01-06 16:03:54,458 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:04:04,475 [INFO] [AUTO-STATS] Processing batch 13/14 (5 matches)
+2026-01-06 16:04:10,695 [INFO] Captured DETAIL for 15286963 -> server/stats\15286963_detail.json
+2026-01-06 16:04:10,834 [INFO] Captured STATS for 15286963 -> server/stats\15286963_stats.json
+2026-01-06 16:04:10,965 [INFO] Captured DETAIL for 15307285 -> server/stats\15307285_detail.json
+2026-01-06 16:04:11,098 [INFO] Captured STATS for 15307285 -> server/stats\15307285_stats.json
+2026-01-06 16:04:11,231 [INFO] Captured DETAIL for 15303842 -> server/stats\15303842_detail.json
+2026-01-06 16:04:11,359 [INFO] Captured STATS for 15303842 -> server/stats\15303842_stats.json
+2026-01-06 16:04:11,496 [INFO] Captured DETAIL for 15273901 -> server/stats\15273901_detail.json
+2026-01-06 16:04:11,498 [WARNING] API Error for 15273901 (STATS), saving empty marker.
+2026-01-06 16:04:11,650 [INFO] Captured DETAIL for 15273942 -> server/stats\15273942_detail.json
+2026-01-06 16:04:11,802 [INFO] Captured STATS for 15273942 -> server/stats\15273942_stats.json
+2026-01-06 16:04:11,803 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711851)
+2026-01-06 16:04:13,303 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:04:29,324 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711869)
+2026-01-06 16:04:30,772 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:04:38,785 [INFO] [AUTO-STATS] Processing batch 14/14 (1 matches)
+2026-01-06 16:04:41,760 [INFO] Captured DETAIL for 14696465 -> server/stats\14696465_detail.json
+2026-01-06 16:04:41,914 [INFO] Captured STATS for 14696465 -> server/stats\14696465_stats.json
+2026-01-06 16:04:45,919 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711885)
+2026-01-06 16:04:49,907 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:05:05,924 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711905)
+2026-01-06 16:05:07,926 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:05:09,931 [INFO] [AUTO-STATS] Processing batch 1/14 (5 matches)
+2026-01-06 16:05:16,127 [INFO] Captured DETAIL for 13981609 -> server/stats\13981609_detail.json
+2026-01-06 16:05:16,315 [INFO] Captured STATS for 13981609 -> server/stats\13981609_stats.json
+2026-01-06 16:05:16,464 [INFO] Captured DETAIL for 15211544 -> server/stats\15211544_detail.json
+2026-01-06 16:05:16,640 [INFO] Captured STATS for 15211544 -> server/stats\15211544_stats.json
+2026-01-06 16:05:16,779 [INFO] Captured DETAIL for 15305991 -> server/stats\15305991_detail.json
+2026-01-06 16:05:16,931 [INFO] Captured STATS for 15305991 -> server/stats\15305991_stats.json
+2026-01-06 16:05:17,077 [INFO] Captured DETAIL for 15318076 -> server/stats\15318076_detail.json
+2026-01-06 16:05:17,079 [WARNING] API Error for 15318076 (STATS), saving empty marker.
+2026-01-06 16:05:17,204 [INFO] Captured DETAIL for 15319167 -> server/stats\15319167_detail.json
+2026-01-06 16:05:17,206 [WARNING] API Error for 15319167 (STATS), saving empty marker.
+2026-01-06 16:05:23,239 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711923)
+2026-01-06 16:05:24,651 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:05:40,713 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711940)
+2026-01-06 16:05:42,181 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:05:44,186 [INFO] [AUTO-STATS] Processing batch 2/14 (5 matches)
+2026-01-06 16:05:50,385 [INFO] Captured DETAIL for 15317944 -> server/stats\15317944_detail.json
+2026-01-06 16:05:50,561 [INFO] Captured STATS for 15317944 -> server/stats\15317944_stats.json
+2026-01-06 16:05:50,709 [INFO] Captured DETAIL for 15290787 -> server/stats\15290787_detail.json
+2026-01-06 16:05:51,144 [INFO] Captured STATS for 15290787 -> server/stats\15290787_stats.json
+2026-01-06 16:05:51,283 [INFO] Captured DETAIL for 15319066 -> server/stats\15319066_detail.json
+2026-01-06 16:05:51,455 [INFO] Captured STATS for 15319066 -> server/stats\15319066_stats.json
+2026-01-06 16:05:51,590 [INFO] Captured DETAIL for 14402964 -> server/stats\14402964_detail.json
+2026-01-06 16:05:51,727 [INFO] Captured STATS for 14402964 -> server/stats\14402964_stats.json
+2026-01-06 16:05:51,871 [INFO] Captured DETAIL for 14402960 -> server/stats\14402960_detail.json
+2026-01-06 16:05:52,004 [INFO] Captured STATS for 14402960 -> server/stats\14402960_stats.json
+2026-01-06 16:05:58,012 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711958)
+2026-01-06 16:05:59,490 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:06:15,507 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711975)
+2026-01-06 16:06:16,931 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:06:18,937 [INFO] [AUTO-STATS] Processing batch 3/14 (5 matches)
+2026-01-06 16:06:25,133 [INFO] Captured DETAIL for 14402962 -> server/stats\14402962_detail.json
+2026-01-06 16:06:25,269 [INFO] Captured STATS for 14402962 -> server/stats\14402962_stats.json
+2026-01-06 16:06:25,448 [INFO] Captured DETAIL for 14402966 -> server/stats\14402966_detail.json
+2026-01-06 16:06:25,603 [INFO] Captured STATS for 14402966 -> server/stats\14402966_stats.json
+2026-01-06 16:06:25,742 [INFO] Captured DETAIL for 14403270 -> server/stats\14403270_detail.json
+2026-01-06 16:06:25,862 [INFO] Captured STATS for 14403270 -> server/stats\14403270_stats.json
+2026-01-06 16:06:26,010 [INFO] Captured DETAIL for 14403581 -> server/stats\14403581_detail.json
+2026-01-06 16:06:26,160 [INFO] Captured STATS for 14403581 -> server/stats\14403581_stats.json
+2026-01-06 16:06:26,352 [INFO] Captured DETAIL for 14403890 -> server/stats\14403890_detail.json
+2026-01-06 16:06:26,499 [INFO] Captured STATS for 14403890 -> server/stats\14403890_stats.json
+2026-01-06 16:06:32,505 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767711992)
+2026-01-06 16:06:34,145 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:06:50,161 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712010)
+2026-01-06 16:06:51,728 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:06:53,733 [INFO] [AUTO-STATS] Processing batch 4/14 (5 matches)
+2026-01-06 16:06:59,927 [INFO] Captured DETAIL for 14404501 -> server/stats\14404501_detail.json
+2026-01-06 16:07:00,069 [INFO] Captured STATS for 14404501 -> server/stats\14404501_stats.json
+2026-01-06 16:07:00,196 [INFO] Captured DETAIL for 14404500 -> server/stats\14404500_detail.json
+2026-01-06 16:07:00,321 [INFO] Captured STATS for 14404500 -> server/stats\14404500_stats.json
+2026-01-06 16:07:00,461 [INFO] Captured DETAIL for 15227405 -> server/stats\15227405_detail.json
+2026-01-06 16:07:00,463 [WARNING] API Error for 15227405 (STATS), saving empty marker.
+2026-01-06 16:07:00,602 [INFO] Captured DETAIL for 14956394 -> server/stats\14956394_detail.json
+2026-01-06 16:07:00,744 [INFO] Captured STATS for 14956394 -> server/stats\14956394_stats.json
+2026-01-06 16:07:00,875 [INFO] Captured DETAIL for 14956393 -> server/stats\14956393_detail.json
+2026-01-06 16:07:01,021 [INFO] Captured STATS for 14956393 -> server/stats\14956393_stats.json
+2026-01-06 16:07:07,029 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712027)
+2026-01-06 16:07:09,383 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:07:25,404 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712045)
+2026-01-06 16:07:26,820 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:07:28,826 [INFO] [AUTO-STATS] Processing batch 5/14 (5 matches)
+2026-01-06 16:07:35,035 [INFO] Captured DETAIL for 15318147 -> server/stats\15318147_detail.json
+2026-01-06 16:07:35,037 [WARNING] API Error for 15318147 (STATS), saving empty marker.
+2026-01-06 16:07:35,177 [INFO] Captured DETAIL for 15262430 -> server/stats\15262430_detail.json
+2026-01-06 16:07:35,303 [INFO] Captured STATS for 15262430 -> server/stats\15262430_stats.json
+2026-01-06 16:07:35,437 [INFO] Captured DETAIL for 15318988 -> server/stats\15318988_detail.json
+2026-01-06 16:07:35,439 [WARNING] API Error for 15318988 (STATS), saving empty marker.
+2026-01-06 16:07:35,607 [INFO] Captured DETAIL for 15309687 -> server/stats\15309687_detail.json
+2026-01-06 16:07:35,722 [INFO] Captured STATS for 15309687 -> server/stats\15309687_stats.json
+2026-01-06 16:07:35,857 [INFO] Captured DETAIL for 15319035 -> server/stats\15319035_detail.json
+2026-01-06 16:07:36,001 [INFO] Captured STATS for 15319035 -> server/stats\15319035_stats.json
+2026-01-06 16:07:42,009 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712062)
+2026-01-06 16:07:43,502 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:07:59,518 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712079)
+2026-01-06 16:08:01,021 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:08:03,028 [INFO] [AUTO-STATS] Processing batch 6/13 (5 matches)
+2026-01-06 16:08:09,234 [INFO] Captured DETAIL for 15322535 -> server/stats\15322535_detail.json
+2026-01-06 16:08:09,367 [INFO] Captured STATS for 15322535 -> server/stats\15322535_stats.json
+2026-01-06 16:08:09,544 [INFO] Captured DETAIL for 14426577 -> server/stats\14426577_detail.json
+2026-01-06 16:08:09,546 [WARNING] API Error for 14426577 (STATS), saving empty marker.
+2026-01-06 16:08:09,691 [INFO] Captured DETAIL for 14426578 -> server/stats\14426578_detail.json
+2026-01-06 16:08:09,693 [WARNING] API Error for 14426578 (STATS), saving empty marker.
+2026-01-06 16:08:09,860 [INFO] Captured DETAIL for 14426579 -> server/stats\14426579_detail.json
+2026-01-06 16:08:09,862 [WARNING] API Error for 14426579 (STATS), saving empty marker.
+2026-01-06 16:08:09,999 [INFO] Captured DETAIL for 14426580 -> server/stats\14426580_detail.json
+2026-01-06 16:08:10,001 [WARNING] API Error for 14426580 (STATS), saving empty marker.
+2026-01-06 16:08:18,018 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712098)
+2026-01-06 16:08:19,521 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:08:35,538 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712115)
+2026-01-06 16:08:37,844 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:08:37,846 [INFO] [AUTO-STATS] Processing batch 7/13 (5 matches)
+2026-01-06 16:08:44,034 [INFO] Captured DETAIL for 14426582 -> server/stats\14426582_detail.json
+2026-01-06 16:08:44,036 [WARNING] API Error for 14426582 (STATS), saving empty marker.
+2026-01-06 16:08:44,191 [INFO] Captured DETAIL for 14426592 -> server/stats\14426592_detail.json
+2026-01-06 16:08:44,193 [WARNING] API Error for 14426592 (STATS), saving empty marker.
+2026-01-06 16:08:44,323 [INFO] Captured DETAIL for 14426593 -> server/stats\14426593_detail.json
+2026-01-06 16:08:44,442 [INFO] Captured STATS for 14426593 -> server/stats\14426593_stats.json
+2026-01-06 16:08:44,567 [INFO] Captured DETAIL for 14803150 -> server/stats\14803150_detail.json
+2026-01-06 16:08:44,569 [WARNING] API Error for 14803150 (STATS), saving empty marker.
+2026-01-06 16:08:44,687 [INFO] Captured DETAIL for 14803157 -> server/stats\14803157_detail.json
+2026-01-06 16:08:44,688 [WARNING] API Error for 14803157 (STATS), saving empty marker.
+2026-01-06 16:08:54,711 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712134)
+2026-01-06 16:08:56,118 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:09:12,137 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712152)
+2026-01-06 16:09:13,688 [INFO] Captured LIVE_LIST -> server/sofascore_live.json
+2026-01-06 16:09:13,692 [INFO] [AUTO-STATS] Processing batch 8/13 (5 matches)
+2026-01-06 16:09:20,031 [INFO] Captured DETAIL for 14803162 -> server/stats\14803162_detail.json
+2026-01-06 16:09:20,033 [WARNING] API Error for 14803162 (STATS), saving empty marker.
+2026-01-06 16:09:20,185 [INFO] Captured DETAIL for 14803147 -> server/stats\14803147_detail.json
+2026-01-06 16:09:20,337 [INFO] Captured STATS for 14803147 -> server/stats\14803147_stats.json
+2026-01-06 16:09:20,463 [INFO] Captured DETAIL for 14803173 -> server/stats\14803173_detail.json
+2026-01-06 16:09:20,466 [WARNING] API Error for 14803173 (STATS), saving empty marker.
+2026-01-06 16:09:20,618 [INFO] Captured DETAIL for 14803154 -> server/stats\14803154_detail.json
+2026-01-06 16:09:20,620 [WARNING] API Error for 14803154 (STATS), saving empty marker.
+2026-01-06 16:09:20,808 [INFO] Captured DETAIL for 14803166 -> server/stats\14803166_detail.json
+2026-01-06 16:09:20,810 [WARNING] API Error for 14803166 (STATS), saving empty marker.
+2026-01-06 16:09:28,861 [INFO] Periodic manual fetch for LIVE_LIST (TS: 1767712168)

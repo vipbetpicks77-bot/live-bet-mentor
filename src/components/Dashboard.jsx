@@ -2065,6 +2065,10 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
                                                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                                                                             {Object.entries(match.consensusReport.agreement || {}).map(([pred, count]) => {
                                                                                 const isMainPred = count >= 2;
+                                                                                // Make double chance predictions more readable
+                                                                                const displayPred = pred === '12' ? '1/2' :
+                                                                                    pred === '1X' ? '1/X' :
+                                                                                        pred === 'X2' ? 'X/2' : pred;
                                                                                 return (
                                                                                     <span key={pred} style={{
                                                                                         fontSize: '0.6rem',
@@ -2075,7 +2079,7 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
                                                                                         color: isMainPred ? '#10b981' : 'rgba(255,255,255,0.6)',
                                                                                         border: isMainPred ? '1px solid rgba(16, 185, 129, 0.4)' : 'none'
                                                                                     }}>
-                                                                                        {pred}: {count}
+                                                                                        {displayPred}: {count}
                                                                                     </span>
                                                                                 );
                                                                             })}
