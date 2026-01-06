@@ -193,42 +193,100 @@ def parse_odds_from_page(driver):
                         match_info['minute'] = text
                         break
                 
-                # Extract odds - look for numeric values in a reasonable range
+                # Extract odds - ENHANCED: Multiple strategies for OddsPortal 2026
                 odds_values = []
-                # Try specific odds elements first
-                odds_elems = row.find_elements(By.CSS_SELECTOR, 
-                    '[class*="odds"], [class*="odd-value"], button[class*="flex"], span[class*="height-content"]')
                 
-                for elem in odds_elems:
-                    text = elem.text.strip()
-                    try:
-                        val = float(text)
-                        if 1.01 <= val <= 50.0 and text not in odds_values:
-                            odds_values.append(text)
-                    except ValueError:
-                        pass
-                
-                # Fallback: extract odds from text lines
-                if len(odds_values) < 3:
-                    for line in lines:
+                # Strategy 1: OddsPortal specific - p.height-content elements inside odds cells
+                try:
+                    odds_cells = row.find_elements(By.CSS_SELECTOR, 
+                        'p.height-content, div[class*="odds"] > p, [class*="odds-value"] p, span[data-v][class*="truncate"]')
+                    for cell in odds_cells:
+                        text = cell.text.strip()
                         try:
-                            val = float(line.strip())
-                            if 1.01 <= val <= 50.0 and line.strip() not in odds_values:
-                                odds_values.append(line.strip())
+                            val = float(text)
+                            if 1.01 <= val <= 50.0 and text not in odds_values:
+                                odds_values.append(text)
+                                logger.debug(f"[ODDS] Strategy 1 found: {text}")
+                        except ValueError:
+                            pass
+                except Exception as e:
+                    logger.debug(f"[ODDS] Strategy 1 failed: {e}")
+                
+                # Strategy 2: Look for clickable odds buttons with decimal text
+                if len(odds_values) < 3:
+                    try:
+                        buttons = row.find_elements(By.CSS_SELECTOR, 
+                            'button[class*="flex"], a[class*="flex"], div[role="button"]')
+                        for btn in buttons:
+                            # Get innerText of the button, looking for decimal odds
+                            inner = btn.text.strip()
+                            # OddsPortal often has odds in nested spans
+                            try:
+                                val = float(inner)
+                                if 1.01 <= val <= 50.0 and inner not in odds_values:
+                                    odds_values.append(inner)
+                                    logger.debug(f"[ODDS] Strategy 2 found: {inner}")
+                            except ValueError:
+                                # Try to extract from inner elements
+                                for span in btn.find_elements(By.TAG_NAME, 'span'):
+                                    span_text = span.text.strip()
+                                    try:
+                                        val = float(span_text)
+                                        if 1.01 <= val <= 50.0 and span_text not in odds_values:
+                                            odds_values.append(span_text)
+                                            logger.debug(f"[ODDS] Strategy 2b found: {span_text}")
+                                    except ValueError:
+                                        pass
+                    except Exception as e:
+                        logger.debug(f"[ODDS] Strategy 2 failed: {e}")
+                
+                # Strategy 3: Find all text nodes matching decimal pattern
+                if len(odds_values) < 3:
+                    try:
+                        # Use a broad selector and filter by text content
+                        all_elems = row.find_elements(By.XPATH, 
+                            './/*[not(self::script)][not(self::style)][string-length(normalize-space(text())) > 0]')
+                        for elem in all_elems:
+                            try:
+                                text = elem.text.strip()
+                                # Match decimal odds pattern: X.XX where X is 1-50
+                                if re.match(r'^\d{1,2}\.\d{1,2}$', text):
+                                    val = float(text)
+                                    if 1.01 <= val <= 50.0 and text not in odds_values:
+                                        odds_values.append(text)
+                                        logger.debug(f"[ODDS] Strategy 3 found: {text}")
+                            except:
+                                pass
+                    except Exception as e:
+                        logger.debug(f"[ODDS] Strategy 3 failed: {e}")
+                
+                # Strategy 4: Parse from raw text lines (last resort)
+                if len(odds_values) < 2:
+                    for line in lines:
+                        line_clean = line.strip()
+                        try:
+                            # Only accept proper decimal format
+                            if re.match(r'^\d{1,2}\.\d{1,2}$', line_clean):
+                                val = float(line_clean)
+                                if 1.01 <= val <= 50.0 and line_clean not in odds_values:
+                                    odds_values.append(line_clean)
                         except ValueError:
                             pass
                 
+                # Build odds object
                 if len(odds_values) >= 3:
                     match_info['odds'] = {
                         'home': odds_values[0],
                         'draw': odds_values[1],
                         'away': odds_values[2]
                     }
+                    logger.info(f"[ODDS] Full 1X2 odds: {odds_values[0]} | {odds_values[1]} | {odds_values[2]}")
                 elif len(odds_values) == 2:
                     match_info['odds'] = {
                         'home': odds_values[0],
                         'away': odds_values[1]
                     }
+                    logger.info(f"[ODDS] Partial odds: {odds_values[0]} | {odds_values[1]}")
                 
                 # Only add if we have at least teams + (odds or score)
                 if match_info.get('homeTeam') and match_info.get('awayTeam') and (match_info.get('odds') or match_info.get('score')):

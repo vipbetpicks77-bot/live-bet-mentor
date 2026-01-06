@@ -126,8 +126,17 @@ class LiveOpportunityScorer {
         const riskScore = this._calculateRiskScore(signal);
         const oddsScore = this._calculateOddsScore(match, signal);
 
+        // Determine stats readiness
+        const stats = match.stats || {};
+        const daTotal = (stats.dangerousAttacks?.home || 0) + (stats.dangerousAttacks?.away || 0);
+        const sogTotal = (stats.shotsOnGoal?.home || 0) + (stats.shotsOnGoal?.away || 0);
+        const xgTotal = (stats.xg?.home || 0) + (stats.xg?.away || 0);
+
+        // Match is ready if it has any meaningful live stat (DA > 10 OR SOG > 2 OR xG > 0)
+        const isStatsReady = daTotal > 10 || sogTotal > 2 || xgTotal > 0;
+
         // Weighted total
-        const totalScore = Math.round(
+        let totalScore = Math.round(
             dqsScore * weights.DQS +
             momentumScore * weights.MOMENTUM +
             pressureScore * weights.PRESSURE +
@@ -135,6 +144,11 @@ class LiveOpportunityScorer {
             riskScore * weights.RISK +
             oddsScore * weights.ODDS
         );
+
+        // CRITICAL: Cap score if stats are not ready (Maximum 50 - SOGUK)
+        if (!isStatsReady) {
+            totalScore = Math.min(50, totalScore);
+        }
 
         // Calculate trend
         const trend = this._calculateTrend(matchId, totalScore);
@@ -165,15 +179,16 @@ class LiveOpportunityScorer {
             heatLevel,
             suggestedMarket,
             reason,
-            oddsInfo,         // NEW: Include odds data
-            valueDetected: oddsScore >= 70,  // NEW: Flag for value
+            oddsInfo,
+            valueDetected: oddsScore >= 70,
+            isStatsReady,      // NEW: Flag for UI
             components: {
                 dqs: dqsScore,
                 momentum: momentumScore,
                 pressure: pressureScore,
                 xg: xgScore,
                 risk: riskScore,
-                odds: oddsScore  // NEW
+                odds: oddsScore
             },
             excluded: false,
             minute

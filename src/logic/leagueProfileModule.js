@@ -13,10 +13,29 @@ export class LeagueProfileModule {
     getTier(leagueName) {
         if (!leagueName) return 3;
         const tiers = CONFIG.MODULAR_SYSTEM.LEAGUE_TIERS;
+        const normalizedName = leagueName.toLowerCase().trim();
 
-        // Exact match check for Tier 1 and Tier 2
-        if (tiers.TIER_1.some(l => leagueName === l || leagueName.startsWith(l + ','))) return 1;
-        if (tiers.TIER_2.some(l => leagueName === l || leagueName.startsWith(l + ','))) return 2;
+        // Helper: Check if league name matches (exact or valid variant)
+        const matchesLeague = (tierLeague) => {
+            const tierLower = tierLeague.toLowerCase();
+
+            // Exact match
+            if (normalizedName === tierLower) return true;
+
+            // Handle common prefixes (e.g., "UEFA Champions League" should match "Champions League")
+            if (normalizedName.endsWith(tierLower)) return true;
+
+            // Handle Turkish variations (Süper Lig / Super Lig)
+            if (tierLower === 'süper lig' && (normalizedName === 'super lig' || normalizedName === 'süper lig')) return true;
+
+            return false;
+        };
+
+        // Check Tier 1
+        if (tiers.TIER_1.some(l => matchesLeague(l))) return 1;
+
+        // Check Tier 2
+        if (tiers.TIER_2.some(l => matchesLeague(l))) return 2;
 
         return 3; // Default to Discovery
     }

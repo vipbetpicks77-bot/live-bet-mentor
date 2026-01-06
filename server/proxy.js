@@ -152,8 +152,8 @@ app.get('/api/odds/live', (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`[PROXY SERVER] Running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[PROXY SERVER] Running on http://0.0.0.0:${PORT} (accessible from network)`);
     startScraper();
     startConsensusScraper();
     startOddsScraper(); // Live odds from OddsPortal

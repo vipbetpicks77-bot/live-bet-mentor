@@ -17,8 +17,12 @@ class PredictionTracker {
      * Initialize tracker for specific user
      */
     async init(userId) {
+        // Prevent clearing if same user re-initializes (avoids UI flicker)
+        if (this.userId === userId && this.predictions.length > 0) return;
+
         this.userId = userId;
         this.predictions = [];
+        this.pendingStatusUpdates = {}; // Track updates for temp IDs
 
         if (!userId) return;
 
@@ -132,6 +136,21 @@ class PredictionTracker {
             this.predictions = this.predictions.slice(0, 200);
         }
 
+        // Check if there's a pending status update from UI (user clicked win/loss immediately)
+        const pendingUpdate = this.pendingStatusUpdates[tempModel.id];
+        if (pendingUpdate) {
+            dbItem.status = pendingUpdate.result;
+            dbItem.final_score = pendingUpdate.finalScoreStr;
+            dbItem.resolved_at = new Date().toISOString();
+
+            // Sync temp model too
+            tempModel.status = pendingUpdate.result;
+            tempModel.finalScore = pendingUpdate.finalScore;
+            tempModel.resolvedAt = Date.now();
+
+            delete this.pendingStatusUpdates[tempModel.id];
+        }
+
         try {
             const { data: inserted, error } = await supabase
                 .from('predictions')
@@ -164,29 +183,36 @@ class PredictionTracker {
      */
     async updateResult(predictionId, result, finalScore) {
         const pred = this.predictions.find(p => p.id === predictionId);
-        if (pred) {
-            const finalScoreStr = finalScore ? `${finalScore.home}-${finalScore.away}` : null;
+        if (!pred) return;
 
-            // Optimistic update
-            pred.status = result;
-            pred.finalScore = finalScore;
-            pred.resolvedAt = Date.now();
+        const finalScoreStr = finalScore ? `${finalScore.home}-${finalScore.away}` : null;
 
-            try {
-                const { error } = await supabase
-                    .from('predictions')
-                    .update({
-                        status: result,
-                        final_score: finalScoreStr,
-                        resolved_at: new Date().toISOString()
-                    })
-                    .eq('id', predictionId);
+        // Optimistic update
+        pred.status = result;
+        pred.finalScore = finalScore;
+        pred.resolvedAt = Date.now();
 
-                if (error) throw error;
-                console.log('[TRACKER] Updated result:', result);
-            } catch (e) {
-                console.error('[TRACKER] Update error:', e);
-            }
+        // If it's a temp ID, store it to be picked up when DB record is created
+        if (typeof predictionId === 'string' && predictionId.startsWith('temp_')) {
+            this.pendingStatusUpdates[predictionId] = { result, finalScore, finalScoreStr };
+            console.log('[TRACKER] Queued result for temp ID:', result);
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('predictions')
+                .update({
+                    status: result,
+                    final_score: finalScoreStr,
+                    resolved_at: new Date().toISOString()
+                })
+                .eq('id', predictionId);
+
+            if (error) throw error;
+            console.log('[TRACKER] Updated result:', result);
+        } catch (e) {
+            console.error('[TRACKER] Update error:', e);
         }
     }
 

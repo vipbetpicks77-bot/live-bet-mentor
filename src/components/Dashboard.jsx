@@ -124,6 +124,8 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
     const [trackingStats, setTrackingStats] = useState(predictionTracker.getStats());
     const [showTrackingPanel, setShowTrackingPanel] = useState(false);
     const [showStakingCalc, setShowStakingCalc] = useState(false);
+    const [liveOpportunitiesLimit, setLiveOpportunitiesLimit] = useState(5);
+    const [hidePendingOpportunities, setHidePendingOpportunities] = useState(false);
 
     const getRemainingDays = (endDate) => {
         if (!endDate) return 0;
@@ -1811,14 +1813,160 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
 
                     {/* Live Opportunities Panel */}
                     {(() => {
-                        const opportunities = liveOpportunityScorer.getOpportunities(enforcedMatches, signals);
-                        const topOpportunities = opportunities.slice(0, 5);
+                        const allOpportunities = liveOpportunityScorer.getOpportunities(enforcedMatches, signals);
+
+                        // Apply limit to TOTAL opportunities first
+                        const limitedOpportunities = liveOpportunitiesLimit === 'ALL'
+                            ? allOpportunities
+                            : allOpportunities.slice(0, liveOpportunitiesLimit);
+
+                        // Then split into ready/pending
+                        const readyOpportunities = allOpportunities.filter(o => o.isStatsReady);
+                        const pendingOpportunities = allOpportunities.filter(o => !o.isStatsReady);
+
+                        const topReady = limitedOpportunities.filter(o => o.isStatsReady);
+                        const topPending = limitedOpportunities.filter(o => !o.isStatsReady);
 
                         const heatColors = {
                             ALPHA: { bg: 'rgba(56, 189, 248, 0.2)', border: 'var(--accent-color)', text: 'var(--accent-color)', icon: '🚀' },
                             ALEV: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: '#ef4444', icon: '🔥' },
                             SICAK: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.4)', text: '#fbbf24', icon: '⚡' },
                             SOGUK: { bg: 'rgba(148, 163, 184, 0.1)', border: 'rgba(148, 163, 184, 0.3)', text: '#94a3b8', icon: '❄️' }
+                        };
+
+                        const renderOppCard = (opp, idx, isCompact = false) => {
+                            const match = matches.find(m => m.id === opp.matchId);
+                            if (!match) return null;
+                            const heatStyle = heatColors[opp.heatLevel] || heatColors.SOGUK;
+                            const isTop = idx === 0 && opp.heatLevel === 'ALEV' && !isCompact;
+
+                            return (
+                                <div
+                                    key={opp.matchId}
+                                    onClick={() => setSelectedMatch(match)}
+                                    style={{
+                                        padding: isCompact ? '0.8rem 1rem' : '1.2rem',
+                                        background: isCompact ? 'rgba(15, 23, 42, 0.3)' : heatStyle.bg,
+                                        border: `1px solid ${isCompact ? 'rgba(255,255,255,0.05)' : heatStyle.border}`,
+                                        borderRadius: '16px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        opacity: isCompact ? 0.7 : 1,
+                                        animation: isTop ? 'pulse 2s infinite' : 'none'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isCompact ? 'center' : 'flex-start' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: isCompact ? '0.5rem' : '0.8rem', marginBottom: isCompact ? '0' : '0.5rem' }}>
+                                                {/* Ranking Badge - shows for both compact and non-compact */}
+                                                <div style={{
+                                                    fontSize: isCompact ? '0.6rem' : '0.7rem',
+                                                    fontWeight: 900,
+                                                    color: '#000',
+                                                    background: heatStyle.text,
+                                                    minWidth: isCompact ? '20px' : '24px',
+                                                    height: isCompact ? '20px' : '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    borderRadius: isCompact ? '5px' : '6px',
+                                                    flexShrink: 0,
+                                                    boxShadow: isCompact ? '0 2px 4px rgba(0,0,0,0.2)' : 'none'
+                                                }}>
+                                                    #{idx + 1}
+                                                </div>
+                                                <span style={{ fontSize: isCompact ? '1rem' : '1.2rem' }}>{heatStyle.icon}</span>
+                                                <span style={{ fontWeight: 800, fontSize: isCompact ? '0.85rem' : '1rem', color: isCompact ? '#e2e8f0' : heatStyle.text }}>
+                                                    {match.homeTeam} vs {match.awayTeam}
+                                                </span>
+                                                {opp.valueDetected && (
+                                                    <span style={{
+                                                        background: 'linear-gradient(135deg, #10b981, #34d399)',
+                                                        padding: '0.1rem 0.4rem',
+                                                        borderRadius: '4px',
+                                                        fontSize: '0.5rem',
+                                                        fontWeight: 900,
+                                                        color: '#000'
+                                                    }}>💰 VALUE</span>
+                                                )}
+                                            </div>
+
+                                            {!isCompact && (
+                                                <>
+                                                    <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
+                                                        {match.minute}' • <span style={{ fontWeight: 800, color: 'var(--accent-color)' }}>{match.score?.home ?? 0} - {match.score?.away ?? 0}</span>
+                                                        {match.stats?.xg && (
+                                                            <span style={{ marginLeft: '0.6rem', color: '#fbbf24' }}>
+                                                                xG: {(match.stats.xg.home || 0).toFixed(1)}-{(match.stats.xg.away || 0).toFixed(1)}
+                                                            </span>
+                                                        )}
+                                                        {opp.trend === 'UP' && <span style={{ marginLeft: '0.4rem', color: '#10b981', fontWeight: 800 }}>↗️</span>}
+                                                    </div>
+
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        gap: '0.8rem',
+                                                        alignItems: 'center',
+                                                        marginBottom: '0.6rem',
+                                                        padding: '0.4rem 0.6rem',
+                                                        background: 'rgba(0,0,0,0.2)',
+                                                        borderRadius: '8px'
+                                                    }}>
+                                                        <div style={{ flex: 1 }}>
+                                                            {(() => {
+                                                                const daHome = match.stats?.dangerousAttacks?.home || 0;
+                                                                const daAway = match.stats?.dangerousAttacks?.away || 0;
+                                                                const total = daHome + daAway || 1;
+                                                                const homePercent = Math.round((daHome / total) * 100);
+                                                                return (
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                                        <span style={{ fontSize: '0.55rem', fontWeight: 700 }}>{homePercent}%</span>
+                                                                        <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden', display: 'flex' }}>
+                                                                            <div style={{ width: `${homePercent}%`, height: '100%', background: 'linear-gradient(90deg, #10b981, #34d399)' }} />
+                                                                        </div>
+                                                                        <span style={{ fontSize: '0.55rem', fontWeight: 700 }}>{100 - homePercent}%</span>
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                        <div style={{ display: 'flex', gap: '0.4rem', fontSize: '0.55rem', fontWeight: 700 }}>
+                                                            <span style={{ color: 'var(--accent-color)' }}>🎯 {match.stats?.shotsOnGoal?.home || 0}-{match.stats?.shotsOnGoal?.away || 0}</span>
+                                                            <span style={{ color: '#fbbf24' }}>⚔️ {match.stats?.dangerousAttacks?.home || 0}-{match.stats?.dangerousAttacks?.away || 0}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        {opp.oddsInfo && (
+                                                            <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                                                                ORANLAR: {opp.oddsInfo.home} | {opp.oddsInfo.draw} | {opp.oddsInfo.away}
+                                                            </div>
+                                                        )}
+                                                        {opp.suggestedMarket?.marketKey && (
+                                                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent-color)' }}>
+                                                                💡 {t[opp.suggestedMarket.marketKey] || opp.suggestedMarket.marketKey}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {isCompact && (
+                                                <div style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.2rem' }}>
+                                                    {match.minute}' • {match.score?.home ?? 0} - {match.score?.away ?? 0} • Veri Bekleniyor...
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: isCompact ? '1.2rem' : '1.8rem', fontWeight: 900, color: heatStyle.text }}>
+                                                {opp.score}
+                                            </div>
+                                            {!isCompact && <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>{opp.heatLevel}</div>}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
                         };
 
                         return (
@@ -1829,7 +1977,7 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
                                     border: '1px solid rgba(239, 68, 68, 0.15)',
                                     borderRadius: '20px'
                                 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <h3 style={{
                                                 fontSize: '1.3rem',
@@ -1844,270 +1992,133 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
                                             }}>
                                                 🔥 {lang === 'tr' ? 'CANLI FIRSATLAR' : 'LIVE OPPORTUNITIES'}
                                             </h3>
-                                            <span style={{
-                                                background: 'rgba(239, 68, 68, 0.2)',
-                                                padding: '0.3rem 0.8rem',
-                                                borderRadius: '20px',
-                                                fontSize: '0.7rem',
-                                                fontWeight: 800,
-                                                color: '#ef4444',
-                                                border: '1px solid rgba(239, 68, 68, 0.3)'
-                                            }}>
-                                                TOP {topOpportunities.length}
-                                            </span>
+                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                                {[5, 10, 'ALL'].map(limit => (
+                                                    <button
+                                                        key={limit}
+                                                        onClick={(e) => { e.stopPropagation(); setLiveOpportunitiesLimit(limit); }}
+                                                        style={{
+                                                            background: liveOpportunitiesLimit === limit ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)',
+                                                            padding: '0.3rem 0.8rem',
+                                                            borderRadius: '20px',
+                                                            fontSize: '0.65rem',
+                                                            fontWeight: 800,
+                                                            color: liveOpportunitiesLimit === limit ? '#ef4444' : 'var(--text-secondary)',
+                                                            border: `1px solid ${liveOpportunitiesLimit === limit ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)'}`,
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s'
+                                                        }}>
+                                                        {limit === 'ALL' ? (lang === 'tr' ? 'TÜMÜ' : 'ALL') : `TOP ${limit}`}
+                                                    </button>
+                                                ))}
+                                                {/* Sadece Hazır Toggle */}
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setHidePendingOpportunities(!hidePendingOpportunities); }}
+                                                    style={{
+                                                        background: hidePendingOpportunities ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
+                                                        padding: '0.3rem 0.8rem',
+                                                        borderRadius: '20px',
+                                                        fontSize: '0.65rem',
+                                                        fontWeight: 800,
+                                                        color: hidePendingOpportunities ? '#10b981' : 'var(--text-secondary)',
+                                                        border: `1px solid ${hidePendingOpportunities ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.1)'}`,
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s',
+                                                        marginLeft: '0.5rem'
+                                                    }}>
+                                                    {lang === 'tr' ? '✓ HAZIR' : '✓ READY'}
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                            {opportunities.length} {lang === 'tr' ? 'fırsat' : 'opportunities'}
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                {allOpportunities.length} {lang === 'tr' ? 'fırsat' : 'opportunities'}
+                                            </div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>
+                                                🟢 {readyOpportunities.length} {lang === 'tr' ? 'hazır' : 'ready'} • ⏳ {pendingOpportunities.length} {lang === 'tr' ? 'bekliyor' : 'pending'}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {topOpportunities.length > 0 ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                            {topOpportunities.map((opp, idx) => {
-                                                const match = matches.find(m => m.id === opp.matchId);
-                                                if (!match) return null;
-                                                const heatStyle = heatColors[opp.heatLevel] || heatColors.SOGUK;
-                                                const isTop = idx === 0 && opp.heatLevel === 'ALEV';
-
-                                                return (
-                                                    <div
-                                                        key={opp.matchId}
-                                                        onClick={() => setSelectedMatch(match)}
-                                                        style={{
-                                                            padding: '1.2rem',
-                                                            background: heatStyle.bg,
-                                                            border: `1px solid ${heatStyle.border}`,
-                                                            borderRadius: '16px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease',
-                                                            position: 'relative',
-                                                            overflow: 'hidden',
-                                                            animation: isTop ? 'pulse 2s infinite' : 'none'
-                                                        }}
-                                                    >
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                            <div style={{ flex: 1 }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.5rem' }}>
-                                                                    <span style={{ fontSize: '1.5rem' }}>{heatStyle.icon}</span>
-                                                                    <span style={{ fontWeight: 800, fontSize: '1rem', color: heatStyle.text }}>
-                                                                        {match.homeTeam} vs {match.awayTeam}
-                                                                    </span>
-                                                                    {opp.trend === 'UP' && <span style={{ color: '#10b981' }}>↑</span>}
-                                                                    {opp.trend === 'DOWN' && <span style={{ color: '#ef4444' }}>↓</span>}
-                                                                    {opp.valueDetected && (
-                                                                        <span style={{
-                                                                            background: 'linear-gradient(135deg, #10b981, #34d399)',
-                                                                            padding: '0.15rem 0.5rem',
-                                                                            borderRadius: '6px',
-                                                                            fontSize: '0.55rem',
-                                                                            fontWeight: 900,
-                                                                            color: '#000',
-                                                                            letterSpacing: '0.5px'
-                                                                        }}>💰 VALUE</span>
-                                                                    )}
-                                                                </div>
-                                                                <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
-                                                                    {match.minute}' • <span style={{ fontWeight: 800, color: 'var(--accent-color)' }}>{match.score?.home ?? 0} - {match.score?.away ?? 0}</span> • {opp.suggestedMarket?.marketKey ? (t[opp.suggestedMarket.marketKey] ? (opp.suggestedMarket.marketParams ? Object.entries(opp.suggestedMarket.marketParams).reduce((acc, [k, v]) => acc.replace(`{${k}}`, v), t[opp.suggestedMarket.marketKey]) : t[opp.suggestedMarket.marketKey]) : opp.suggestedMarket.marketKey) : (opp.suggestedMarket?.market || '-')}
-                                                                    {opp.suggestedMarket?.confidence && (
-                                                                        <span style={{
-                                                                            marginLeft: '0.5rem',
-                                                                            padding: '0.1rem 0.4rem',
-                                                                            background: opp.suggestedMarket.confidence === 'VALUE' ? 'rgba(16, 185, 129, 0.2)' :
-                                                                                opp.suggestedMarket.confidence === 'HIGH' ? 'rgba(251, 191, 36, 0.2)' :
-                                                                                    'rgba(148, 163, 184, 0.15)',
-                                                                            color: opp.suggestedMarket.confidence === 'VALUE' ? '#10b981' :
-                                                                                opp.suggestedMarket.confidence === 'HIGH' ? '#fbbf24' :
-                                                                                    '#94a3b8',
-                                                                            borderRadius: '4px',
-                                                                            fontSize: '0.55rem',
-                                                                            fontWeight: 700
-                                                                        }}>{opp.suggestedMarket.confidence}</span>
-                                                                    )}
-                                                                    {opp.heatLevel === 'ALPHA' && (
-                                                                        <span style={{
-                                                                            marginLeft: '0.5rem',
-                                                                            padding: '0.1rem 0.5rem',
-                                                                            background: 'var(--accent-color)',
-                                                                            color: '#000',
-                                                                            borderRadius: '6px',
-                                                                            fontSize: '0.6rem',
-                                                                            fontWeight: 900,
-                                                                            boxShadow: '0 0 10px var(--accent-glow)'
-                                                                        }}>{t.heat_alpha}</span>
-                                                                    )}
-                                                                </div>
-                                                                <div style={{ fontSize: '0.7rem', opacity: 0.6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                                        {Array.isArray(opp.reason) ? opp.reason.map(r => {
-                                                                            if (typeof r === 'string') return r;
-                                                                            let txt = t[r.key] || r.key;
-                                                                            if (r.params) Object.entries(r.params).forEach(([k, v]) => txt = txt.replace(`{${k}}`, v));
-                                                                            return txt;
-                                                                        }).join(' • ') : opp.reason}
-                                                                    </div>
-
-                                                                    {/* Bot vs Site Comparison */}
-                                                                    {opp.oddsInfo && (
-                                                                        <div style={{
-                                                                            display: 'flex',
-                                                                            gap: '0.8rem',
-                                                                            alignItems: 'center',
-                                                                            background: 'rgba(255,255,255,0.05)',
-                                                                            padding: '0.2rem 0.6rem',
-                                                                            borderRadius: '6px'
-                                                                        }}>
-                                                                            <div style={{ fontSize: '0.6rem' }}>
-                                                                                <span style={{ opacity: 0.5 }}>BOT:</span> <b style={{ color: 'var(--accent-color)' }}>%{Math.round(opp.oddsInfo.pSit * 100)}</b>
-                                                                            </div>
-                                                                            <div style={{ fontSize: '0.6rem' }}>
-                                                                                <span style={{ opacity: 0.5 }}>SITE:</span> <b style={{ color: '#fff' }}>%{Math.round(opp.oddsInfo.pMkt * 100)}</b>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Consensus Preview - Show if available */}
-                                                                {match.consensusReport?.totalSources > 0 && (
-                                                                    <div style={{
-                                                                        marginTop: '0.8rem',
-                                                                        padding: '0.6rem 0.8rem',
-                                                                        background: 'rgba(56, 189, 248, 0.08)',
-                                                                        borderRadius: '10px',
-                                                                        border: '1px solid rgba(56, 189, 248, 0.15)'
-                                                                    }}>
-                                                                        <div style={{
-                                                                            fontSize: '0.6rem',
-                                                                            fontWeight: 800,
-                                                                            color: 'var(--accent-color)',
-                                                                            marginBottom: '0.5rem',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'space-between'
-                                                                        }}>
-                                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                                                🎯 {lang === 'tr' ? 'RADAR TAHMİNLERİ' : 'RADAR PREDICTIONS'}
-                                                                            </span>
-                                                                            <span style={{ opacity: 0.5, fontWeight: 600 }}>
-                                                                                {match.consensusReport.totalSources} {lang === 'tr' ? 'kaynak' : 'sources'}
-                                                                            </span>
-                                                                        </div>
-
-                                                                        {/* Source List with Predictions */}
-                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.5rem' }}>
-                                                                            {(match.consensusReport.signals || [])
-                                                                                .filter(signal => signal.prediction && signal.prediction !== 'N/A')
-                                                                                .slice(0, 4).map((signal, idx) => {
-                                                                                    const sourceName = RADAR_SOURCES.find(rs => rs.id === signal.site)?.label || signal.site;
-                                                                                    return (
-                                                                                        <div key={idx} style={{
-                                                                                            display: 'flex',
-                                                                                            alignItems: 'center',
-                                                                                            justifyContent: 'space-between',
-                                                                                            fontSize: '0.6rem',
-                                                                                            padding: '0.25rem 0.4rem',
-                                                                                            background: 'rgba(255,255,255,0.03)',
-                                                                                            borderRadius: '4px'
-                                                                                        }}>
-                                                                                            <span style={{ opacity: 0.7, fontWeight: 600 }}>{sourceName}</span>
-                                                                                            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                                                                                                {signal.prediction && (
-                                                                                                    <span style={{
-                                                                                                        fontWeight: 800,
-                                                                                                        color: signal.prediction === '1' ? '#10b981' :
-                                                                                                            signal.prediction === '2' ? '#ef4444' : '#fbbf24',
-                                                                                                        background: signal.prediction === '1' ? 'rgba(16, 185, 129, 0.15)' :
-                                                                                                            signal.prediction === '2' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(251, 191, 36, 0.15)',
-                                                                                                        padding: '0.1rem 0.35rem',
-                                                                                                        borderRadius: '4px'
-                                                                                                    }}>
-                                                                                                        {signal.prediction}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                                {signal.score_prediction && (
-                                                                                                    <span style={{
-                                                                                                        fontWeight: 700,
-                                                                                                        color: '#fbbf24',
-                                                                                                        fontSize: '0.55rem'
-                                                                                                    }}>
-                                                                                                        📊 {signal.score_prediction}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                                {signal.btts && (
-                                                                                                    <span style={{
-                                                                                                        fontWeight: 600,
-                                                                                                        color: signal.btts === 'Yes' ? '#10b981' : '#94a3b8',
-                                                                                                        fontSize: '0.5rem'
-                                                                                                    }}>
-                                                                                                        KG:{signal.btts === 'Yes' ? '✓' : '✗'}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                                {signal.over_under && (
-                                                                                                    <span style={{
-                                                                                                        fontWeight: 600,
-                                                                                                        color: '#38bdf8',
-                                                                                                        fontSize: '0.5rem'
-                                                                                                    }}>
-                                                                                                        {signal.over_under}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                })}
-                                                                            {(match.consensusReport.signals || []).filter(s => s.prediction && s.prediction !== 'N/A').length > 4 && (
-                                                                                <div style={{ fontSize: '0.5rem', opacity: 0.4, textAlign: 'center' }}>
-                                                                                    +{match.consensusReport.signals.filter(s => s.prediction && s.prediction !== 'N/A').length - 4} {lang === 'tr' ? 'daha' : 'more'}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-
-                                                                        {/* Consensus Summary */}
-                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                                                                            {Object.entries(match.consensusReport.agreement || {}).map(([pred, count]) => {
-                                                                                const isMainPred = count >= 2;
-                                                                                // Make double chance predictions more readable
-                                                                                const displayPred = pred === '12' ? '1/2' :
-                                                                                    pred === '1X' ? '1/X' :
-                                                                                        pred === 'X2' ? 'X/2' : pred;
-                                                                                return (
-                                                                                    <span key={pred} style={{
-                                                                                        fontSize: '0.6rem',
-                                                                                        fontWeight: isMainPred ? 800 : 600,
-                                                                                        padding: '0.15rem 0.4rem',
-                                                                                        borderRadius: '4px',
-                                                                                        background: isMainPred ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
-                                                                                        color: isMainPred ? '#10b981' : 'rgba(255,255,255,0.6)',
-                                                                                        border: isMainPred ? '1px solid rgba(16, 185, 129, 0.4)' : 'none'
-                                                                                    }}>
-                                                                                        {displayPred}: {count}
-                                                                                    </span>
-                                                                                );
-                                                                            })}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <div style={{ textAlign: 'right' }}>
-                                                                <div style={{
-                                                                    fontSize: '1.8rem',
-                                                                    fontWeight: 900,
-                                                                    color: heatStyle.text
-                                                                }}>
-                                                                    {opp.score}
-                                                                </div>
-                                                                <div style={{ fontSize: '0.6rem', opacity: 0.5, textTransform: 'uppercase' }}>
-                                                                    {opp.heatLevel}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                    {/* SECTION 1: READY OPPORTUNITIES */}
+                                    <div style={{ marginBottom: '2.5rem' }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.6rem',
+                                            marginBottom: '1rem',
+                                            padding: '0.4rem 0.8rem',
+                                            background: 'rgba(16, 185, 129, 0.1)',
+                                            borderRadius: '8px',
+                                            width: 'fit-content',
+                                            border: '1px solid rgba(16, 185, 129, 0.2)'
+                                        }}>
+                                            <span style={{ fontSize: '0.8rem' }}>🟢</span>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#10b981', letterSpacing: '0.5px' }}>
+                                                {lang === 'tr' ? 'CANLI ANALİZ HAZIR' : 'LIVE ANALYSIS READY'}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>
-                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📡</div>
-                                            {t.no_opportunities || 'Şu an aktif fırsat bulunmuyor...'}
+
+                                        {topReady.length > 0 ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                                {topReady.map((opp, idx) => renderOppCard(opp, idx, false))}
+                                            </div>
+                                        ) : (
+                                            <div style={{
+                                                padding: '2rem',
+                                                textAlign: 'center',
+                                                background: 'rgba(255,255,255,0.02)',
+                                                borderRadius: '16px',
+                                                fontSize: '0.85rem',
+                                                opacity: 0.5
+                                            }}>
+                                                {lang === 'tr' ? 'Şu an tam analiz bekleyen canlı maç bulunmuyor.' : 'No live matches ready for full analysis yet.'}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION 2: PENDING STATS */}
+                                    {topPending.length > 0 && !hidePendingOpportunities && (
+                                        <div>
+                                            <div style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.6rem',
+                                                marginBottom: '1rem',
+                                                padding: '0.4rem 0.8rem',
+                                                background: 'rgba(148, 163, 184, 0.1)',
+                                                borderRadius: '8px',
+                                                width: 'fit-content',
+                                                border: '1px solid rgba(148, 163, 184, 0.2)'
+                                            }}>
+                                                <span style={{ fontSize: '0.8rem' }}>⏳</span>
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#94a3b8', letterSpacing: '0.5px' }}>
+                                                    {lang === 'tr' ? 'CANLI VERİ BEKLENİYOR (RADAR AKTİF)' : 'WAITING FOR LIVE DATA (RADAR ACTIVE)'}
+                                                </span>
+                                            </div>
+
+                                            <div style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                                                gap: '0.8rem',
+                                                maxHeight: liveOpportunitiesLimit === 'ALL' ? '600px' : 'none',
+                                                overflowY: liveOpportunitiesLimit === 'ALL' ? 'auto' : 'visible',
+                                                paddingRight: liveOpportunitiesLimit === 'ALL' ? '0.5rem' : '0'
+                                            }}>
+                                                {topPending.map((opp, idx) => renderOppCard(opp, idx, true))}
+                                            </div>
+
+                                            <div style={{
+                                                marginTop: '1.5rem',
+                                                fontSize: '0.65rem',
+                                                opacity: 0.4,
+                                                textAlign: 'center',
+                                                fontStyle: 'italic',
+                                                padding: '0.8rem',
+                                                borderTop: '1px solid rgba(255,255,255,0.03)'
+                                            }}>
+                                                * {lang === 'tr' ? 'Bu maçlar için yeterli istatistik toplandığında otomatik olarak yukarıdaki analiz bölümüne taşınacaktır.' : 'These matches will automatically move to the analysis section once enough live stats are collected.'}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -2986,13 +2997,21 @@ export const Dashboard = ({ user, userProfile, onLogout, lang, setLang, settings
                                     onClick={() => {
                                         // Record prediction when user accepts
                                         const match = matches.find(m => m.id === showAlertPopup.matchId);
+                                        // Parse score string to object
+                                        let scoreObj = { home: 0, away: 0 };
+                                        if (typeof showAlertPopup.score === 'string' && showAlertPopup.score.includes('-')) {
+                                            const parts = showAlertPopup.score.split('-');
+                                            scoreObj = { home: parseInt(parts[0]) || 0, away: parseInt(parts[1]) || 0 };
+                                        } else if (typeof showAlertPopup.score === 'object') {
+                                            scoreObj = showAlertPopup.score;
+                                        }
                                         predictionTracker.recordPrediction({
                                             matchId: showAlertPopup.matchId,
                                             match: showAlertPopup.match,
                                             homeTeam: showAlertPopup.homeTeam,
                                             awayTeam: showAlertPopup.awayTeam,
                                             minute: showAlertPopup.minute,
-                                            score: showAlertPopup.score,
+                                            score: scoreObj,
                                             market: showAlertPopup.recommendation?.marketKey || showAlertPopup.recommendation?.market,
                                             prediction: showAlertPopup.recommendation?.marketKey || showAlertPopup.recommendation?.market,
                                             confidence: showAlertPopup.recommendation?.confidence,

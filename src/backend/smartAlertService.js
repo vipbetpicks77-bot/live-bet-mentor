@@ -81,6 +81,18 @@ class SmartAlertService {
         }
 
         // 4. Good Timing Check (sweet spot: 55-80 minutes)
+        // Also block alerts for 85+ minutes - match is essentially over
+        if (minute >= 85) {
+            // Match too late - don't generate any alerts
+            return {
+                conditions,
+                metCount: 0,
+                score: 0,
+                shouldAlert: false,
+                alertLevel: 'NORMAL',
+                blockedReason: 'TOO_LATE'
+            };
+        }
         if (minute >= 55 && minute <= 80) {
             conditions.goodTiming = true;
         }

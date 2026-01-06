@@ -12,22 +12,47 @@ export const sofaScoreAdapter = {
      */
     async fetchScheduledEvents() {
         try {
-            // Fetch from Firebase
-            const snapshot = await get(ref(database, 'live_events'));
-            if (!snapshot.exists()) return [];
+            // Detect environment: localhost = use proxy, production = use Firebase
+            const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-            const data = snapshot.val();
+            if (isLocalDev) {
+                // LOCAL DEVELOPMENT: Use local proxy (faster, no Firebase quota)
+                const proxyUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001') + '/api/sofascore/live';
+                const response = await fetch(proxyUrl);
 
-            // The JSON from the scraper is already the events list
-            if (data && data.events) {
-                const normalized = data.events
-                    .map(event => this.normalizeEvent(event))
-                    .filter(event => event !== null);
+                if (!response.ok) {
+                    console.warn('[SOFASCORE_ADAPTER] Proxy returned:', response.status);
+                    return [];
+                }
 
-                console.log(`[SOFASCORE_ADAPTER] Found ${data.events.length} total, ${normalized.length} active football matches`);
-                return normalized;
+                const data = await response.json();
+
+                if (data && data.events) {
+                    const normalized = data.events
+                        .map(event => this.normalizeEvent(event))
+                        .filter(event => event !== null);
+
+                    console.log(`[SOFASCORE_ADAPTER] LOCAL: Found ${data.events.length} total, ${normalized.length} active football matches`);
+                    return normalized;
+                }
+                return [];
+            } else {
+                // PRODUCTION: Use Firebase (internet access required)
+                const snapshot = await get(ref(database, 'live_events'));
+                if (!snapshot.exists()) return [];
+
+                const data = snapshot.val();
+
+                if (data && data.events) {
+                    const normalized = data.events
+                        .map(event => this.normalizeEvent(event))
+                        .filter(event => event !== null);
+
+                    console.log(`[SOFASCORE_ADAPTER] FIREBASE: Found ${data.events.length} total, ${normalized.length} active football matches`);
+                    return normalized;
+                }
+                return [];
             }
-            return [];
         } catch (error) {
             console.error('[SOFASCORE_ADAPTER] Error fetching:', error);
             return [];
